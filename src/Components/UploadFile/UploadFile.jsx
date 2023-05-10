@@ -1,18 +1,17 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Papa from "papaparse";
 
 function UploadFile() {
   const [fileData, setFileData] = useState();
   const [gridRow, setGridRow] = useState();
   const [gridColumn, setGridColumn] = useState();
-  const inputRef = useRef();
 
   const changeHandler = (event) => {
     event.preventDefault()
     Papa.parse(event.target.files[0], {
         header: true,
         skipEmptyLines: true,
-        complete: function(results) {
+        complete: async function(results) {
             const tempRow = [];
             const tempCol = [];
 
@@ -22,12 +21,47 @@ function UploadFile() {
             })
 
             setFileData(results.data)
+            localStorage.setItem('csv-data', results.data);
             setGridColumn(tempCol);
             setGridRow(tempRow[0]);
-            console.log(tempCol.length)
+
+            // Send csv to backend
+            const formData = new FormData()
+            formData.append('file', event.target.files[0]);
+            try {
+                const response = await fetch('/api', {
+                    headers: {
+                        "Content-Type": "multipart/form-data"
+                    },
+                    method: "POST",
+                    body: formData
+                })
+                const data = await response.json()
+                console.log(data)
+            } catch (error) {
+                console.error(error)
+            }
         }
     })
   }
+
+  // TODO: Save csv file localstorage
+//   useEffect(() => {
+//     const tempData = localStorage.getItem('csv-data');
+//     if(tempData) {
+//         const tempRow = [];
+//         const tempCol = [];
+
+//         tempData.map(d => {
+//             tempRow.push(Object.keys(d));
+//             if(tempCol.length < 5) tempCol.push(Object.values(d));
+//         })
+
+//         setGridColumn(tempCol);
+//         setGridRow(tempRow[0]);  
+//         setFileData(tempData)      
+//     }
+//   }, [])
 
   return (
     <div className='bg-[rgba(0,0,0,0.25)] text-[10px] p-4 rounded-sm text-white'>
@@ -44,7 +78,7 @@ function UploadFile() {
         </> : 
         <>
             <p className='font-medium text-[10px] mb-1'>File uploaded successfully.</p>
-            <div className='p-2 border w-60 h-36 overflow-scroll '>
+            <div className='p-2 border w-60 h-40 overflow-x-scroll overflow-y-hidden custom-scroll'>
                 <table className='w-full text-[8px] text-left text-gray-500'>
                     <thead className='text-xs text-white0 uppercase bg-gray-50'>
                         <tr>
@@ -55,11 +89,9 @@ function UploadFile() {
                     </thead>
                     <tbody>
                         {gridColumn.map((cols, index) => {
-                            console.log(cols);
-                            return;
                             return <tr className='bg-white border-b' key={index}>
                                 {cols.map((col, ind) => {
-                                    <td className='px-2 py-1' key={ind}>{col}</td>
+                                    return <td className='px-2 py-1' key={ind}>{col}</td>
                                 })}
                             </tr>
                         })}

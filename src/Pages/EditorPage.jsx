@@ -4,14 +4,16 @@ import 'reactflow/dist/style.css';
 import Sidebar from '../Components/Sidebar/Sidebar';
 import UploadFile from '../Components/UploadFile/UploadFile';
 
-const initialNodes = [];
-
 const nodeTypes = {
   upload: UploadFile
 }
 
 let id = 0;
 const getId = () => `dndnode_${id++}`;
+
+const initialNodes = [
+  {id: getId(), type: 'upload', position: {x : 0, y : 0}}
+];
 
 function EditorPage() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);

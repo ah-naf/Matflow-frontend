@@ -2,8 +2,13 @@ import { useCallback, useRef, useState } from 'react';
 import ReactFlow, { Controls, Background, useNodesState, ReactFlowProvider, useEdgesState, addEdge } from 'reactflow';
 import 'reactflow/dist/style.css';
 import Sidebar from '../Components/Sidebar/Sidebar';
+import UploadFile from '../Components/UploadFile/UploadFile';
 
 const initialNodes = [];
+
+const nodeTypes = {
+  upload: UploadFile
+}
 
 let id = 0;
 const getId = () => `dndnode_${id++}`;
@@ -40,8 +45,7 @@ function EditorPage() {
       const newNode = {
         id: getId(),
         type,
-        position,
-        data: { label: `${type} node` },
+        position
       };
 
       setNodes((nds) => nds.concat(newNode));
@@ -63,6 +67,7 @@ function EditorPage() {
             onInit={setReactFlowInstance}
             onDrop={onDrop}
             onDragOver={onDragOver}
+            nodeTypes={nodeTypes}
             fitView
           >
             <Controls />

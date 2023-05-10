@@ -3,7 +3,7 @@ import EditorPage from "./Pages/EditorPage"
 
 function App() {
   return (
-    <div className="bg-gray-600">
+    <div className="bg-p1">
       <EditorPage />
     </div>
   )

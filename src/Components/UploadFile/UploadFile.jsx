@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Papa from "papaparse";
+import { Handle, Position } from 'reactflow';
 
 function UploadFile() {
   const [fileData, setFileData] = useState();
@@ -65,6 +66,7 @@ function UploadFile() {
 
   return (
     <div className='bg-[rgba(0,0,0,0.25)] text-[10px] p-4 rounded-sm text-white'>
+        <Handle type='source' position={Position.Right}></Handle>
         {fileData === undefined ? 
         <>
             <h3 className='mb-2'>Please upload a CSV file</h3>

@@ -1,11 +1,15 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import ReactFlow, { Controls, Background, useNodesState, ReactFlowProvider, useEdgesState, addEdge } from 'reactflow';
 import 'reactflow/dist/style.css';
 import Sidebar from '../Components/Sidebar/Sidebar';
 import UploadFile from '../Components/UploadFile/UploadFile';
+import ChartNode from '../Components/ChartNode/ChartNode';
+import { useDispatch, useSelector } from 'react-redux';
+import { removeImage } from '../Slices/ChartSlices';
 
 const nodeTypes = {
-  upload: UploadFile
+  upload: UploadFile,
+  chart: ChartNode
 }
 
 let id = 0;
@@ -20,8 +24,27 @@ function EditorPage() {
   const reactFlowWrapper = useRef(null);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
+  const charImages = useSelector(state => state.charts.charts)
+  const dispatch = useDispatch()
 
-  const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), []);
+  // useEffect(() => {
+
+  // }, [])
+
+  const onConnect = useCallback((params) => setEdges((eds) => {
+    let image = charImages.filter(c => c.id === params.source)[0]
+    if(image) {
+      image = image.imageUrl
+      let tempNode = nodes.filter(n => n.id === params.target)[0];
+      tempNode = {...tempNode, data: {imageUrl : image}}
+      console.log(tempNode)
+      const changedNode = nodes.filter(n => n.id !== params.target);
+      changedNode.push(tempNode);
+      setNodes(changedNode);
+    }
+    
+    return addEdge(params, eds);
+  }), [charImages, nodes]);
 
   const onDragOver = useCallback((event) => {
     event.preventDefault();
@@ -55,6 +78,11 @@ function EditorPage() {
     [reactFlowInstance]
   );
 
+  const onNodesDelete = (e) => {
+    // console.log(e[0].id)
+    dispatch(removeImage(e[0].id))
+  }
+
   return (
     <div className=" flex flex-col md:flex-row flex-1 h-screen">
       <ReactFlowProvider>
@@ -71,6 +99,7 @@ function EditorPage() {
             onDragOver={onDragOver}
             nodeTypes={nodeTypes}
             fitView
+            onNodesDelete={onNodesDelete}
           >
             <Controls />
           </ReactFlow>

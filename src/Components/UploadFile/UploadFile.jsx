@@ -1,14 +1,20 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Papa from "papaparse";
 import { Handle, Position } from 'reactflow';
+import { useDispatch } from 'react-redux';
+import { addImage } from '../../Slices/ChartSlices';
 
-function UploadFile() {
+function UploadFile({id}) {
   const [fileData, setFileData] = useState();
   const [gridRow, setGridRow] = useState();
   const [gridColumn, setGridColumn] = useState();
+  const [imageUrl, setImageUrl] = useState();
+
+  const dispatch = useDispatch()
 
   const changeHandler = (event) => {
     event.preventDefault()
+    // console.log(props)
     Papa.parse(event.target.files[0], {
         header: true,
         skipEmptyLines: true,
@@ -30,15 +36,18 @@ function UploadFile() {
             const formData = new FormData()
             formData.append('file', event.target.files[0]);
             try {
-                const response = await fetch('/api', {
-                    headers: {
-                        "Content-Type": "multipart/form-data"
-                    },
+                const response = await fetch('http://localhost:8000/api/', {
                     method: "POST",
                     body: formData
                 })
-                const data = await response.json()
-                console.log(data)
+                
+                const imageBlob = await response.blob();
+                // console.log(imageBlob)
+                const imageUrl = URL.createObjectURL(imageBlob);
+
+                // Update state with image URL
+                setImageUrl(imageUrl);
+                dispatch(addImage({id, imageUrl}))
             } catch (error) {
                 console.error(error)
             }
@@ -102,6 +111,7 @@ function UploadFile() {
             </div>
             
             <p className='text-[8px] font-light mt-1'>Showing first 5 results</p>
+            {/* <img src={imageUrl} alt="" /> */}
         </>}
     </div>
   )

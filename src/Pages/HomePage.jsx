@@ -7,7 +7,7 @@ function HomePage() {
     <div className="">
       {/* First Section */}
       <div className="flex flex-col md:flex-row lg:max-w-[1400px] mx-auto gap-12 pt-4 md:pt-14 px-8">
-        <div className="flex order-2 md:order-1 flex-col align-middle justify-center">
+        <div className="flex order-2 md:order-1 flex-col w-1/2 justify-center">
           <h1 className="font-bold text-3xl lg:text-4xl mb-10">
             Machine Learning and Data Analytic with{" "}
             <span className="text-primary-btn underline">
@@ -15,9 +15,10 @@ function HomePage() {
             </span>
           </h1>
           <p className="text-md lg:text-lg">
-            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ea
-            officiis iure porro rerum itaque nobis sunt laudantium quo sapiente
-            impedit.
+            Matflow, the ultimate destination for machine learning and data
+            analytics. Explore cutting-edge techniques, discover powerful tools,
+            and stay up-to-date with the latest advancements in the field.
+            Unleash the full potential of your data with Matflow.
           </p>
           <div className="mt-10 flex gap-8">
             <button className="cursor-pointer bg-primary-btn px-6 py-4 rounded-md hover:translate-x-0 hover:translate-y-[-3px] hover:shadow-accent hover:shadow-[0px_20px_80px_-10px] duration-150 font-medium">
@@ -28,7 +29,7 @@ function HomePage() {
             </button>
           </div>
         </div>
-        <div className="order-1 md:order-2">
+        <div className="order-1 md:order-2 w-1/2">
           <img
             src="/iso-ai.jpg"
             alt=""
@@ -49,23 +50,33 @@ function HomePage() {
           </p>
         </div>
         <div className="flex align-middle justify-around mt-6 flex-wrap">
-          <div className="flex border border-gray-300 shadow-md py-2 mt-4 px-4 items-center gap-4 rounded">
+          <div className="border border-gray-300 shadow-md py-4 mt-4 px-4 flex flex-col items-center rounded gap-3">
             <div>
-              <img src="/2.png" alt="" className="w-28 h-full max-h-28" />
+              <img src="/field-of-view.png" alt="" className="w-28 h-full max-h-28" />
             </div>
             <h3 className="font-medium text-text text-xl">Model & Visualize</h3>
+            <p className="max-w-xs font-light">Harness the power of machine learning algorithms to build accurate models, and visualize your data like never before. Uncover insights and make informed decisions with Matflow.</p>
           </div>
-          <div className="flex border border-gray-300 shadow-md py-2 mt-4 px-4 items-center gap-4 rounded">
+          <div className="flex flex-col border border-gray-300 shadow-md py-4 mt-4 px-4 items-center rounded gap-3">
             <div>
-              <img src="/1.png" alt="" className="w-28 h-full max-h-28" />
+              <img src="/translator.png" alt="" className="w-28 h-full max-h-28" />
             </div>
             <h3 className="font-medium text-text text-xl">Blend & Transform</h3>
+            <p className="max-w-xs font-light">Unlock the power of data manipulation and transformation. Seamlessly blend datasets, apply powerful transformations, and extract valuable insights to enhance your machine learning and data analysis workflows.</p>
           </div>
-          <div className="flex border border-gray-300 shadow-md py-2 mt-4 px-4 items-center gap-4 rounded">
+          <div className="flex flex-col border border-gray-300 shadow-md py-4 mt-4 px-4 items-center rounded gap-3">
             <div>
-              <img src="/3.png" alt="" className="w-28 h-full max-h-28" />
+              <img src="/analysis.png" alt="" className="w-28 h-full max-h-28" />
             </div>
-            <h3 className="font-medium text-text text-xl">Deploy & Monitor</h3>
+            <h3 className="font-medium text-text text-xl">Predicative Analysis</h3>
+            <p className="max-w-xs font-light">Dive into the world of advanced analytics and forecasting. Harness the power of data-driven insights to make accurate predictions and drive informed decision-making.</p>
+          </div>
+          <div className="flex flex-col border border-gray-300 shadow-md py-4 mt-4 px-4 items-center rounded gap-3">
+            <div>
+              <img src="/presentation.png" alt="" className="w-28 h-full max-h-28" />
+            </div>
+            <h3 className="font-medium text-text text-xl">Time Series Forecasting</h3>
+            <p className="max-w-xs font-light">Dive into the world of time series forecasting on Matflow. Unlock insights from temporal data, leverage advanced algorithms, and make accurate predictions for future trends and patterns. Master the art of forecasting with Matflow.</p>
           </div>
         </div>
       </div>
@@ -107,6 +118,14 @@ function HomePage() {
           </div>
         </div>
       </div>
+
+      {/* Fifth Section */}
+      {/* <div>
+        <h1>Technologies We Used</h1>
+        <div>
+          <img src="/jupyter.png" alt="" />
+        </div>
+      </div> */}
     </div>
   );
 }

@@ -14,6 +14,10 @@ export default {
         "secondary-btn": "#f2f2f2",
         accent: "#7fdcbd",
       },
+      fontFamily: {
+        titillium: ["Titillium Web", "sans-serif"],
+        roboto: ["Roboto", "sans-serif"]
+      },
     },
   },
   plugins: [require("tailwind-scrollbar-hide")],

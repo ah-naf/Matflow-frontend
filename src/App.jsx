@@ -1,10 +1,4 @@
-import {
-  BrowserRouter,
-  Route,
-  RouterProvider,
-  Routes,
-  createBrowserRouter,
-} from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import EditorPage from "./Pages/EditorPage";
 import HomePage from "./Pages/HomePage";
 import Navbar from "./Components/Navbar/Navbar";

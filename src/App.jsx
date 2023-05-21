@@ -3,20 +3,21 @@ import EditorPage from "./Pages/EditorPage";
 import HomePage from "./Pages/HomePage";
 import Navbar from "./Components/Navbar/Navbar";
 import Login from "./Pages/Login";
+import Dashboard from "./Pages/Dashboard";
+import Layout from "./Layout";
 // import DnDFlow from "./Page/EditorPage"
 
 function App() {
   return (
     <>
-      <BrowserRouter>
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<HomePage />}></Route>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<HomePage />} />
           <Route path="/login" element={<Login />}></Route>
-          <Route path="/editor" element={<EditorPage />}></Route>
-        </Routes>
-      </BrowserRouter>
-      {/* <RouterProvider router={router} /> */}
+          {/* <Route path="/editor" element={<EditorPage />}></Route> */}
+        </Route>
+        <Route path="/dashboard" element={<Dashboard />} />
+      </Routes>
     </>
   );
 }

@@ -16,7 +16,7 @@ export default {
       },
       fontFamily: {
         titillium: ["Titillium Web", "sans-serif"],
-        roboto: ["Roboto", "sans-serif"]
+        roboto: ["Roboto", "sans-serif"],
       },
     },
   },

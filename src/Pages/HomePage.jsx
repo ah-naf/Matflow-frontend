@@ -30,7 +30,7 @@ function HomePage() {
           </p>
           <div className="mt-10 flex gap-8">
             <button className="cursor-pointer bg-primary-btn px-6 py-4 rounded-md hover:translate-x-0 hover:translate-y-[-3px] hover:shadow-accent hover:shadow-[0px_20px_80px_-10px] duration-150 font-medium">
-              <Link to={"/editor"}>Get Started</Link>
+              <Link to={"/dashboard"} className="text-black">Get Started</Link>
             </button>
             <button className="cursor-pointer bg-secondary-btn px-6 py-4 rounded-md hover:translate-x-0 font-medium hover:translate-y-[-3px] shadow-sm duration-150">
               Request A Demo
@@ -206,25 +206,25 @@ function HomePage() {
           </div>
           <div className="flex flex-col">
             <h3 className="font-medium mb-2">PRODUCT</h3>
-            <Link className="font-light hover:underline">AI Platform</Link>
-            <Link className="font-light hover:underline">Use Case Library</Link>
-            <Link className="font-light hover:underline">Customer Stories</Link>
+            <Link className="text-white font-light hover:underline">AI Platform</Link>
+            <Link className="text-white font-light hover:underline">Use Case Library</Link>
+            <Link className="text-white font-light hover:underline">Customer Stories</Link>
           </div>
           <div className="flex flex-col">
             <h3 className="font-medium mb-2">SUPPORT</h3>
-            <Link className="font-light hover:underline">Documentation</Link>
-            <Link className="font-light hover:underline">Community</Link>
-            <Link className="font-light hover:underline">Support Hub</Link>
-            <Link className="font-light hover:underline">Contact Us</Link>
-            <Link className="font-light hover:underline">Login</Link>
+            <Link className="text-white font-light hover:underline">Documentation</Link>
+            <Link className="text-white font-light hover:underline">Community</Link>
+            <Link className="text-white font-light hover:underline">Support Hub</Link>
+            <Link className="text-white font-light hover:underline">Contact Us</Link>
+            <Link className="text-white font-light hover:underline">Login</Link>
           </div>
           <div className="flex flex-col">
             <h3 className="font-medium mb-2">RESOURCES</h3>
-            <Link className="font-light hover:underline">
+            <Link className="text-white font-light hover:underline">
               Resources Library
             </Link>
-            <Link className="font-light hover:underline">Blog</Link>
-            <Link className="font-light hover:underline">Events</Link>
+            <Link className="text-white font-light hover:underline">Blog</Link>
+            <Link className="text-white font-light hover:underline">Events</Link>
           </div>
         </div>
       </footer>

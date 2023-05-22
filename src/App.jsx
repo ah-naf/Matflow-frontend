@@ -5,6 +5,7 @@ import Navbar from "./Components/Navbar/Navbar";
 import Login from "./Pages/Login";
 import Dashboard from "./Pages/Dashboard";
 import Layout from "./Layout";
+import TempPage from "./TempPage";
 // import DnDFlow from "./Page/EditorPage"
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
           {/* <Route path="/editor" element={<EditorPage />}></Route> */}
         </Route>
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/temp" element={<TempPage />}></Route>
       </Routes>
     </>
   );

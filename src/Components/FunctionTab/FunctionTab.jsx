@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { BsFillPlayFill } from "react-icons/bs";
 import { AiFillCloseCircle, AiOutlineLineChart } from "react-icons/ai";
 import { HiOutlineDocumentReport, HiOutlinePuzzle } from "react-icons/hi";
-import { RxGear } from "react-icons/rx";
+import { RxGear, RxRocket } from "react-icons/rx";
 import { MdOutlineDataset } from "react-icons/md";
 import { RiFlowChart } from "react-icons/ri";
 import { TbBrain } from "react-icons/tb";
@@ -17,17 +17,18 @@ const functionsName = [
   { name: "Final Dataset", icon: <HiOutlineDocumentReport size={"25"} /> },
   { name: "Pipeline", icon: <RiFlowChart size={"25"} /> },
   { name: "Model Building", icon: <TbBrain size={"25"} /> },
-  { name: "Model Deployment", icon: <GrDeploy size={"25"} /> },
+  { name: "Model Deployment", icon: <RxRocket size={"25"} /> },
   { name: "Time Series Analysis", icon: <AiOutlineLineChart size={"25"} /> },
   { name: "ReverseML", icon: <HiOutlinePuzzle size={"25"} /> },
 ];
 
 function FunctionTab() {
   const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
-  const [activeFunction, setActiveFunction] = useState("");
+  const [activeFunction, setActiveFunction] = useState("Dataset");
+  
 
   return (
-    <div className="px-1 mt-4">
+    <div className="px-2 mt-4">
       {activeCsvFile ? (
         functionsName.map((item, ind) => {
           return (
@@ -37,7 +38,7 @@ function FunctionTab() {
               onClick={() => setActiveFunction(item.name)}
             >
               <div
-                className={`flex cursor-pointer items-center py-2 px-4 gap-3 rounded hover:text-primary-btn ${item.name === activeFunction ? 'text-primary-btn font-bold border-2 border-gray-300 rounded-full' : ''}`}
+                className={`flex cursor-pointer items-center py-2 px-4 gap-3 rounded hover:text-gray-50 ${item.name === activeFunction ? 'text-gray-50 font-bold bg-[#287e5a] rounded-md' : 'text-gray-300 hover:bg-[#287e5a] '}`}
                 // onClick={() => handleFileSelect(item)}
               >
                 <p className="">{item.icon}</p>
@@ -47,7 +48,7 @@ function FunctionTab() {
           );
         })
       ) : (
-        <p className="mt-4 p-2 text-center tracking-wide font-bold text-lg">
+        <p className="mt-4 p-2 text-center text-white tracking-wide font-bold text-lg">
           Please select a file to view the functions.
         </p>
       )}

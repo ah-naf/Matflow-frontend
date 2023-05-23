@@ -4,14 +4,23 @@ import { RxQuestionMark } from "react-icons/rx";
 import { FiLogOut } from "react-icons/fi";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { Button, Popover, User } from "@nextui-org/react";
+import { useDispatch, useSelector } from "react-redux";
+import { setShowLeftSideBar } from "../../Slices/SideBarSlice";
 
 function DashBoardTop() {
+  const showLeftSideBar = useSelector((state) => state.sideBar.showLeftSideBar);
+  const dispatch = useDispatch();
+
   return (
-    <div className="flex px-4 py-2 shadow items-center justify-between">
+    <div className="flex px-4 py-2 shadow items-center justify-between bg-[#064f32] ">
       <div className="flex items-center gap-2 cursor-pointer">
-        <GiHamburgerMenu />
+        <GiHamburgerMenu
+          color="white"
+          className={`${showLeftSideBar ? "hidden" : "flex"}`}
+          onClick={() => dispatch(setShowLeftSideBar(true))}
+        />
         <Link
-          className="font-titillium font-bold tracking-widest cursor-pointer text-black"
+          className="font-titillium font-bold tracking-widest cursor-pointer text-white"
           to={"/"}
         >
           MATFLOW
@@ -19,15 +28,15 @@ function DashBoardTop() {
       </div>
       <div className="flex items-center gap-2">
         <RxQuestionMark
-          color="black"
-          size={"25px"}
+          color="white"
+          size={"22"}
           className="cursor-pointer"
         />
 
         <div>
           <Popover>
             <Popover.Trigger>
-              <User as="button" text="A" color="success" />
+              <User as="button" text="A"  />
             </Popover.Trigger>
             <Popover.Content css={{ px: "$4", py: "$2" }}>
               <UserCard />

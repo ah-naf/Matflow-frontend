@@ -19,6 +19,11 @@ function FileTab() {
     if (tempFiles) {
       setFiles(JSON.parse(tempFiles));
     }
+    const tempActiveFile = localStorage.getItem("activeFile");
+    if (tempActiveFile) {
+      dispatch(setActiveFile(JSON.parse(tempActiveFile)));
+      setFileActiveId(JSON.parse(tempActiveFile).name);
+    }
   }, []);
 
   const handleDrag = (e) => {
@@ -39,12 +44,18 @@ function FileTab() {
     const tempFiles = files.filter((item) => item.name != name);
     setFiles(tempFiles);
     localStorage.setItem("uploadedFiles", JSON.stringify(tempFiles));
+    if (name === fileActiveId) {
+      localStorage.removeItem("activeFile");
+      dispatch(setActiveFile(null));
+      setFileActiveId("");
+    }
   };
 
   const handleFileSelect = (name) => {
     setFileActiveId(name);
     const active = files.filter((item) => item.name === name)[0];
     dispatch(setActiveFile(active));
+    localStorage.setItem("activeFile", JSON.stringify(active));
   };
 
   const handleFileUpload = () => {
@@ -78,26 +89,26 @@ function FileTab() {
             return (
               <div key={ind}>
                 <div
-                  className={`flex cursor-pointer items-center group justify-between mt-2 px-2 py-3 rounded ${
+                  className={`flex cursor-pointer  items-center group justify-between mt-2 px-2 py-3 rounded ${
                     fileActiveId === item.name
-                      ? "bg-primary-btn text-white"
-                      : "bg-white"
+                      ? "bg-[#287e5a] text-gray-100"
+                      : "text-gray-300 hover:bg-[#276a4e] hover:text-gray-100"
                   }`}
-                  onClick={() => handleFileSelect(item.name)}
                 >
                   <p
-                    className={`flex tracking-wide gap-1 items-center ${
+                    className={`flex w-full tracking-wide gap-1 items-center ${
                       fileActiveId === item.name ? "font-bold" : ""
                     }`}
+                    onClick={() => handleFileSelect(item.name)}
                   >
                     {" "}
                     <span>
                       {fileActiveId === item.name && <BsFillPlayFill />}
                     </span>{" "}
-                    {item.name}
+                    <span className="w-full">{item.name}</span>
                   </p>
                   <button
-                    className="hidden group-hover:flex"
+                    className="hidden group-hover:flex z-[9999] "
                     onClick={() => handleDelete(item.name)}
                   >
                     <AiFillCloseCircle />
@@ -107,13 +118,13 @@ function FileTab() {
             );
           })
         ) : (
-          <p className="text-center mt-4 font-bold tracking-wide">
+          <p className="text-center mt-4 font-bold text-white tracking-wide">
             Please upload a file
           </p>
         )}
       </div>
       <div
-        className="p-2 pt-4 rounded text-end "
+        className="p-2 pt-4 rounded text-end border-t border-gray-400"
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
         onDragOver={handleDrag}
@@ -126,7 +137,7 @@ function FileTab() {
           onDragOver={handleDrag}
           onDrop={handleDrop}
           onSubmit={(e) => e.preventDefault()}
-          className="bg-[#f8fafc] rounded py-2 border-[#cbd5e1] text-center border-2 border-dashed"
+          className="bg-emerald-600 rounded py-2 text-gray-300 border-[#cbd5e1] text-center border-2 border-dashed"
         >
           <label htmlFor="input-file-upload" className="">
             <p className="text-sm">Drag and drop your file or</p>
@@ -135,7 +146,7 @@ function FileTab() {
             </p>
 
             {uploadedFile ? (
-              <p className="font-bold tracking-wide text-md">
+              <p className="font-bold text-gray-100 tracking-wide text-md">
                 {uploadedFile.name}
               </p>
             ) : (
@@ -151,7 +162,7 @@ function FileTab() {
           />
         </form>
         <button
-          className="mt-2 outline-none bg-primary-btn text-white text-sm font-medium px-4 py-2 rounded text"
+          className="mt-2 outline-none bg-primary-btn text-slate-100 text-sm font-medium px-4 py-2 rounded text"
           onClick={handleFileUpload}
         >
           Upload

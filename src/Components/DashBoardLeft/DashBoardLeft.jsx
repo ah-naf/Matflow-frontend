@@ -2,34 +2,44 @@ import React, { useState } from "react";
 import { AiOutlineDoubleLeft } from "react-icons/ai";
 import FileTab from "../FileTab/FileTab";
 import FunctionTab from "../FunctionTab/FunctionTab";
+import { useDispatch, useSelector } from "react-redux";
+import { setShowLeftSideBar } from "../../Slices/SideBarSlice";
 
 function DashBoardLeft() {
+  const showLeftSideBar = useSelector((state) => state.sideBar.showLeftSideBar);
   const [currentTab, setCurrentTab] = useState("file");
+  const dispatch = useDispatch()
 
   return (
-    <div className="w-full h-full flex flex-col">
-      <div className="flex justify-end p-2">
-        <AiOutlineDoubleLeft size={"20"} className=" cursor-pointer" />
+    <div
+      className={`bg-[#06603b] w-64 h-full relative ${
+        showLeftSideBar ? "flex" : "hidden"
+      }`}
+    >
+      <div className="w-full h-full flex flex-col">
+        <div className="absolute right-0 translate-x-1/2 top-1/2 -translate-y-1/2 bg-emerald-100 shadow-md rounded-full justify-end p-2" onClick={() => dispatch(setShowLeftSideBar(false))}>
+          <AiOutlineDoubleLeft size={"20"} className=" cursor-pointer text-black" />
+        </div>
+        <div className="flex font-roboto gap-2 border-b text-gray-300 border-[rgba(255,255,255,0.5)] shadow-sm">
+          <button
+            className={`py-3 w-full ${
+              currentTab === "file" ? "text-[whitesmoke] font-bold" : ""
+            } border-b border-transparent  outline-none hover:text-white hover:border-white`}
+            onClick={() => setCurrentTab("file")}
+          >
+            File
+          </button>
+          <button
+            className={`py-3 w-full ${
+              currentTab === "functions" ? "text-[whitesmoke] font-bold" : ""
+            } border-b border-transparent  outline-none hover:text-white hover:border-white`}
+            onClick={() => setCurrentTab("functions")}
+          >
+            Functions
+          </button>
+        </div>
+        {currentTab === "file" ? <FileTab /> : <FunctionTab />}
       </div>
-      <div className="flex mt-2 font-roboto gap-2 border-b border-[rgba(0,0,0,0.15)] shadow-sm">
-        <button
-          className={`py-3 w-full ${
-            currentTab === "file" ? "text-primary-btn font-bold" : ""
-          } border-b border-transparent  outline-none hover:text-primary-btn hover:border-primary-btn`}
-          onClick={() => setCurrentTab("file")}
-        >
-          File
-        </button>
-        <button
-          className={`py-3 w-full ${
-            currentTab === "functions" ? "text-primary-btn font-bold" : ""
-          } border-b border-transparent  outline-none hover:text-primary-btn hover:border-primary-btn`}
-          onClick={() => setCurrentTab("functions")}
-        >
-          Functions
-        </button>
-      </div>
-      {currentTab === "file" ? <FileTab /> : <FunctionTab />}
     </div>
   );
 }

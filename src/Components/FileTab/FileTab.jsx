@@ -3,6 +3,15 @@ import { BsFillPlayFill } from "react-icons/bs";
 import { AiFillCloseCircle } from "react-icons/ai";
 import { useDispatch } from "react-redux";
 import { setActiveFile } from "../../Slices/UploadedFileSlice";
+import {
+  deleteIndexedDB,
+  parseCsv,
+  storeDataInIndexedDB,
+} from "../../util/indexDB";
+import {
+  setActiveFunction,
+  setActiveSubFunction,
+} from "../../Slices/SideBarSlice";
 
 function FileTab() {
   const [files, setFiles] = useState([]);
@@ -24,23 +33,26 @@ function FileTab() {
       dispatch(setActiveFile(JSON.parse(tempActiveFile)));
       setFileActiveId(JSON.parse(tempActiveFile).name);
     }
-  }, []);
+  }, [dispatch]);
 
   const handleDrag = (e) => {
     e.preventDefault();
     e.stopPropagation();
   };
 
-  const handleDrop = (e) => {
+  const handleDrop = async (e) => {
     e.preventDefault();
     e.stopPropagation();
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       // handleFiles(e.dataTransfer.files);
-      setUploadedFile(e.dataTransfer.files[0]);
+      const file = e.dataTransfer.files[0];
+      setUploadedFile(file);
+      const parsedData = await parseCsv(file);
+      storeDataInIndexedDB(parsedData, file.name);
     }
   };
 
-  const handleDelete = (name) => {
+  const handleDelete = async (name) => {
     const tempFiles = files.filter((item) => item.name != name);
     setFiles(tempFiles);
     localStorage.setItem("uploadedFiles", JSON.stringify(tempFiles));
@@ -48,7 +60,12 @@ function FileTab() {
       localStorage.removeItem("activeFile");
       dispatch(setActiveFile(null));
       setFileActiveId("");
+      dispatch(setActiveFunction(""));
+      dispatch(setActiveSubFunction(""));
     }
+    window.location.reload()
+    await deleteIndexedDB(name);
+    
   };
 
   const handleFileSelect = (name) => {
@@ -58,23 +75,22 @@ function FileTab() {
     localStorage.setItem("activeFile", JSON.stringify(active));
   };
 
-  const handleFileUpload = () => {
+  const handleFileUpload = async () => {
     if (uploadedFile) {
-      const reader = new FileReader();
+      const tempFiles = [...files, { name: uploadedFile.name }];
+      setFiles(tempFiles);
+      localStorage.setItem("uploadedFiles", JSON.stringify(tempFiles));
 
-      reader.onload = () => {
-        const contents = reader.result;
-        const blob = new Blob([contents], { type: "text/csv" });
-        const blobUrl = URL.createObjectURL(blob);
+      const parsedData = await parseCsv(uploadedFile);
+      await storeDataInIndexedDB(parsedData, uploadedFile.name);
+      setUploadedFile("");
+    }
+  };
 
-        const tempFiles = [
-          ...files,
-          { name: uploadedFile.name, link: blobUrl },
-        ];
-        setFiles(tempFiles);
-        localStorage.setItem("uploadedFiles", JSON.stringify(tempFiles));
-      };
-      reader.readAsText(uploadedFile);
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setUploadedFile(file);
     }
   };
 
@@ -158,7 +174,7 @@ function FileTab() {
             type="file"
             id="input-file-upload"
             hidden
-            onChange={(e) => setUploadedFile(e.target.files[0])}
+            onChange={handleFileChange}
           />
         </form>
         <button

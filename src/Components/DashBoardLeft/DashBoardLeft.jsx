@@ -12,7 +12,7 @@ function DashBoardLeft() {
 
   return (
     <div
-      className={`bg-[#06603b] w-64 h-full relative ${
+      className={`bg-[#06603b] w-64 min-w-max h-full relative ${
         showLeftSideBar ? "flex" : "hidden"
       }`}
     >

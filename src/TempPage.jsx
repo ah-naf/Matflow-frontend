@@ -1,48 +1,67 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Papa from "papaparse";
+import { Table } from "@nextui-org/react";
+import { fetchDataFromIndexedDB, parseCsv, storeDataInIndexedDB } from "./util/indexDB";
+const CSVRenderer = () => {
+  const [csvData, setCsvData] = useState([]);
 
-function TempPage() {
-  const [file, setFile] = useState();
-  const [Data, setData] = useState();
-  const [blobUrl, setBlobUrl] = useState()
+  useEffect(() => {
+    const temp = async () => {
+      const res = await fetchDataFromIndexedDB("sample.csv");
+      setCsvData(res);
+    };
+    temp();
+  }, []);
 
-  const handleSubmit = () => {
-    if (file) {
-      const reader = new FileReader();
-
-      reader.onload = () => {
-        const contents = reader.result;
-        const blob = new Blob([contents], { type: "text/csv" });
-        const blobUrl = URL.createObjectURL(blob);
-
-        console.log(blobUrl);
-        setBlobUrl(blobUrl)
-        // dispatch(setBlobUrl(blobUrl));
-
-        Papa.parse(blobUrl, {
-          download: true,
-          complete: (results) => {
-            const data = results.data;
-            // console.log(data);
-            setData(data);
-          },
-        });
-      };
-      reader.readAsText(file);
-    }
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    const parsedData = await parseCsv(file);
+    storeDataInIndexedDB(parsedData, file.name);
+    setCsvData(parsedData);
+    // console.log(parsedData)
   };
+
   return (
     <div>
-      <input
-        type="file"
-        name=""
-        id=""
-        onChange={(e) => setFile(e.target.files[0])}
-      />
-      <button onClick={handleSubmit}>Submit</button>
-      {blobUrl && <input type="file" value={blobUrl} />}
+      <input type="file" accept=".csv" onChange={handleFileChange} />
+      <div>
+        {csvData.length > 0 && (
+          <Table
+            bordered
+            shadow={false}
+            color="secondary"
+            aria-label="Example pagination  table"
+            css={{
+              height: "700px",
+              minWidth: "100%",
+            }}
+          >
+            <Table.Header>
+              {Object.keys(csvData[0]).map((val, index) => {
+                return <Table.Column key={index}>{val}</Table.Column>;
+              })}
+            </Table.Header>
+            <Table.Body>
+              {csvData.map((row, index) => (
+                <Table.Row key={index}>
+                  {Object.values(row).map((value, index) => (
+                    <Table.Cell key={index}>{value}</Table.Cell>
+                  ))}
+                </Table.Row>
+              ))}
+            </Table.Body>
+            <Table.Pagination
+              shadow
+              noMargin
+              align="center"
+              onPageChange={(page) => console.log({ page })}
+              rowsPerPage={10}
+            />
+          </Table>
+        )}
+      </div>
+      ;
     </div>
   );
-}
-
-export default TempPage;
+};
+export default CSVRenderer;

@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { BsFillPlayFill } from "react-icons/bs";
 import { AiFillCloseCircle, AiOutlineLineChart } from "react-icons/ai";
 import { HiOutlineDocumentReport, HiOutlinePuzzle } from "react-icons/hi";
@@ -9,6 +9,7 @@ import { RiFlowChart } from "react-icons/ri";
 import { TbBrain } from "react-icons/tb";
 import { GrDeploy } from "react-icons/gr";
 import { SlMagnifier } from "react-icons/sl";
+import { setActiveFunction } from "../../Slices/SideBarSlice";
 
 const functionsName = [
   { name: "Dataset", icon: <MdOutlineDataset size={"25"} /> },
@@ -24,8 +25,20 @@ const functionsName = [
 
 function FunctionTab() {
   const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
-  const [activeFunction, setActiveFunction] = useState("Dataset");
+  const activeFunction = useSelector(state => state.sideBar.activeFunction)
+  const dispatch = useDispatch()
   
+  useEffect(() => {
+    const temp = localStorage.getItem('activeFunction')
+    if(temp) {
+      dispatch(setActiveFunction(temp));
+    }
+  }, [dispatch])
+
+  const handleClick = (name) => {
+    dispatch(setActiveFunction(name));
+    localStorage.setItem('activeFunction', name);
+  }
 
   return (
     <div className="px-2 mt-4">
@@ -35,7 +48,7 @@ function FunctionTab() {
             <div
               key={ind}
               className="w-full mb-2"
-              onClick={() => setActiveFunction(item.name)}
+              onClick={() => handleClick(item.name)}
             >
               <div
                 className={`flex cursor-pointer items-center py-2 px-4 gap-3 rounded hover:text-gray-50 ${item.name === activeFunction ? 'text-gray-50 font-bold bg-[#287e5a] rounded-md' : 'text-gray-300 hover:bg-[#287e5a] '}`}

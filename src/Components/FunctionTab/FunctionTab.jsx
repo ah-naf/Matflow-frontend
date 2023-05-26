@@ -62,7 +62,7 @@ function FunctionTab() {
         })
       ) : (
         <p className="mt-4 p-2 text-center text-white tracking-wide font-bold text-lg">
-          Please select a file to view the functions.
+          Please select a file to <br/> view the functions.
         </p>
       )}
     </div>

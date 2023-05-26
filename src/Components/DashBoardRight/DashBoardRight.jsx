@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import FunctionSubMenu from "../FunctionSubMenu/FunctionSubMenu";
 import { useSelector } from "react-redux";
-import { Button, Radio, Table } from "@nextui-org/react";
-import Papa from "papaparse";
+import { Button } from "@nextui-org/react";
+import { AgGridReact } from "ag-grid-react";
+import "ag-grid-community/styles/ag-grid.css";
+import "ag-grid-community/styles/ag-theme-alpine.css";
 import { fetchDataFromIndexedDB } from "../../util/indexDB";
 
 function DashBoardRight() {
@@ -32,13 +34,14 @@ function DashBoardRight() {
   );
 }
 
-// Function -> Dataset | SubFunction -> Display
-
 const DatasetDisplay = () => {
-  const [value, setValue] = useState("All");
+  const [value] = useState("All");
   const [csvData, setCsvData] = useState([]);
+  const [filterText] = useState("");
   const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
+  const [selectedRows, setSelectedRows] = useState([]);
 
+  // Fetch data from IndexedDB
   useEffect(() => {
     if (activeCsvFile && activeCsvFile.name) {
       const getData = async () => {
@@ -47,87 +50,89 @@ const DatasetDisplay = () => {
       };
       getData();
     }
-  });
+  }, [activeCsvFile]);
+
+  const handleExportCSV = () => {
+    // Code to export CSV
+  };
+
+  const handleDeleteSelectedRows = () => {
+    // Code to delete selected rows
+  };
+
+  // Define the row data based on the selected view option
+  let rowData;
+  if (value === "Head") {
+    rowData = csvData.slice(0, 10); // Display the first 10 rows
+  } else if (value === "Tail") {
+    rowData = csvData.slice(-10); // Display the last 10 rows
+  } else if (value === "Custom") {
+    // Apply custom filtering based on filterText
+    rowData = csvData.filter((row) =>
+      Object.values(row).some(
+        (value) =>
+          value !== null &&
+          value.toString().toLowerCase().includes(filterText.toLowerCase())
+      )
+    );
+  } else {
+    rowData = csvData; // Display all rows
+  }
+
+  // Define the grid options
+  const gridOptions = {
+    columnDefs:
+      csvData.length > 0
+        ? Object.keys(csvData[0]).map((key) => ({
+            headerName: key,
+            field: key,
+            valueFormatter: ({ value }) => (value !== null ? value : "N/A"),
+            filter: true, // Enable filtering for the column
+            filterParams: {
+              suppressAndOrCondition: true, // Optional: Suppress 'and'/'or' filter conditions
+              newRowsAction: "keep", // Optional: Preserve filter when new rows are loaded
+            },
+            sortable: true, // Enable sorting for the column
+          }))
+        : [],
+    rowData,
+    pagination: true,
+    paginationPageSize: 10,
+    enableFilter: true, // Enable filtering
+    enableSorting: true, // Enable sorting
+    rowSelection: "multiple", // Enable multiple row selection
+    onRowSelected: (event) => {
+      setSelectedRows(event.api.getSelectedRows());
+    },
+  };
 
   return (
-    <div className="">
+    <>
       <h1 className="text-3xl mt-4">Display Dataset</h1>
-      <div>
-        <Radio.Group value={value} onChange={setValue} orientation="horizontal">
-          <Radio size="sm" value="All" color="success">
-            All
-          </Radio>
-          <Radio size="sm" value="Head" color="success">
-            Head
-          </Radio>
-          <Radio size="sm" value="Tail" color="success">
-            Tail
-          </Radio>
-          <Radio size="sm" value="Custom" color="success">
-            Custom
-          </Radio>
-        </Radio.Group>
+
+      <div className="mt-4">
+        {rowData.length > 0 && (
+          <div
+            className="ag-theme-alpine"
+            style={{ height: "600px", width: "100%" }}
+          >
+            <AgGridReact gridOptions={gridOptions} />
+          </div>
+        )}
       </div>
-      {(value === "All" || value === "Head" || value === "Tail") && (
+      {selectedRows.length > 0 && (
         <div className="mt-4">
-          {csvData.length > 0 && (
-            <Table
-              bordered
-              shadow={false}
-              color="secondary"
-              aria-label="Example pagination table"
-              aria-labelledby="f"
-              aria-describedby="f"
-              aria-details="s"
-              css={{
-                height: "600px",
-                minWidth: "100%",
-              }}
-            >
-              <Table.Header>
-                {/* {console.log(csvData[0])} */}
-                {Object.keys(csvData[0]).map((val, index) => {
-                  return (
-                    <Table.Column key={index} className="capitalize">
-                      {val}
-                    </Table.Column>
-                  );
-                })}
-              </Table.Header>
-              <Table.Body>
-                {value !== "Tail"
-                  ? csvData.map((row, index) => (
-                      <Table.Row key={index}>
-                        {Object.values(row).map((value, index) => (
-                          <Table.Cell key={index} css={{ fontSize: "$sm" }}>
-                            {value}
-                          </Table.Cell>
-                        ))}
-                      </Table.Row>
-                    ))
-                  : csvData.slice(-10).map((row, index) => (
-                      <Table.Row key={index}>
-                        {Object.values(row).map((value, index) => (
-                          <Table.Cell key={index} css={{ fontSize: "$sm" }}>
-                            {value}
-                          </Table.Cell>
-                        ))}
-                      </Table.Row>
-                    ))}
-              </Table.Body>
-              <Table.Pagination
-                color={"success"}
-                shadow
-                align="center"
-                onPageChange={(page) => console.log({ page })}
-                rowsPerPage={10}
-                className={`${value !== "All" ? "!hidden" : ""}`}
-              />
-            </Table>
-          )}
+          <Button auto onClick={handleDeleteSelectedRows}>
+            Delete Selected Rows
+          </Button>
         </div>
       )}
-    </div>
+      <div className="mt-4">
+        <Button auto onClick={handleExportCSV}>
+          Export CSV
+        </Button>
+      </div>
+    </>
   );
 };
 

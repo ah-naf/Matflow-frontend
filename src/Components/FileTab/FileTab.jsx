@@ -73,6 +73,7 @@ function FileTab() {
     const active = files.filter((item) => item.name === name)[0];
     dispatch(setActiveFile(active));
     localStorage.setItem("activeFile", JSON.stringify(active));
+    window.location.reload()
   };
 
   const handleFileUpload = async () => {

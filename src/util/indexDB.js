@@ -106,4 +106,25 @@ const parseCsv = (file) => {
   });
 };
 
-export { fetchDataFromIndexedDB, storeDataInIndexedDB, parseCsv, deleteIndexedDB };
+function fixMismatchedColumns(parsedData) {
+  const maxColumns = Math.max(...parsedData.map(row => row.length));
+
+  // Align columns for each row
+  const alignedData = parsedData.map(row => {
+    if (row.length < maxColumns) {
+      // Add empty values or placeholders for missing columns
+      const missingColumns = maxColumns - row.length;
+      return [...row, ...Array(missingColumns).fill('')];
+    } else if (row.length > maxColumns) {
+      // Truncate extra columns
+      return row.slice(0, maxColumns);
+    } else {
+      // Row already has the correct column count
+      return row;
+    }
+  });
+
+  return alignedData;
+}
+
+export { fetchDataFromIndexedDB, storeDataInIndexedDB, parseCsv, deleteIndexedDB, fixMismatchedColumns };

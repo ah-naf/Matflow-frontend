@@ -1,144 +1,78 @@
-import React, { useEffect, useState } from "react";
-import { AiOutlineRight } from "react-icons/ai";
+import React, { useEffect, useState, useMemo } from "react";
+import { AgGridReact } from "ag-grid-react";
+import "ag-grid-community/styles/ag-grid.css";
+import "ag-grid-community/styles/ag-theme-alpine.css";
+import { fetchDataFromIndexedDB } from "./util/indexDB";
 
-const treeData = [
-  {
-    key: "0",
-    label: "Root",
-    children: [
-      {
-        key: "0-0",
-        label: "Level 1 - Node 1",
-        children: [
-          {
-            key: "0-0-0",
-            label: "Level 2 - Node 1",
-            children: [
-              {
-                key: "0-0-0-0",
-                label: "Level 3 - Node 1",
-              },
-              {
-                key: "0-0-0-1",
-                label: "Level 3 - Node 2",
-              },
-            ],
-          },
-          {
-            key: "0-0-1",
-            label: "Level 2 - Node 2",
-          },
-        ],
-      },
-      {
-        key: "0-1",
-        label: "Level 1 - Node 2",
-        children: [
-          {
-            key: "0-1-0",
-            label: "Level 2 - Node 3",
-          },
-        ],
-      },
-    ],
-  },
-  {
-    key: "1",
-    label: "Root 2",
-    children: [
-      {
-        key: "1-0",
-        label: "Level 1 - Node 4",
-      },
-    ],
-  },
-];
-
-function TreeView({ treeData, setActiveLeaf }) {
-  return (
-    <ul>
-      {treeData.map((node) => (
-        <TreeNode node={node} key={node.key} setActiveLeaf={setActiveLeaf} />
-      ))}
-    </ul>
-  );
-}
-
-function TreeNode({ node, setActiveLeaf }) {
-  const { children, label } = node;
-
-  const [showChildren, setShowChildren] = useState(false);
-  const [isActive, setIsActive] = useState(false);
-
-  const handleClick = () => {
-    setIsActive(true);
-    if (children && children.length > 0) {
-      setShowChildren(!showChildren);
-    } else {
-      console.log("first");
-      setActiveLeaf(label);
-      window.location.reload();
-    }
-  };
+const TempPage = () => {
+  const [rowData, setRowData] = useState([]);
 
   useEffect(() => {
-    const isOpen = localStorage.getItem(`menu-${label}`);
-    const isActiveMenu = localStorage.getItem(`active-menu`);
-    const isActiveLeaf = localStorage.getItem(`active-leaf`);
-
-    setShowChildren(isOpen === "true");
-    setIsActive(label === isActiveMenu || label === isActiveLeaf);
-  }, [label]);
-
-  useEffect(() => {
-    localStorage.setItem(`menu-${label}`, showChildren);
-    if (isActive) {
-      localStorage.setItem(`active-menu`, label);
-      localStorage.setItem(`active-leaf`, label);
-    }
-  }, [label, showChildren, isActive]);
-
-  return (
-    <>
-      <div
-        onClick={handleClick}
-        className={`text-black hover:text-black cursor-pointer flex mb-4 items-center ${
-          isActive ? "font-bold" : ""
-        }`}
-      >
-        {children && children.length > 0 && (
-          <span className="mr-1">
-            <AiOutlineRight
-              size={13}
-              className={`${showChildren ? "rotate-90" : ""}`}
-            />
-          </span>
-        )}
-        <span>{label}</span>
-      </div>
-      <ul className="border-l">
-        {showChildren && (
-          <TreeView treeData={children} setActiveLeaf={setActiveLeaf} />
-        )}
-      </ul>
-    </>
-  );
-}
-
-function CSVRenderer() {
-  const [activeLeaf, setActiveLeaf] = useState(null);
-
-  useEffect(() => {
-    const storedActiveLeaf = localStorage.getItem(`active-leaf`);
-    setActiveLeaf(storedActiveLeaf);
+    const fetchCSVData = async () => {
+      const res = await fetchDataFromIndexedDB("IRIS.csv");
+      setRowData(res);
+    };
+    fetchCSVData();
   }, []);
 
   return (
     <div>
-      <TreeView treeData={treeData} setActiveLeaf={setActiveLeaf} />
-      <p>Active Leaf: {activeLeaf}</p>
+      <h1>Ag-Grid React Example</h1>
+      {rowData.length > 0 && <MyAgGridComponent rowData={rowData} />}
     </div>
   );
-}
+};
 
-export default CSVRenderer;
+const MyAgGridComponent = ({ rowData }) => {
+  const data = useMemo(() => {
+    const columns = Object.keys(rowData[0] || {});
+    const columnInfo = [];
+
+    columns.forEach((column) => {
+      const uniqueValues = new Set();
+      let nonNullCount = 0;
+
+      rowData.forEach((row) => {
+        const value = row[column];
+        if (value) {
+          uniqueValues.add(value);
+          nonNullCount++;
+        }
+      });
+
+      const nullCount = rowData.length - nonNullCount;
+      const nullPercentage = (nullCount / rowData.length) * 100;
+      const dtype = typeof rowData[0][column];
+
+      columnInfo.push({
+        column,
+        uniqueValues: uniqueValues.size,
+        nonNullCount,
+        nullPercentage,
+        dtype,
+      });
+    });
+
+    return columnInfo;
+  }, [rowData]);
+
+  const columnDefs = useMemo(() => {
+    const columns = Object.keys(data[0] || {});
+    return columns.map((column) => ({
+      headerName: column,
+      field: column,
+    }));
+  }, [data]);
+
+  return (
+    <div>
+      <div className="ag-theme-alpine h-[500px] w-full">
+        {console.log(data)}
+        {columnDefs && data && <AgGridReact rowData={data} columnDefs={columnDefs} />}
+      </div>
+      
+    </div>
+  );
+};
+
+export default TempPage;

@@ -5,7 +5,7 @@ import { setActiveFunction } from "../../Slices/SideBarSlice";
 
 function TreeView({ treeData, setActiveLeaf }) {
   return (
-    <ul>
+    <ul className="ml-4">
       {treeData.map((node) => (
         <TreeNode node={node} key={node.key} setActiveLeaf={setActiveLeaf} />
       ))}
@@ -73,7 +73,7 @@ function TreeNode({ node, setActiveLeaf }) {
         {icon && <span className="mr-2">{icon}</span>}
         <span className="tracking-wider capitalize">{label}</span>
       </div>
-      <ul className="border-l border-slate-400">
+      <ul className="border-l border-slate-400 ml-4">
         {showChildren && (
           <TreeView treeData={children} setActiveLeaf={setActiveLeaf} />
         )}

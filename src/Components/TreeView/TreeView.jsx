@@ -5,7 +5,7 @@ import { setActiveFunction } from "../../Slices/SideBarSlice";
 
 function TreeView({ treeData, setActiveLeaf }) {
   return (
-    <ul className="ml-4">
+    <ul className="ml-2">
       {treeData.map((node) => (
         <TreeNode node={node} key={node.key} setActiveLeaf={setActiveLeaf} />
       ))}
@@ -62,14 +62,14 @@ function TreeNode({ node, setActiveLeaf }) {
           isActive ? "font-bold" : ""
         }`}
       >
-        {children && children.length > 0 && (
+        
           <span className="mr-1">
             <AiOutlineRight
               size={13}
-              className={`${showChildren ? "rotate-90" : ""}`}
+              className={`${showChildren ? "rotate-90" : ""} ${(!children || children.length === 0) ? "opacity-0" : ""}`}
             />
           </span>
-        )}
+        
         {icon && <span className="mr-2">{icon}</span>}
         <span className="tracking-wider capitalize">{label}</span>
       </div>

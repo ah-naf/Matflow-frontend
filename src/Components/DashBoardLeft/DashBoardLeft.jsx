@@ -47,7 +47,7 @@ function DashBoardLeft() {
           </button>
           <button
             className={`py-3 w-full ${
-              currentTab === "functions" ? "text-[whitesmoke] font-bold" : ""
+              currentTab === "function" ? "text-[whitesmoke] font-bold" : ""
             } border-b border-transparent  outline-none hover:text-white hover:border-white`}
             onClick={() => handleClick("function")}
           >

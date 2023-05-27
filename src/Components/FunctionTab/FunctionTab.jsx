@@ -103,7 +103,7 @@ function FunctionTab() {
   }, [dispatch]);
 
   return (
-    <div className=" mt-1">
+    <div className=" mt-4">
       {activeCsvFile ? (
         <TreeView treeData={functionTreeData} setActiveLeaf={setActiveLeaf} />
       ) : (

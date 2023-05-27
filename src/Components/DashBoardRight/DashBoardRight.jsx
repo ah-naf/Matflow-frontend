@@ -1,27 +1,20 @@
-import React, { useEffect, useState } from "react";
-import FunctionSubMenu from "../FunctionSubMenu/FunctionSubMenu";
-import { useSelector } from "react-redux";
 import { Button } from "@nextui-org/react";
-import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
+import { AgGridReact } from "ag-grid-react";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { fetchDataFromIndexedDB } from "../../util/indexDB";
 
 function DashBoardRight() {
   const activeFunction = useSelector((state) => state.sideBar.activeFunction);
   const activeFile = useSelector((state) => state.uploadedFile.activeFile);
-  const activeSubFunction = useSelector(
-    (state) => state.sideBar.activeSubFunction
-  );
 
   return (
     <div className="flex-grow h-full overflow-y-auto px-6">
       {activeFunction && activeFile ? (
         <>
-          <FunctionSubMenu />
-          {activeSubFunction && activeSubFunction === "Display" && (
-            <DatasetDisplay />
-          )}
+          {activeFunction && activeFunction === "Display" && <DatasetDisplay />}
         </>
       ) : (
         <div className="w-full h-full grid place-content-center">

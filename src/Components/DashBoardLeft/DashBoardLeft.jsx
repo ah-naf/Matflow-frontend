@@ -1,14 +1,24 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AiOutlineDoubleLeft } from "react-icons/ai";
-import FileTab from "../FileTab/FileTab";
-import FunctionTab from "../FunctionTab/FunctionTab";
 import { useDispatch, useSelector } from "react-redux";
 import { setShowLeftSideBar } from "../../Slices/SideBarSlice";
+import FileTab from "../FileTab/FileTab";
+import FunctionTab from "../FunctionTab/FunctionTab";
 
 function DashBoardLeft() {
   const showLeftSideBar = useSelector((state) => state.sideBar.showLeftSideBar);
   const [currentTab, setCurrentTab] = useState("file");
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
+
+  const handleClick = (name) => {
+    setCurrentTab(name);
+    localStorage.setItem("currentTab", name);
+  };
+
+  useEffect(() => {
+    const storedCurrentTab = localStorage.getItem("currentTab");
+    if (storedCurrentTab) setCurrentTab(storedCurrentTab);
+  }, []);
 
   return (
     <div
@@ -17,15 +27,21 @@ function DashBoardLeft() {
       }`}
     >
       <div className="w-full h-full flex flex-col">
-        <div className="absolute right-0 translate-x-1/2 top-1/2 -translate-y-1/2 bg-emerald-100 shadow-md rounded-full justify-end p-2" onClick={() => dispatch(setShowLeftSideBar(false))}>
-          <AiOutlineDoubleLeft size={"20"} className=" cursor-pointer text-black" />
+        <div
+          className="absolute right-0 translate-x-1/2 top-1/2 -translate-y-1/2 bg-emerald-100 shadow-md rounded-full justify-end p-2"
+          onClick={() => dispatch(setShowLeftSideBar(false))}
+        >
+          <AiOutlineDoubleLeft
+            size={"20"}
+            className=" cursor-pointer text-black"
+          />
         </div>
         <div className="flex font-roboto gap-2 border-b text-gray-300 border-[rgba(255,255,255,0.5)] shadow-sm">
           <button
             className={`py-3 w-full ${
               currentTab === "file" ? "text-[whitesmoke] font-bold" : ""
             } border-b border-transparent  outline-none hover:text-white hover:border-white`}
-            onClick={() => setCurrentTab("file")}
+            onClick={() => handleClick("file")}
           >
             File
           </button>
@@ -33,7 +49,7 @@ function DashBoardLeft() {
             className={`py-3 w-full ${
               currentTab === "functions" ? "text-[whitesmoke] font-bold" : ""
             } border-b border-transparent  outline-none hover:text-white hover:border-white`}
-            onClick={() => setCurrentTab("functions")}
+            onClick={() => handleClick("function")}
           >
             Functions
           </button>

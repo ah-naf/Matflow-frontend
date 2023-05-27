@@ -1,8 +1,17 @@
-import DashBoardTop from "../Components/DashBoardTop/DashBoardTop";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
 import DashBoardLeft from "../Components/DashBoardLeft/DashBoardLeft";
 import DashBoardRight from "../Components/DashBoardRight/DashBoardRight";
+import DashBoardTop from "../Components/DashBoardTop/DashBoardTop";
+import { setActiveFunction } from "../Slices/SideBarSlice";
 
 export default function Dashboard() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(setActiveFunction(localStorage.getItem("activeFunction")));
+  }, [dispatch]);
+
   return (
     <div className="h-screen">
       <DashBoardTop />

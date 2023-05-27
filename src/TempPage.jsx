@@ -1,139 +1,144 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { Button } from "@nextui-org/react";
-import { AgGridReact } from "ag-grid-react";
-import "ag-grid-community/styles/ag-grid.css";
-import "ag-grid-community/styles/ag-theme-alpine.css";
-import FunctionSubMenu from "./Components/FunctionSubMenu/FunctionSubMenu";
-import { fetchDataFromIndexedDB } from "./util/indexDB";
+import { AiOutlineRight } from "react-icons/ai";
 
-function CSVRenderer() {
-  const activeFunction = useSelector((state) => state.sideBar.activeFunction);
-  const activeFile = useSelector((state) => state.uploadedFile.activeFile);
-  const activeSubFunction = useSelector(
-    (state) => state.sideBar.activeSubFunction
-  );
+const treeData = [
+  {
+    key: "0",
+    label: "Root",
+    children: [
+      {
+        key: "0-0",
+        label: "Level 1 - Node 1",
+        children: [
+          {
+            key: "0-0-0",
+            label: "Level 2 - Node 1",
+            children: [
+              {
+                key: "0-0-0-0",
+                label: "Level 3 - Node 1",
+              },
+              {
+                key: "0-0-0-1",
+                label: "Level 3 - Node 2",
+              },
+            ],
+          },
+          {
+            key: "0-0-1",
+            label: "Level 2 - Node 2",
+          },
+        ],
+      },
+      {
+        key: "0-1",
+        label: "Level 1 - Node 2",
+        children: [
+          {
+            key: "0-1-0",
+            label: "Level 2 - Node 3",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    key: "1",
+    label: "Root 2",
+    children: [
+      {
+        key: "1-0",
+        label: "Level 1 - Node 4",
+      },
+    ],
+  },
+];
 
+function TreeView({ treeData, setActiveLeaf }) {
   return (
-    <div className="flex-grow h-full overflow-y-auto px-6">
-      {activeFunction && activeFile ? (
-        <>
-          <FunctionSubMenu />
-          {activeSubFunction && activeSubFunction === "Display" && (
-            <DatasetDisplay />
-          )}
-        </>
-      ) : (
-        <div className="w-full h-full grid place-content-center">
-          <h1 className="text-3xl tracking-wide text-center">
-            Please select a function to continue...
-          </h1>
-        </div>
-      )}
-    </div>
+    <ul>
+      {treeData.map((node) => (
+        <TreeNode node={node} key={node.key} setActiveLeaf={setActiveLeaf} />
+      ))}
+    </ul>
   );
 }
 
-const DatasetDisplay = () => {
-  const [value] = useState("All");
-  const [csvData, setCsvData] = useState([]);
-  const [filterText] = useState("");
-  const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
-  const [selectedRows, setSelectedRows] = useState([]);
+function TreeNode({ node, setActiveLeaf }) {
+  const { children, label } = node;
 
-  // Fetch data from IndexedDB
-  useEffect(() => {
-    if (activeCsvFile && activeCsvFile.name) {
-      const getData = async () => {
-        const res = await fetchDataFromIndexedDB(activeCsvFile.name);
-        setCsvData(res);
-      };
-      getData();
+  const [showChildren, setShowChildren] = useState(false);
+  const [isActive, setIsActive] = useState(false);
+
+  const handleClick = () => {
+    setIsActive(true);
+    if (children && children.length > 0) {
+      setShowChildren(!showChildren);
+    } else {
+      console.log("first");
+      setActiveLeaf(label);
+      window.location.reload();
     }
-  }, [activeCsvFile]);
-
-  const handleExportCSV = () => {
-    // Code to export CSV
   };
 
-  const handleDeleteSelectedRows = () => {
-    // Code to delete selected rows
-  };
+  useEffect(() => {
+    const isOpen = localStorage.getItem(`menu-${label}`);
+    const isActiveMenu = localStorage.getItem(`active-menu`);
+    const isActiveLeaf = localStorage.getItem(`active-leaf`);
 
-  // Define the row data based on the selected view option
-  let rowData;
-  if (value === "Head") {
-    rowData = csvData.slice(0, 10); // Display the first 10 rows
-  } else if (value === "Tail") {
-    rowData = csvData.slice(-10); // Display the last 10 rows
-  } else if (value === "Custom") {
-    // Apply custom filtering based on filterText
-    rowData = csvData.filter((row) =>
-      Object.values(row).some(
-        (value) =>
-          value !== null &&
-          value.toString().toLowerCase().includes(filterText.toLowerCase())
-      )
-    );
-  } else {
-    rowData = csvData; // Display all rows
-  }
+    setShowChildren(isOpen === "true");
+    setIsActive(label === isActiveMenu || label === isActiveLeaf);
+  }, [label]);
 
-  // Define the grid options
-  const gridOptions = {
-    columnDefs:
-      csvData.length > 0
-        ? Object.keys(csvData[0]).map((key) => ({
-            headerName: key,
-            field: key,
-            valueFormatter: ({ value }) => (value !== null ? value : "N/A"),
-            filter: true, // Enable filtering for the column
-            filterParams: {
-              suppressAndOrCondition: true, // Optional: Suppress 'and'/'or' filter conditions
-              newRowsAction: "keep", // Optional: Preserve filter when new rows are loaded
-            },
-            sortable: true, // Enable sorting for the column
-          }))
-        : [],
-    rowData,
-    pagination: true,
-    paginationPageSize: 10,
-    enableFilter: true, // Enable filtering
-    enableSorting: true, // Enable sorting
-    rowSelection: "multiple", // Enable multiple row selection
-    onRowSelected: (event) => {
-      setSelectedRows(event.api.getSelectedRows());
-    },
-  };
+  useEffect(() => {
+    localStorage.setItem(`menu-${label}`, showChildren);
+    if (isActive) {
+      localStorage.setItem(`active-menu`, label);
+      localStorage.setItem(`active-leaf`, label);
+    }
+  }, [label, showChildren, isActive]);
 
   return (
     <>
-      <h1 className="text-3xl mt-4">Display Dataset</h1>
-
-      <div className="mt-4">
-        {rowData.length > 0 && (
-          <div
-            className="ag-theme-alpine"
-            style={{ height: "600px", width: "100%" }}
-          >
-            <AgGridReact gridOptions={gridOptions} />
-          </div>
+      <div
+        onClick={handleClick}
+        className={`text-black hover:text-black cursor-pointer flex mb-4 items-center ${
+          isActive ? "font-bold" : ""
+        }`}
+      >
+        {children && children.length > 0 && (
+          <span className="mr-1">
+            <AiOutlineRight
+              size={13}
+              className={`${showChildren ? "rotate-90" : ""}`}
+            />
+          </span>
         )}
+        <span>{label}</span>
       </div>
-      {selectedRows.length > 0 && (
-        <div className="mt-4">
-          <Button auto onClick={handleDeleteSelectedRows}>
-            Delete Selected Rows
-          </Button>
-        </div>
-      )}
-      <div className="mt-4">
-        <Button auto onClick={handleExportCSV}>
-          Export CSV
-        </Button>
-      </div>
+      <ul className="border-l">
+        {showChildren && (
+          <TreeView treeData={children} setActiveLeaf={setActiveLeaf} />
+        )}
+      </ul>
     </>
   );
-};
+}
+
+function CSVRenderer() {
+  const [activeLeaf, setActiveLeaf] = useState(null);
+
+  useEffect(() => {
+    const storedActiveLeaf = localStorage.getItem(`active-leaf`);
+    setActiveLeaf(storedActiveLeaf);
+  }, []);
+
+  return (
+    <div>
+      <TreeView treeData={treeData} setActiveLeaf={setActiveLeaf} />
+      <p>Active Leaf: {activeLeaf}</p>
+    </div>
+  );
+}
 
 export default CSVRenderer;

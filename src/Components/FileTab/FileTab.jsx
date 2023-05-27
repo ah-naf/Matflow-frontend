@@ -1,17 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
-import { BsFillPlayFill } from "react-icons/bs";
 import { AiFillCloseCircle } from "react-icons/ai";
+import { BsFillPlayFill } from "react-icons/bs";
 import { useDispatch } from "react-redux";
+import { setActiveFunction } from "../../Slices/SideBarSlice";
 import { setActiveFile } from "../../Slices/UploadedFileSlice";
 import {
   deleteIndexedDB,
   parseCsv,
   storeDataInIndexedDB,
 } from "../../util/indexDB";
-import {
-  setActiveFunction,
-  setActiveSubFunction,
-} from "../../Slices/SideBarSlice";
 
 function FileTab() {
   const [files, setFiles] = useState([]);
@@ -61,11 +58,10 @@ function FileTab() {
       dispatch(setActiveFile(null));
       setFileActiveId("");
       dispatch(setActiveFunction(""));
-      dispatch(setActiveSubFunction(""));
+      localStorage.removeItem("activeFunction");
     }
-    window.location.reload()
+    window.location.reload();
     await deleteIndexedDB(name);
-    
   };
 
   const handleFileSelect = (name) => {
@@ -73,7 +69,9 @@ function FileTab() {
     const active = files.filter((item) => item.name === name)[0];
     dispatch(setActiveFile(active));
     localStorage.setItem("activeFile", JSON.stringify(active));
-    window.location.reload()
+    localStorage.setItem("menu-Dataset", true);
+    localStorage.setItem("activeFunction", "Display");
+    window.location.reload();
   };
 
   const handleFileUpload = async () => {

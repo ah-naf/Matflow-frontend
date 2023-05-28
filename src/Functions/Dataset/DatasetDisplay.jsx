@@ -1,6 +1,6 @@
-import { AgGridReact } from "ag-grid-react";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import AgGridComponent from "../../Components/AgGridComponent/AgGridComponent";
 import { fetchDataFromIndexedDB } from "../../util/indexDB";
 
 const DatasetDisplay = () => {
@@ -8,7 +8,6 @@ const DatasetDisplay = () => {
   const [csvData, setCsvData] = useState([]);
   const [filterText] = useState("");
   const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
-  const [selectedRows, setSelectedRows] = useState([]);
 
   // Fetch data from IndexedDB
   useEffect(() => {
@@ -20,14 +19,6 @@ const DatasetDisplay = () => {
       getData();
     }
   }, [activeCsvFile]);
-
-  const handleExportCSV = () => {
-    // Code to export CSV
-  };
-
-  const handleDeleteSelectedRows = () => {
-    // Code to delete selected rows
-  };
 
   // Define the row data based on the selected view option
   let rowData;
@@ -48,33 +39,21 @@ const DatasetDisplay = () => {
     rowData = csvData; // Display all rows
   }
 
-  // Define the grid options
-  const gridOptions = {
-    columnDefs:
-      csvData.length > 0
-        ? Object.keys(csvData[0]).map((key) => ({
-            headerName: key,
-            field: key,
-            valueFormatter: ({ value }) => (value !== null ? value : "N/A"),
-            filter: true, // Enable filtering for the column
-            filterParams: {
-              suppressAndOrCondition: true, // Optional: Suppress 'and'/'or' filter conditions
-              newRowsAction: "keep", // Optional: Preserve filter when new rows are loaded
-            },
-            sortable: true, // Enable sorting for the column
-            flex: 1,
-          }))
-        : [],
-    rowData,
-    pagination: true,
-    paginationPageSize: 10,
-    enableFilter: true, // Enable filtering
-    enableSorting: true, // Enable sorting
-    rowSelection: "multiple", // Enable multiple row selection
-    onRowSelected: (event) => {
-      setSelectedRows(event.api.getSelectedRows());
-    },
-  };
+  const columnDefs =
+    csvData.length > 0
+      ? Object.keys(csvData[0]).map((key) => ({
+          headerName: key,
+          field: key,
+          valueFormatter: ({ value }) => (value !== null ? value : "N/A"),
+          filter: true, // Enable filtering for the column
+          filterParams: {
+            suppressAndOrCondition: true, // Optional: Suppress 'and'/'or' filter conditions
+            newRowsAction: "keep", // Optional: Preserve filter when new rows are loaded
+          },
+          sortable: true, // Enable sorting for the column
+          flex: 1,
+        }))
+      : [];
 
   return (
     <>
@@ -86,7 +65,7 @@ const DatasetDisplay = () => {
             className="ag-theme-alpine"
             style={{ height: "600px", width: "100%" }}
           >
-            <AgGridReact gridOptions={gridOptions} rowHeight={50} />
+            <AgGridComponent rowData={rowData} columnDefs={columnDefs} />
           </div>
         )}
       </div>

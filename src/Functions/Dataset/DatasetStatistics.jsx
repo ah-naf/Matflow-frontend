@@ -1,17 +1,17 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import * as stats from "simple-statistics";
-import AgGridComponent from "./Components/AgGridComponent/AgGridComponent";
-import { fetchDataFromIndexedDB } from "./util/indexDB";
+import AgGridComponent from "../../Components/AgGridComponent/AgGridComponent";
+import { fetchDataFromIndexedDB } from "../../util/indexDB";
 
-const DatasetInformation = () => {
+function DatasetStatistics() {
   const [rowData, setRowData] = useState([]);
   const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
 
   useEffect(() => {
-    if (true) {
+    if (activeCsvFile && activeCsvFile.name) {
       const fetchCSVData = async () => {
-        const res = await fetchDataFromIndexedDB("IRIS.csv");
+        const res = await fetchDataFromIndexedDB(activeCsvFile.name);
         setRowData(res);
       };
       fetchCSVData();
@@ -20,11 +20,11 @@ const DatasetInformation = () => {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold my-4">Dataset Information</h1>
+      <h1 className="text-3xl font-bold my-4">Dataset Statistics</h1>
       {rowData.length > 0 && <MyAgGridComponent rowData={rowData} />}
     </div>
   );
-};
+}
 
 const MyAgGridComponent = ({ rowData }) => {
   const [columnStats, setColumnStats] = useState([]);
@@ -61,9 +61,9 @@ const MyAgGridComponent = ({ rowData }) => {
               max,
               std,
               mean,
-              percentile25,
-              median,
-              percentile75,
+              "25%": percentile25,
+              "50%": median,
+              "75%": percentile75,
             });
           }
         }
@@ -99,4 +99,4 @@ const MyAgGridComponent = ({ rowData }) => {
   );
 };
 
-export default DatasetInformation;
+export default DatasetStatistics;

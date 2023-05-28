@@ -2,6 +2,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import DatasetDisplay from "../../Functions/Dataset/DatasetDisplay";
 import DatasetInformation from "../../Functions/Dataset/DatasetInformation";
+import DatasetStatistics from "../../Functions/Dataset/DatasetStatistics";
 
 function DashBoardRight() {
   const activeFunction = useSelector((state) => state.sideBar.activeFunction);
@@ -14,6 +15,9 @@ function DashBoardRight() {
           {activeFunction && activeFunction === "Display" && <DatasetDisplay />}
           {activeFunction && activeFunction === "Information" && (
             <DatasetInformation />
+          )}
+          {activeFunction && activeFunction === "Statistics" && (
+            <DatasetStatistics />
           )}
         </>
       ) : (

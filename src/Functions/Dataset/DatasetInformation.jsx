@@ -1,7 +1,7 @@
 import { Popover } from "@nextui-org/react";
-import { AgGridReact } from "ag-grid-react";
 import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
+import AgGridComponent from "../../Components/AgGridComponent/AgGridComponent";
 import { fetchDataFromIndexedDB } from "../../util/indexDB";
 
 const DatasetInformation = () => {
@@ -132,13 +132,7 @@ const MyAgGridComponent = ({ rowData }) => {
                 </Popover.Content>
               </Popover>
             </div>
-            <AgGridReact
-              rowData={data}
-              columnDefs={columnDefs}
-              rowHeight={50}
-              pagination
-              paginationPageSize={10}
-            />
+            <AgGridComponent rowData={data} columnDefs={columnDefs} />
           </>
         )}
       </div>

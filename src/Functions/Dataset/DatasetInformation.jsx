@@ -98,7 +98,7 @@ const MyAgGridComponent = ({ rowData }) => {
 
   return (
     <div className="w-full">
-      <div className="ag-theme-alpine h-[500px] w-full">
+      <div className="ag-theme-alpine h-[600px] w-full">
         {columnDefs && data && (
           <>
             <div className="w-full flex mb-2 justify-end">
@@ -136,6 +136,8 @@ const MyAgGridComponent = ({ rowData }) => {
               rowData={data}
               columnDefs={columnDefs}
               rowHeight={50}
+              pagination
+              paginationPageSize={10}
             />
           </>
         )}

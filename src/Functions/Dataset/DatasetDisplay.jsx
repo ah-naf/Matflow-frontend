@@ -86,7 +86,7 @@ const DatasetDisplay = () => {
             className="ag-theme-alpine"
             style={{ height: "600px", width: "100%" }}
           >
-            <AgGridReact gridOptions={gridOptions} />
+            <AgGridReact gridOptions={gridOptions} rowHeight={50} />
           </div>
         )}
       </div>

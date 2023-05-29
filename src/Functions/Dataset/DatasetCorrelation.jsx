@@ -1,19 +1,21 @@
-import { AgGridReact } from "ag-grid-react";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import * as stats from "simple-statistics"; // Importing the corrcoef function from mathjs
-import { fetchDataFromIndexedDB } from "./util/indexDB";
+import * as stats from "simple-statistics";
+import AgGridComponent from "../../Components/AgGridComponent/AgGridComponent";
+import { fetchDataFromIndexedDB } from "../../util/indexDB";
 
-const CorrelationGrid = () => {
+function DatasetCorrelation() {
   const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
   const [columnDefs, setColumnDefs] = useState([]);
   const [rowData, setRowData] = useState([]);
+  const [relationMethod, setRelationMethod] = useState("pearson");
+  const [displayType, setDisplayType] = useState("table");
 
   useEffect(() => {
-    if (true) {
+    if (activeCsvFile) {
       const fetchCSVData = async () => {
         try {
-          const res = await fetchDataFromIndexedDB("IRIS.csv");
+          const res = await fetchDataFromIndexedDB(activeCsvFile.name);
 
           const correlations = calculateCorrelations(res);
           const { columnDefs, rowData } = generateAgGridData(res, correlations);
@@ -71,13 +73,15 @@ const CorrelationGrid = () => {
     let columnDefs = Object.keys(correlations).map((columnName) => ({
       headerName: columnName,
       field: columnName,
+      flex: 1,
+      filter: true,
+      sortable: true,
     }));
     columnDefs = [{ headerName: "", field: "name" }, ...columnDefs];
     const columnName = Object.keys(correlations);
     let ind = 0;
 
     let rowData = Object.values(correlations);
-    // console.log(JSON.stringify(correlations));
     rowData = rowData.map((val) => {
       return { ...val, name: columnName[ind++] };
     });
@@ -86,13 +90,50 @@ const CorrelationGrid = () => {
   };
 
   return (
-    <div className="ag-theme-alpine" style={{ height: "500px", width: "100%" }}>
-      {console.log(JSON.stringify(rowData))}
-      <AgGridReact columnDefs={columnDefs} rowData={rowData} />
+    <div className="ag-theme-alpine w-full h-[600px]">
+      <h1 className="text-3xl font-bold my-4">Feature Correlation</h1>
+      {rowData && columnDefs && (
+        <>
+          <div className="flex text-lg my-6 items-center gap-8 max-w-2xl ">
+            <div className="flex flex-col w-1/2 gap-1">
+              <label className="" htmlFor="correlation-method">
+                Correlation Method
+              </label>
+              <select
+                className="text-xl p-2 rounded outline-none border-2 border-[#06603b] shadow bg-gray-100"
+                name="correlation-method"
+                id="correlation-method"
+                value={relationMethod}
+                onChange={(e) => setRelationMethod(e.target.value)}
+              >
+                <option value="pearson">Pearson</option>
+                <option value="kendall">Kendall</option>
+                <option value="spearman">Spearman</option>
+              </select>
+            </div>
+            <div className="flex flex-col w-1/2 gap-1">
+              <label htmlFor="display-type">Display Type</label>
+              <select
+                className="text-xl p-2 rounded outline-none border-2 border-[#06603b] shadow bg-gray-100"
+                name="display-type"
+                id="display-type"
+                value={displayType}
+                onChange={(e) => setDisplayType(e.target.value)}
+              >
+                <option value="table">Table</option>
+                <option value="heatmap">Heatmap</option>
+              </select>
+            </div>
+          </div>
+          {displayType === "table" ? (
+            <AgGridComponent columnDefs={columnDefs} rowData={rowData} />
+          ) : (
+            <p>Display heatmap</p>
+          )}
+        </>
+      )}
     </div>
   );
-};
+}
 
-export default CorrelationGrid;
-
-
+export default DatasetCorrelation;

@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import DatasetDisplay from "../../Functions/Dataset/DatasetDisplay";
 import DatasetInformation from "../../Functions/Dataset/DatasetInformation";
 import DatasetStatistics from "../../Functions/Dataset/DatasetStatistics";
+import DatasetCorrelation from "../../Functions/Dataset/DatasetCorrelation";
 
 function DashBoardRight() {
   const activeFunction = useSelector((state) => state.sideBar.activeFunction);
@@ -18,6 +19,9 @@ function DashBoardRight() {
           )}
           {activeFunction && activeFunction === "Statistics" && (
             <DatasetStatistics />
+          )}
+          {activeFunction && activeFunction === "Corelation" && (
+            <DatasetCorrelation />
           )}
         </>
       ) : (

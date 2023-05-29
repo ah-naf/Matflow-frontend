@@ -5,73 +5,62 @@ import AgGridComponent from "../../Components/AgGridComponent/AgGridComponent";
 import { fetchDataFromIndexedDB } from "../../util/indexDB";
 
 function DatasetStatistics() {
-  const [rowData, setRowData] = useState([]);
+  const [columnStats, setColumnStats] = useState([]);
   const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
 
   useEffect(() => {
     if (activeCsvFile && activeCsvFile.name) {
       const fetchCSVData = async () => {
         const res = await fetchDataFromIndexedDB(activeCsvFile.name);
-        setRowData(res);
+        setColumnStats(calculateColumnStats(res));
       };
       fetchCSVData();
     }
   }, [activeCsvFile]);
 
-  return (
-    <div>
-      <h1 className="text-3xl font-bold my-4">Dataset Statistics</h1>
-      {rowData.length > 0 && <MyAgGridComponent rowData={rowData} />}
-    </div>
-  );
-}
+  const calculateColumnStats = (rowData) => {
+    if (!rowData || rowData.length === 0) return [];
 
-const MyAgGridComponent = ({ rowData }) => {
-  const [columnStats, setColumnStats] = useState([]);
+    let columns = Object.keys(rowData[0] || {});
+    const columnStatsData = [];
+    columns = columns.filter((item, index) => {
+      const dtype = typeof rowData[0][item];
+      return dtype === "number";
+    });
 
-  useEffect(() => {
-    if (rowData && rowData.length > 0) {
-      let columns = Object.keys(rowData[0] || {});
-      const columnStatsData = [];
-      columns = columns.filter((item, index) => {
-        const dtype = typeof rowData[0][item];
-        return dtype === "number";
-      });
+    columns.forEach((column) => {
+      if (column !== "id") {
+        let values = rowData
+          .map((row) => parseFloat(row[column]))
+          .filter((value) => !isNaN(value));
+        const count = values.length;
+        if (count > 0) {
+          const min = stats.min(values);
+          const max = stats.max(values);
+          const std = stats.standardDeviation(values);
 
-      columns.forEach((column) => {
-        if (column !== "id") {
-          let values = rowData
-            .map((row) => parseFloat(row[column]))
-            .filter((value) => !isNaN(value));
-          const count = values.length;
-          if (count > 0) {
-            const min = stats.min(values);
-            const max = stats.max(values);
-            const std = stats.standardDeviation(values);
+          const mean = stats.mean(values);
+          const percentile25 = stats.quantile(values, 0.25);
+          const median = stats.quantile(values, 0.5);
+          const percentile75 = stats.quantile(values, 0.75);
 
-            const mean = stats.mean(values);
-            const percentile25 = stats.quantile(values, 0.25);
-            const median = stats.quantile(values, 0.5);
-            const percentile75 = stats.quantile(values, 0.75);
-
-            columnStatsData.push({
-              column,
-              count,
-              min,
-              max,
-              std,
-              mean,
-              "25%": percentile25,
-              "50%": median,
-              "75%": percentile75,
-            });
-          }
+          columnStatsData.push({
+            column,
+            count,
+            min,
+            max,
+            std,
+            mean,
+            "25%": percentile25,
+            "50%": median,
+            "75%": percentile75,
+          });
         }
-      });
+      }
+    });
 
-      setColumnStats(columnStatsData);
-    }
-  }, [rowData]);
+    return columnStatsData;
+  };
 
   const columnDefs = useMemo(() => {
     const columns = Object.keys(columnStats[0] || {});
@@ -89,14 +78,17 @@ const MyAgGridComponent = ({ rowData }) => {
   }, [columnStats]);
 
   return (
-    <div className="w-full">
-      <div className="ag-theme-alpine h-[600px] w-full">
-        {columnDefs && columnStats && (
-          <AgGridComponent rowData={columnStats} columnDefs={columnDefs} />
-        )}
-      </div>
+    <div>
+      <h1 className="text-3xl font-bold my-4">Dataset Statistics</h1>
+      {columnDefs && columnStats && (
+        <div className="w-full">
+          <div className="ag-theme-alpine h-[600px] w-full">
+            <AgGridComponent rowData={columnStats} columnDefs={columnDefs} />
+          </div>
+        </div>
+      )}
     </div>
   );
-};
+}
 
 export default DatasetStatistics;

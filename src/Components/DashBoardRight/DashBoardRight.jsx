@@ -4,6 +4,7 @@ import DatasetDisplay from "../../Functions/Dataset/DatasetDisplay";
 import DatasetDuplicates from "../../Functions/Dataset/DatasetDuplicates";
 import DatasetInformation from "../../Functions/Dataset/DatasetInformation";
 import DatasetStatistics from "../../Functions/Dataset/DatasetStatistics";
+import DatasetGroup from "../../Functions/Dataset/DatasetGroup";
 
 function DashBoardRight() {
   const activeFunction = useSelector((state) => state.sideBar.activeFunction);
@@ -25,6 +26,9 @@ function DashBoardRight() {
           )}
           {activeFunction && activeFunction === "Duplicate" && (
             <DatasetDuplicates />
+          )}
+          {activeFunction && activeFunction === "Group" && (
+            <DatasetGroup />
           )}
         </>
       ) : (

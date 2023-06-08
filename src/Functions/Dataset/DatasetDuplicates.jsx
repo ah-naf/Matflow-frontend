@@ -43,6 +43,21 @@ function DatasetDuplicates() {
         try {
           const res = await fetchDataFromIndexedDB(activeCsvFile.name);
 
+          const response = await fetch("http://127.0.0.1:8000/api/display/", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              file: res,
+              group_var: ["sepal_length", "sepal_width"],
+              agg_func: "count",
+            }),
+          });
+
+          const { data } = await response.json();
+          console.log(JSON.parse(data));
+
           const generatedColumnDefs = generateColumnDefs(res, excludeKeys);
           setColumnDefs(generatedColumnDefs);
 
@@ -71,7 +86,6 @@ function DatasetDuplicates() {
             missingValues.push(value);
           }
         }
-        console.log({ firstList, secondList });
         return missingValues;
       };
       const colShowing = findMissingValues(

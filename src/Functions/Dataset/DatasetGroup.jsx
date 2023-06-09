@@ -8,6 +8,7 @@ import { fetchDataFromIndexedDB } from "../../util/indexDB";
 
 function DatasetGroup() {
   const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
+  const [initialData, setInitialData] = useState();
   const [groupVar, setGroupVar] = useState([]);
   const [aggFunc, setAggFunc] = useState("");
   const [rowData, setRowData] = useState(null);
@@ -17,7 +18,8 @@ function DatasetGroup() {
 
   const columnDefs = useMemo(() => {
     if (!rowData) return;
-    const columns = Object.keys(rowData[0] || {});
+    let columns = Object.keys(rowData[0] || {});
+    columns = columns.filter((col) => col !== "id");
     return columns.map((column) => ({
       headerName: column,
       field: column,
@@ -37,6 +39,7 @@ function DatasetGroup() {
         try {
           const res = await fetchDataFromIndexedDB(activeCsvFile.name);
           const tempColumns = Object.keys(res[0]);
+          setInitialData(res);
           setAllColumns(tempColumns);
           setGroupVar([tempColumns[0]]);
           allColumnsRef.current = tempColumns;
@@ -75,7 +78,7 @@ function DatasetGroup() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        file: rowData,
+        file: initialData,
         group_var: [...groupVar, searchValue],
         agg_func: aggFunc ? aggFunc : "count",
       }),
@@ -95,7 +98,7 @@ function DatasetGroup() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        file: rowData,
+        file: initialData,
         group_var: tempFunc,
         agg_func: aggFunc ? aggFunc : "count",
       }),
@@ -115,7 +118,7 @@ function DatasetGroup() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        file: rowData,
+        file: initialData,
         group_var: groupVar,
         agg_func: e.target.value,
       }),
@@ -123,8 +126,7 @@ function DatasetGroup() {
 
     let { data } = await response.json();
     data = JSON.parse(data);
-    console.log(data)
-    // console.log(data);
+
     setRowData(data);
   };
 
@@ -136,15 +138,22 @@ function DatasetGroup() {
           <Popover placement={"bottom-right"} shouldFlip isBordered>
             <Popover.Trigger>
               <h3 className="text-base underline cursor-pointer text-[#06603b] font-medium tracking-wide">
-                Aggregate Column
+                Apply Aggregation
               </h3>
             </Popover.Trigger>
             <Popover.Content>
               <div className="px-6 py-4 min-w-[350px] max-w-xl">
                 <div className="w-full">
                   <div className="flex gap-2 mb-2 items-center">
-                    <p className="font-titillium font-semibold tracking-wide text-sm">Aggregate Function: </p>
-                    <select name="aggFunc" id="" onChange={handleOptionChange} className="flex-grow p-2 rounded border-2 border-[#097045] bg-transparent">
+                    <p className="font-titillium font-semibold tracking-wide text-sm">
+                      Aggregate Function:{" "}
+                    </p>
+                    <select
+                      name="aggFunc"
+                      id=""
+                      onChange={handleOptionChange}
+                      className="flex-grow p-2 rounded border-2 border-[#097045] bg-transparent"
+                    >
                       <option value="count">count</option>
                       <option value="sum">sum</option>
                       <option value="min">min</option>

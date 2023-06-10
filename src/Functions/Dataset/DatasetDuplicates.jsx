@@ -1,7 +1,5 @@
-import { Input, Popover } from "@nextui-org/react";
+import { Checkbox, Input, Popover } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
-import { BiHide } from "react-icons/bi";
-import { GrFormAdd } from "react-icons/gr";
 import { useSelector } from "react-redux";
 import AgGridComponent from "../../Components/AgGridComponent/AgGridComponent";
 import { fetchDataFromIndexedDB } from "../../util/indexDB";
@@ -12,8 +10,9 @@ function DatasetDuplicates() {
   const [columnDefs, setColumnDefs] = useState([]);
   const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
   const [excludeKeys, setExcludeKeys] = useState(["id"]);
-  const [columnShown, setColumnShown] = useState([]);
   const [searchValue, setSearchValue] = useState("");
+  const [selectedColumns, setSelectedColumns] = useState([]);
+  const [columnNames, setColumnNames] = useState([]);
 
   useEffect(() => {
     if (activeCsvFile) {
@@ -43,20 +42,9 @@ function DatasetDuplicates() {
         try {
           const res = await fetchDataFromIndexedDB(activeCsvFile.name);
 
-          const response = await fetch("http://127.0.0.1:8000/api/display/", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              file: res,
-              group_var: ["sepal_length", "sepal_width"],
-              agg_func: "count",
-            }),
-          });
-
-          const { data } = await response.json();
-          console.log(JSON.parse(data));
+          let cNames = Object.keys(res[0]);
+          cNames = cNames.filter((val) => val !== "id");
+          setColumnNames(cNames);
 
           const generatedColumnDefs = generateColumnDefs(res, excludeKeys);
           setColumnDefs(generatedColumnDefs);
@@ -92,7 +80,7 @@ function DatasetDuplicates() {
         excludeKeys,
         Object.keys(rowData[0])
       );
-      setColumnShown(colShowing);
+      setSelectedColumns(colShowing);
     }
   }, [excludeKeys, rowData]);
 
@@ -110,94 +98,81 @@ function DatasetDuplicates() {
       columnDefs.push({
         headerName: columnName[i],
         field: columnName[i].toLowerCase().replace(/\s/g, ""),
-        flex: 1,
-        filter: true,
-        sortable: true,
+        valueGetter: (params) => {
+          return params.data[columnName[i]];
+        },
       });
     }
-
     return columnDefs;
   };
 
   // Function to generate row data dynamically
 
-  const filterColumn = (column) => {
-    setExcludeKeys([...excludeKeys, column]);
-    setColumnShown(columnShown.filter((val) => val !== column));
+  const handleColumnToggle = (column) => {
+    if (selectedColumns.includes(column)) {
+      setExcludeKeys([...excludeKeys, column]);
+      setSelectedColumns(
+        selectedColumns.filter((selectedColumn) => selectedColumn !== column)
+      );
+    } else {
+      setExcludeKeys(excludeKeys.filter((val) => val !== column));
+      setSelectedColumns([...selectedColumns, column]);
+    }
   };
 
-  const handleColHide = () => {
-    setColumnShown([...columnShown, searchValue]);
-    setExcludeKeys(excludeKeys.filter((val) => val !== searchValue));
-    setSearchValue("");
-  };
+  const filteredColumns = columnNames.filter((column) =>
+    column.toLowerCase().includes(searchValue.toLowerCase())
+  );
 
   return (
     <div className="mt-4">
-      {duplicateRows && duplicateRows.length > 0 ? (
-        <div className="ag-theme-alpine w-full h-[600px]">
-          <div className="w-full flex justify-between mb-2">
-            <p className="">There are {duplicateRows.length} duplicate data.</p>
-            <Popover placement={"bottom-right"} shouldFlip isBordered>
-              <Popover.Trigger>
-                <h3 className="text-base underline cursor-pointer text-[#06603b] font-medium tracking-wide">
-                  Filter Column
-                </h3>
-              </Popover.Trigger>
-              <Popover.Content>
-                <div className="px-6 py-4 min-w-[300px] max-w-xl">
-                  <div className="w-full">
-                    <p className="mb-2 tracking-wide font-semibold font-titillium">
-                      Add Column
-                    </p>
-                    <Input
-                      width="100%"
-                      color="success"
-                      bordered
-                      value={searchValue}
-                      onChange={(e) => setSearchValue(e.target.value)}
-                      placeholder="Enter Column Name. (Check spelling)"
-                      contentRight={
-                        <button
-                          className="cursor-pointer"
-                          onClick={handleColHide}
-                        >
-                          <GrFormAdd color="#06603b" />
-                        </button>
-                      }
-                      contentClickable
-                    />
-                  </div>
-                  <div className="mt-3">
-                    <h3 className="text-sm tracking-wide font-titillium font-semibold">
-                      Showing Column :
-                    </h3>
-                    <div className="w-full flex items-center mt-4 flex-wrap gap-2 max-w-xl">
-                      {columnShown.map((val, ind) => (
-                        <button
-                          className="text-white flex items-center justify-between rounded cursor-pointer bg-[#097045] font-roboto tracking-wide group"
-                          key={ind}
-                        >
-                          <span className="p-2">{val}</span>
-                          <span
-                            className="pr-2 hidden group-hover:flex"
-                            onClick={(e) => filterColumn(val)}
-                          >
-                            <BiHide />
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+      <div className="ag-theme-alpine w-full h-[600px]">
+        <div className="w-full flex justify-between mb-2">
+          <p className="">There are {duplicateRows.length} duplicate data.</p>
+          <Popover placement={"bottom-right"} shouldFlip isBordered>
+            <Popover.Trigger>
+              <h3 className="text-base underline cursor-pointer text-[#06603b] font-medium tracking-wide">
+                Filter Column
+              </h3>
+            </Popover.Trigger>
+            <Popover.Content>
+              <div className="px-6 py-4 min-w-[300px] max-w-xl">
+                <div className="w-full">
+                  <p className="mb-2 tracking-wide font-semibold font-titillium">
+                    Column Name
+                  </p>
+                  <Input
+                    width="100%"
+                    color="success"
+                    bordered
+                    value={searchValue}
+                    onChange={(e) => setSearchValue(e.target.value)}
+                    placeholder="Enter Column Name. (Check spelling)"
+                  />
                 </div>
-              </Popover.Content>
-            </Popover>
-          </div>
-          <AgGridComponent rowData={duplicateRows} columnDefs={columnDefs} />
+                <div className="mt-3">
+                  <ul className="max-h-96 overflow-y-auto">
+                    {filteredColumns.map((column, index) => (
+                      <li key={index} className="flex items-center gap-2">
+                        <Checkbox
+                          color="success"
+                          defaultSelected={selectedColumns.includes(column)}
+                          onChange={() => handleColumnToggle(column)}
+                        >
+                          {column}
+                        </Checkbox>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </Popover.Content>
+          </Popover>
         </div>
-      ) : (
-        <h3>There are no duplicate data.</h3>
-      )}
+        {duplicateRows && duplicateRows.length > 0 && (
+          <AgGridComponent rowData={duplicateRows} columnDefs={columnDefs} />
+        )}
+      </div>
     </div>
   );
 }

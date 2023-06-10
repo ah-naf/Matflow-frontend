@@ -1,4 +1,5 @@
-import Papa from 'papaparse'
+import Papa from "papaparse";
+import * as XLSX from "xlsx";
 
 const fetchDataFromIndexedDB = (name) => {
   return new Promise((resolve, reject) => {
@@ -92,13 +93,70 @@ const deleteIndexedDB = (name) => {
   });
 };
 
+const parseExcel = (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const data = new Uint8Array(event.target.result);
+      const workbook = XLSX.read(data, { type: "array" });
+      const sheetName = workbook.SheetNames[0];
+      const sheetData = XLSX.utils.sheet_to_csv(workbook.Sheets[sheetName]);
+
+      let id = 1;
+      Papa.parse(sheetData, {
+        header: true,
+        dynamicTyping: true,
+        complete: (results) => {
+          let data = [];
+          if (results.errors.length > 0) {
+            const validData = results.data.filter(
+              (_, index) => !results.errors.some((error) => error.row === index)
+            );
+            data = validData;
+          } else data = results.data;
+
+          const temp = data.map((row) => {
+            const modifiedRow = { ...row };
+            if (modifiedRow[""] || modifiedRow[" "]) {
+              modifiedRow[`Unnamed Column ${id}`] = modifiedRow[""];
+              delete modifiedRow[""];
+            }
+            return modifiedRow;
+          });
+          resolve(temp);
+        },
+        error: (error) => {
+          reject(error);
+        },
+      });
+    };
+    reader.readAsArrayBuffer(file);
+  });
+};
+
 const parseCsv = (file) => {
   return new Promise((resolve, reject) => {
     Papa.parse(file, {
       header: true,
       dynamicTyping: true,
       complete: (results) => {
-        resolve(results.data);
+        let data = [];
+        if (results.errors.length > 0) {
+          const validData = results.data.filter(
+            (_, index) => !results.errors.some((error) => error.row === index)
+          );
+          data = validData;
+        } else data = results.data;
+
+        const temp = data.map((row) => {
+          const modifiedRow = { ...row };
+          if (modifiedRow[""]) {
+            modifiedRow[`Unnamed Column`] = modifiedRow[""];
+            delete modifiedRow[""];
+          }
+          return modifiedRow;
+        });
+        resolve(temp);
       },
       error: (error) => {
         reject(error);
@@ -108,14 +166,14 @@ const parseCsv = (file) => {
 };
 
 function fixMismatchedColumns(parsedData) {
-  const maxColumns = Math.max(...parsedData.map(row => row.length));
+  const maxColumns = Math.max(...parsedData.map((row) => row.length));
 
   // Align columns for each row
-  const alignedData = parsedData.map(row => {
+  const alignedData = parsedData.map((row) => {
     if (row.length < maxColumns) {
       // Add empty values or placeholders for missing columns
       const missingColumns = maxColumns - row.length;
-      return [...row, ...Array(missingColumns).fill('')];
+      return [...row, ...Array(missingColumns).fill("")];
     } else if (row.length > maxColumns) {
       // Truncate extra columns
       return row.slice(0, maxColumns);
@@ -128,4 +186,11 @@ function fixMismatchedColumns(parsedData) {
   return alignedData;
 }
 
-export { fetchDataFromIndexedDB, storeDataInIndexedDB, parseCsv, deleteIndexedDB, fixMismatchedColumns };
+export {
+  fetchDataFromIndexedDB,
+  storeDataInIndexedDB,
+  parseCsv,
+  parseExcel,
+  deleteIndexedDB,
+  fixMismatchedColumns,
+};

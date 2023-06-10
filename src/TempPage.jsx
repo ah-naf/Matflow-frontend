@@ -1,45 +1,39 @@
-import { Input, Table } from "@nextui-org/react";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { fetchDataFromIndexedDB } from "./util/indexDB";
 
-function TempPage() {
-  return (
-    <div>
-      <h1>TempPage</h1>
-      <div className="max-w-md">
-        <Table
-          aria-label="Example disabled keys collection table"
-          css={{
-            height: "auto",
-            minWidth: "100%",
-          }}
-          disallowEmptySelection
-          defaultSelectedKeys={["2"]}
-          selectionMode="multiple"
-          color="secondary"
-        >
-          <Table.Header>
-            <Table.Column hideHeader>
-              <input type="text" className="z-100" />
-            </Table.Column>
-          </Table.Header>
-          <Table.Body>
-            <Table.Row key="1">
-              <Table.Cell>Tony Reichert</Table.Cell>
-            </Table.Row>
-            <Table.Row key="2">
-              <Table.Cell>Zoey Lang</Table.Cell>
-            </Table.Row>
-            <Table.Row key="3">
-              <Table.Cell>Jane Fisher</Table.Cell>
-            </Table.Row>
-            <Table.Row key="4">
-              <Table.Cell>William Howard</Table.Cell>
-            </Table.Row>
-          </Table.Body>
-        </Table>
-      </div>
-    </div>
-  );
-}
+const MultiSelectDropdown = () => {
+  const [rowData, setRowData] = useState([]);
+  useEffect(() => {
+    const fetchCSVData = async () => {
+      try {
+        const res = await fetchDataFromIndexedDB("IRIS.csv");
 
-export default TempPage;
+        setRowData(res);
+
+        const resp = await fetch(
+          "http://127.0.0.1:8000/api/display_correlation/",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              file: res,
+            }),
+          }
+        );
+        let { data } = await resp.json();
+        const tempData = JSON.parse(data);
+        console.log(tempData);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
+    fetchCSVData();
+  }, []);
+
+  return <div className="dropdown"></div>;
+};
+
+export default MultiSelectDropdown;

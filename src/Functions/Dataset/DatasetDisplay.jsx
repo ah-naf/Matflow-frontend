@@ -3,6 +3,8 @@ import { useSelector } from "react-redux";
 import AgGridComponent from "../../Components/AgGridComponent/AgGridComponent";
 import { fetchDataFromIndexedDB } from "../../util/indexDB";
 
+let id = 1;
+
 const DatasetDisplay = () => {
   const [value] = useState("All");
   const [csvData, setCsvData] = useState([]);
@@ -44,22 +46,19 @@ const DatasetDisplay = () => {
       ? Object.keys(csvData[0]).map((key) => ({
           headerName: key,
           field: key,
-          valueFormatter: ({ value }) => (value !== null ? value : "N/A"),
-          filter: true, // Enable filtering for the column
-          filterParams: {
-            suppressAndOrCondition: true, // Optional: Suppress 'and'/'or' filter conditions
-            newRowsAction: "keep", // Optional: Preserve filter when new rows are loaded
+          valueGetter: (params) => {
+            return params.data[key];
           },
-          sortable: true, // Enable sorting for the column
-          flex: 1,
         }))
       : [];
+
+  // console.log(columnDefs);
 
   return (
     <>
       <h1 className="text-3xl mt-4 font-bold">Display Dataset</h1>
 
-      <div className="mt-4">
+      <div className="mt-4 w-full">
         {rowData.length > 0 && (
           <div
             className="ag-theme-alpine"

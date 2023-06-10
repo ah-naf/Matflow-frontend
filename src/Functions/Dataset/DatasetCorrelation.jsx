@@ -10,6 +10,7 @@ function DatasetCorrelation() {
   const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
   const [columnDefs, setColumnDefs] = useState([]);
   const [rowData, setRowData] = useState([]);
+  const [initialData, setInitialData] = useState([]);
   const [relationMethod, setRelationMethod] = useState("pearson");
   const [displayType, setDisplayType] = useState("table");
 
@@ -64,7 +65,7 @@ function DatasetCorrelation() {
               );
 
               // // Store the correlation coefficient in the correlations object
-              correlations[column1][column2] = cc.rho.toFixed(4);
+              correlations[column1][column2] = cc.rho.toFixed(3);
             } else if (relationMethod === "pearson") {
               const cc = temp.correlationCoefficient(
                 l[0],
@@ -73,11 +74,7 @@ function DatasetCorrelation() {
 
               // // Store the correlation coefficient in the correlations object
               correlations[column1][column2] =
-                cc.correlationCoefficient.toFixed(4);
-            } else if (relationMethod === "kendall") {
-              const cc = temp.kendallsTau(l[0], l[l.length === 1 ? 0 : 1]);
-              // // Store the correlation coefficient in the correlations object
-              correlations[column1][column2] = cc.a ? cc.a.tauA : 0;
+                cc.correlationCoefficient.toFixed(3);
             }
           }
         }
@@ -90,10 +87,11 @@ function DatasetCorrelation() {
           const res = await fetchDataFromIndexedDB(activeCsvFile.name);
 
           const correlations = calculateCorrelations(res);
-          const { columnDefs, rowData } = generateAgGridData(res, correlations);
+          const { columnDefs, rowData } = generateAgGridData(correlations);
 
           setColumnDefs(columnDefs);
           setRowData(rowData);
+          setInitialData(res);
         } catch (error) {
           console.error("Error:", error);
         }
@@ -102,13 +100,60 @@ function DatasetCorrelation() {
     }
   }, [activeCsvFile, relationMethod]);
 
-  const generateAgGridData = (data, correlations) => {
+  useEffect(() => {
+    if (relationMethod === "kendall") {
+      const fetchData = async () => {
+        const resp = await fetch(
+          "http://127.0.0.1:8000/api/display_correlation/",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              file: initialData,
+            }),
+          }
+        );
+        let { data } = await resp.json();
+        // console.log(data)
+        const tempData = JSON.parse(data);
+
+        let columnName = Object.keys(tempData[0]);
+        columnName = columnName.filter((val) => val !== "id");
+        let newData = [];
+        for (let i = 0; i < columnName.length; i++) {
+          const { id, ...rest } = tempData[i];
+          newData.push(rest);
+        }
+
+        let columnDefs = Object.keys(newData[0]).map((columnName) => ({
+          headerName: columnName,
+          field: columnName,
+          valueGetter: (params) => {
+            return params.data[columnName];
+          },
+        }));
+        columnDefs = [{ headerName: "", field: "name" }, ...columnDefs];
+        // let ind = 0;
+        newData = newData.map((val, ind) => {
+          return { ...val, name: columnName[ind] };
+        });
+        setRowData(newData);
+        setColumnDefs(columnDefs);
+      };
+
+      fetchData();
+    }
+  }, [relationMethod, initialData]);
+
+  const generateAgGridData = (correlations) => {
     let columnDefs = Object.keys(correlations).map((columnName) => ({
       headerName: columnName,
       field: columnName,
-      flex: 1,
-      filter: true,
-      sortable: true,
+      valueGetter: (params) => {
+        return params.data[columnName];
+      },
     }));
     columnDefs = [{ headerName: "", field: "name" }, ...columnDefs];
     const columnName = Object.keys(correlations);
@@ -118,7 +163,6 @@ function DatasetCorrelation() {
     rowData = rowData.map((val) => {
       return { ...val, name: columnName[ind++] };
     });
-
     return { columnDefs, rowData };
   };
 

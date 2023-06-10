@@ -58,7 +58,7 @@ const MyAgGridComponent = ({ rowData }) => {
       if (column !== "id") {
         rowData.forEach((row) => {
           const value = row[column];
-          if (value) {
+          if (value !== undefined && value !== null) {
             uniqueValues.add(value);
             nonNullCount++;
           }

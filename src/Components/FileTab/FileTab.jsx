@@ -7,6 +7,7 @@ import { setActiveFile } from "../../Slices/UploadedFileSlice";
 import {
   deleteIndexedDB,
   parseCsv,
+  parseExcel,
   storeDataInIndexedDB,
 } from "../../util/indexDB";
 
@@ -44,7 +45,14 @@ function FileTab() {
       // handleFiles(e.dataTransfer.files);
       const file = e.dataTransfer.files[0];
       setUploadedFile(file);
-      const parsedData = await parseCsv(file);
+      let parsedData;
+      const type = file.name.split(".").slice(-1)[0];
+      if (type === "csv") {
+        parsedData = await parseCsv(file);
+      } else {
+        parsedData = await parseExcel(file);
+        console.log(parsedData);
+      }
       storeDataInIndexedDB(parsedData, file.name);
     }
   };
@@ -80,7 +88,14 @@ function FileTab() {
       setFiles(tempFiles);
       localStorage.setItem("uploadedFiles", JSON.stringify(tempFiles));
 
-      const parsedData = await parseCsv(uploadedFile);
+      let parsedData;
+      const type = uploadedFile.name.split(".").slice(-1)[0];
+      if (type === "csv") {
+        parsedData = await parseCsv(uploadedFile);
+      } else {
+        parsedData = await parseExcel(uploadedFile);
+        console.log(parsedData);
+      }
       await storeDataInIndexedDB(parsedData, uploadedFile.name);
       setUploadedFile("");
     }

@@ -23,7 +23,7 @@ function DatasetStatistics() {
 
     let columns = Object.keys(rowData[0] || {});
     const columnStatsData = [];
-    columns = columns.filter((item, index) => {
+    columns = columns.filter((item) => {
       const dtype = typeof rowData[0][item];
       return dtype === "number";
     });
@@ -35,14 +35,14 @@ function DatasetStatistics() {
           .filter((value) => !isNaN(value));
         const count = values.length;
         if (count > 0) {
-          const min = stats.min(values);
-          const max = stats.max(values);
-          const std = stats.standardDeviation(values);
+          const min = stats.min(values).toFixed(3);
+          const max = stats.max(values).toFixed(3);
+          const std = stats.standardDeviation(values).toFixed(3);
 
-          const mean = stats.mean(values);
-          const percentile25 = stats.quantile(values, 0.25);
-          const median = stats.quantile(values, 0.5);
-          const percentile75 = stats.quantile(values, 0.75);
+          const mean = stats.mean(values).toFixed(3);
+          const percentile25 = stats.quantile(values, 0.25).toFixed(3);
+          const median = stats.quantile(values, 0.5).toFixed(3);
+          const percentile75 = stats.quantile(values, 0.75).toFixed(3);
 
           columnStatsData.push({
             column,
@@ -67,13 +67,9 @@ function DatasetStatistics() {
     return columns.map((column) => ({
       headerName: column,
       field: column,
-      filter: true,
-      filterParams: {
-        suppressAndOrCondition: true,
-        newRowsAction: "keep",
+      valueGetter: (params) => {
+        return params.data[column];
       },
-      sortable: true,
-      flex: 1,
     }));
   }, [columnStats]);
 

@@ -1,20 +1,19 @@
-import { Input, Popover } from "@nextui-org/react";
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { BiHide } from "react-icons/bi";
-import { GrFormAdd } from "react-icons/gr";
+import { Checkbox, Input, Popover } from "@nextui-org/react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import AgGridComponent from "../../Components/AgGridComponent/AgGridComponent";
 import { fetchDataFromIndexedDB } from "../../util/indexDB";
 
 function DatasetGroup() {
   const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
-  const [initialData, setInitialData] = useState();
-  const [groupVar, setGroupVar] = useState([]);
-  const [aggFunc, setAggFunc] = useState("");
+  const [initialData, setInitialData] = useState([]);
+
   const [rowData, setRowData] = useState(null);
-  const [allColumns, setAllColumns] = useState([]);
   const [searchValue, setSearchValue] = useState("");
-  const allColumnsRef = useRef(allColumns);
+  const [selectValue, setSelectValue] = useState("count");
+
+  const [selectedColumns, setSelectedColumns] = useState([]);
+  const [columnNames, setColumnNames] = useState([]);
 
   const columnDefs = useMemo(() => {
     if (!rowData) return;
@@ -23,13 +22,9 @@ function DatasetGroup() {
     return columns.map((column) => ({
       headerName: column,
       field: column,
-      filter: true,
-      filterParams: {
-        suppressAndOrCondition: true, // Optional: Suppress 'and'/'or' filter conditions
-        newRowsAction: "keep", // Optional: Preserve filter when new rows are loaded
+      valueGetter: (params) => {
+        return params.data[column];
       },
-      sortable: true,
-      flex: 1,
     }));
   }, [rowData]);
 
@@ -38,28 +33,12 @@ function DatasetGroup() {
       const fetchCSVData = async () => {
         try {
           const res = await fetchDataFromIndexedDB(activeCsvFile.name);
-          const tempColumns = Object.keys(res[0]);
+          let tempColumns = Object.keys(res[0]);
           setInitialData(res);
-          setAllColumns(tempColumns);
-          setGroupVar([tempColumns[0]]);
-          allColumnsRef.current = tempColumns;
 
-          const response = await fetch("http://127.0.0.1:8000/api/display/", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              file: res,
-              group_var: tempColumns[0],
-              agg_func: "count",
-            }),
-          });
-
-          let { data } = await response.json();
-          data = JSON.parse(data);
-
-          setRowData(data);
+          tempColumns = tempColumns.filter((col) => col !== "id");
+          setColumnNames(tempColumns);
+          setSelectedColumns([...selectedColumns, tempColumns[0]]);
         } catch (error) {
           console.error("Error:", error);
         }
@@ -69,66 +48,47 @@ function DatasetGroup() {
     }
   }, [activeCsvFile]);
 
-  const handleColAdd = async () => {
-    setGroupVar([...groupVar, searchValue]);
-    setSearchValue("");
-    const response = await fetch("http://127.0.0.1:8000/api/display/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        file: initialData,
-        group_var: [...groupVar, searchValue],
-        agg_func: aggFunc ? aggFunc : "count",
-      }),
-    });
+  useEffect(() => {
+    if (initialData && initialData.length) {
+      const fetchData = async () => {
+        try {
+          const res = await fetch("http://127.0.0.1:8000/api/display_group/", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              file: initialData,
+              group_var: selectedColumns,
+              agg_func: selectValue,
+            }),
+          });
 
-    let { data } = await response.json();
-    data = JSON.parse(data);
-    setRowData(data);
+          let { data } = await res.json();
+          const tempData = JSON.parse(data);
+          setRowData(tempData);
+        } catch (error) {
+          console.error(error);
+        }
+      };
+
+      fetchData();
+    }
+  }, [initialData, selectValue, selectedColumns]);
+
+  const handleColumnToggle = (column) => {
+    if (selectedColumns.includes(column)) {
+      setSelectedColumns(
+        selectedColumns.filter((selectedColumn) => selectedColumn !== column)
+      );
+    } else {
+      setSelectedColumns([...selectedColumns, column]);
+    }
   };
 
-  const filterColumn = async (name) => {
-    const tempFunc = groupVar.filter((val) => val !== name);
-    setGroupVar(tempFunc);
-    const response = await fetch("http://127.0.0.1:8000/api/display/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        file: initialData,
-        group_var: tempFunc,
-        agg_func: aggFunc ? aggFunc : "count",
-      }),
-    });
-
-    let { data } = await response.json();
-    data = JSON.parse(data);
-    setRowData(data);
-  };
-
-  const handleOptionChange = async (e) => {
-    e.preventDefault();
-    setAggFunc(e.target.value);
-    const response = await fetch("http://127.0.0.1:8000/api/display/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        file: initialData,
-        group_var: groupVar,
-        agg_func: e.target.value,
-      }),
-    });
-
-    let { data } = await response.json();
-    data = JSON.parse(data);
-
-    setRowData(data);
-  };
+  const filteredColumns = columnNames.filter((column) =>
+    column.toLowerCase().includes(searchValue.toLowerCase())
+  );
 
   return (
     <div>
@@ -150,8 +110,8 @@ function DatasetGroup() {
                     </p>
                     <select
                       name="aggFunc"
-                      id=""
-                      onChange={handleOptionChange}
+                      value={selectValue}
+                      onChange={(e) => setSelectValue(e.target.value)}
                       className="flex-grow p-2 rounded border-2 border-[#097045] bg-transparent"
                     >
                       <option value="count">count</option>
@@ -165,7 +125,7 @@ function DatasetGroup() {
                     </select>
                   </div>
                   <p className="mb-2 tracking-wide font-semibold font-titillium">
-                    Add Column
+                    Column Name
                   </p>
                   <Input
                     width="100%"
@@ -173,37 +133,23 @@ function DatasetGroup() {
                     bordered
                     value={searchValue}
                     onChange={(e) => setSearchValue(e.target.value)}
-                    placeholder="Enter Column Name. (Check spelling)"
-                    contentRight={
-                      <button className="cursor-pointer" onClick={handleColAdd}>
-                        <GrFormAdd color="#06603b" />
-                      </button>
-                    }
-                    contentClickable
+                    placeholder="Enter Column Name"
                   />
                 </div>
                 <div className="mt-3">
-                  <h3 className="text-sm tracking-wide font-titillium font-semibold">
-                    Showing Column :
-                  </h3>
-                  <div className="w-full flex items-center mt-4 flex-wrap gap-2 max-w-xl">
-                    {groupVar &&
-                      groupVar.length > 0 &&
-                      groupVar.map((val, ind) => (
-                        <button
-                          className="text-white flex items-center justify-between rounded cursor-pointer bg-[#097045] font-roboto tracking-wide group"
-                          key={ind}
+                  <ul className="max-h-96 overflow-y-auto">
+                    {filteredColumns.map((column, index) => (
+                      <li key={index} className="flex items-center gap-2">
+                        <Checkbox
+                          color="success"
+                          defaultSelected={selectedColumns.includes(column)}
+                          onChange={() => handleColumnToggle(column)}
                         >
-                          <span className="p-2">{val}</span>
-                          <span
-                            className="pr-2 hidden group-hover:flex"
-                            onClick={() => filterColumn(val)}
-                          >
-                            <BiHide />
-                          </span>
-                        </button>
-                      ))}
-                  </div>
+                          {column}
+                        </Checkbox>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </div>
             </Popover.Content>

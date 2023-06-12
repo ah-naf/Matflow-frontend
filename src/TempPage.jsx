@@ -1,39 +1,61 @@
-import React, { useEffect, useState } from "react";
-import { fetchDataFromIndexedDB } from "./util/indexDB";
+import React, { useState, useEffect, useRef } from 'react';
 
-const MultiSelectDropdown = () => {
-  const [rowData, setRowData] = useState([]);
+function DropdownMenu() {
+  const [filter, setFilter] = useState('');
+  const [menuItems, setMenuItems] = useState([
+    'Apple',
+    'Banana',
+    'Cherry',
+    'Durian',
+    'Elderberry',
+    'Fig',
+  ]);
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
   useEffect(() => {
-    const fetchCSVData = async () => {
-      try {
-        const res = await fetchDataFromIndexedDB("IRIS.csv");
-
-        setRowData(res);
-
-        const resp = await fetch(
-          "http://127.0.0.1:8000/api/display_correlation/",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              file: res,
-            }),
-          }
-        );
-        let { data } = await resp.json();
-        const tempData = JSON.parse(data);
-        console.log(tempData);
-      } catch (error) {
-        console.error("Error:", error);
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
       }
     };
 
-    fetchCSVData();
+    window.addEventListener('click', handleClickOutside);
+
+    return () => {
+      window.removeEventListener('click', handleClickOutside);
+    };
   }, []);
 
-  return <div className="dropdown"></div>;
-};
+  const handleInputChange = (event) => {
+    const newFilter = event.target.value;
+    setFilter(newFilter);
+    setIsOpen(true);
+  };
 
-export default MultiSelectDropdown;
+  const filteredItems = menuItems.filter((item) =>
+    item.toLowerCase().includes(filter.toLowerCase())
+  );
+
+  return (
+    <div ref={dropdownRef}>
+      <input
+        type="text"
+        value={filter}
+        onChange={handleInputChange}
+        onFocus={() => setIsOpen(true)}
+      />
+
+      {isOpen && (
+        <ul>
+          {filteredItems.map((item) => (
+            <li key={item} onClick={() => console.log('first')}>{item}</li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+
+export default DropdownMenu

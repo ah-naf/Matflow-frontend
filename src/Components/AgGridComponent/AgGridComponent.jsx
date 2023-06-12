@@ -43,7 +43,7 @@ function AgGridComponent({ rowData, columnDefs }) {
         paginationPageSize={10}
         defaultColDef={defaultColDef}
       ></AgGridReact>
-      <div className="flex items-center gap-2 mt-4">
+      <div className="flex items-center gap-2 mt-4 pb-8">
         <button
           className="rounded px-4 py-2 border-2 border-[#097045]"
           onClick={sizeToFit}

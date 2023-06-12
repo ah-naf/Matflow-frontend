@@ -47,16 +47,16 @@ function BarPlot() {
     if (activeNumberColumn && activeStringColumn && csvData) {
       const fetchData = async () => {
         setLoading(true);
-        setImage('')
+        setImage("");
         const resp = await fetch("http://127.0.0.1:8000/api/eda_barplot/", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            cat: activeStringColumn || '-',
-            num: activeNumberColumn || '-',
-            hue: activeHueColumn || '-',
+            cat: activeStringColumn || "-",
+            num: activeNumberColumn || "-",
+            hue: activeHueColumn || "-",
             orient: orientation,
             annote: annotate,
             file: csvData,
@@ -80,10 +80,6 @@ function BarPlot() {
     csvData,
   ]);
 
-  const onCatChange = (name) => setActiveStringColumn(name);
-  const onNumChange = (name) => setActiveNumberColumn(name);
-  const onHueChange = (name) => setActiveHueColumn(name);
-
   return (
     <div>
       <div className="flex items-center gap-8 mt-8">
@@ -93,7 +89,7 @@ function BarPlot() {
           </p>
           <SingleDropDown
             columnNames={stringColumn}
-            onValueChange={onCatChange}
+            onValueChange={setActiveStringColumn}
           />
         </div>
         <div className="w-full">
@@ -102,13 +98,13 @@ function BarPlot() {
           </p>
           <SingleDropDown
             columnNames={numberColumn}
-            onValueChange={onNumChange}
+            onValueChange={setActiveNumberColumn}
           />
         </div>
         <div className="w-full">
           <p className="text-lg font-medium tracking-wide">Hue</p>
           <SingleDropDown
-            onValueChange={onHueChange}
+            onValueChange={setActiveHueColumn}
             columnNames={stringColumn}
           />
         </div>
@@ -163,8 +159,8 @@ function BarPlot() {
         </div>
       )}
       {image && (
-        <div className="py-8">
-          <img src={image} alt="" className="w-full" />
+        <div className="py-8 flex justify-center">
+          <img src={image} alt="" className="w-full max-w-[800px]" />
         </div>
       )}
     </div>

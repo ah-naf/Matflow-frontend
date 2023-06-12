@@ -1,6 +1,7 @@
-import { Checkbox, Input } from "@nextui-org/react";
-import React, { useEffect, useRef, useState } from "react";
+import { Checkbox } from "@nextui-org/react";
+import React, { useEffect, useState } from "react";
 import AgGridComponent from "../AgGridComponent/AgGridComponent";
+import SingleDropDown from "../SingleDropDown/SingleDropDown";
 
 function FeaturePair({ rowData }) {
   let columnNames = Object.keys(rowData[0]);
@@ -12,36 +13,7 @@ function FeaturePair({ rowData }) {
   const [absolute, setAbsolute] = useState(false);
 
   const [filter1, setFilter1] = useState("");
-  const [isOpen1, setIsOpen1] = useState(false);
-  const dropdownRef1 = useRef(null);
-
   const [filter2, setFilter2] = useState("");
-  const [isOpen2, setIsOpen2] = useState(false);
-  const dropdownRef2 = useRef(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        dropdownRef1.current &&
-        !dropdownRef1.current.contains(event.target)
-      ) {
-        setIsOpen1(false);
-      }
-
-      if (
-        dropdownRef2.current &&
-        !dropdownRef2.current.contains(event.target)
-      ) {
-        setIsOpen2(false);
-      }
-    };
-
-    window.addEventListener("click", handleClickOutside);
-
-    return () => {
-      window.removeEventListener("click", handleClickOutside);
-    };
-  }, []);
 
   useEffect(() => {
     const colNames = new Set(columnNames);
@@ -94,17 +66,6 @@ function FeaturePair({ rowData }) {
     }
   }, [filter1, filter2, rowData]);
 
-  const handleInputChange1 = (event) => {
-    const newFilter = event.target.value;
-    setFilter1(newFilter);
-    setIsOpen1(true);
-  };
-  const handleInputChange2 = (event) => {
-    const newFilter = event.target.value;
-    setFilter2(newFilter);
-    setIsOpen2(true);
-  };
-
   const filteredItems1 = columnNames.filter((item) =>
     item.toLowerCase().includes(filter1.toLowerCase())
   );
@@ -141,69 +102,19 @@ function FeaturePair({ rowData }) {
           <label className="mb-1" htmlFor="correlation-method">
             Feature 1 Filter
           </label>
-          <div ref={dropdownRef1} className="relative">
-            <Input
-              type="text"
-              bordered
-              color="success"
-              fullWidth
-              placeholder="Column Name"
-              value={filter1}
-              onChange={handleInputChange1}
-              onFocus={() => setIsOpen1(true)}
-            />
-
-            {isOpen1 && (
-              <ul className="border border-gray-300 shadow-md rounded-md absolute max-h-60 overflow-y-auto w-full top-full p-2 px-4 z-50 bg-white">
-                {filteredItems1.map((item, ind) => (
-                  <li
-                    key={ind}
-                    onClick={() => {
-                      setFilter1(item);
-                      setIsOpen1(false);
-                    }}
-                    className="text-lg tracking-wider cursor-pointer"
-                  >
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+          <SingleDropDown
+            columnNames={filteredItems1}
+            onValueChange={setFilter1}
+          />
         </div>
         <div className="flex flex-col gap-1 basis-80">
           <label className="mb-1" htmlFor="correlation-method">
             Feature 2 Filter
           </label>
-          <div ref={dropdownRef2} className="relative">
-            <Input
-              type="text"
-              bordered
-              placeholder="Column Name"
-              color="success"
-              fullWidth
-              value={filter2}
-              onChange={handleInputChange2}
-              onFocus={() => setIsOpen2(true)}
-            />
-
-            {isOpen2 && (
-              <ul className="border border-gray-300 shadow-md rounded-md absolute max-h-60 overflow-y-auto w-full top-full p-2 px-4 z-50 bg-white">
-                {filteredItems2.map((item, ind) => (
-                  <li
-                    key={ind}
-                    onClick={() => {
-                      setFilter2(item);
-                      setIsOpen2(false);
-                    }}
-                    className="text-lg tracking-wider cursor-pointer"
-                  >
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+          <SingleDropDown
+            columnNames={filteredItems2}
+            onValueChange={setFilter2}
+          />
         </div>
         <div className="flex flex-col gap-2 text-sm">
           <Checkbox color="success" onChange={(e) => setDrop(e.valueOf())}>

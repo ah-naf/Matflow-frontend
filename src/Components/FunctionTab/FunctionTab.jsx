@@ -140,7 +140,7 @@ function FunctionTab() {
   }, [dispatch]);
 
   return (
-    <div className=" mt-4">
+    <div className="overflow-y-auto mt-4">
       {activeCsvFile ? (
         <TreeView treeData={functionTreeData} setActiveLeaf={setActiveLeaf} />
       ) : (

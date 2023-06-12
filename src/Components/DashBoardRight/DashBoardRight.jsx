@@ -2,9 +2,10 @@ import { useSelector } from "react-redux";
 import DatasetCorrelation from "../../Functions/Dataset/DatasetCorrelation";
 import DatasetDisplay from "../../Functions/Dataset/DatasetDisplay";
 import DatasetDuplicates from "../../Functions/Dataset/DatasetDuplicates";
+import DatasetGroup from "../../Functions/Dataset/DatasetGroup";
 import DatasetInformation from "../../Functions/Dataset/DatasetInformation";
 import DatasetStatistics from "../../Functions/Dataset/DatasetStatistics";
-import DatasetGroup from "../../Functions/Dataset/DatasetGroup";
+import BarPlot from "../../Functions/EDA/BarPlot";
 
 function DashBoardRight() {
   const activeFunction = useSelector((state) => state.sideBar.activeFunction);
@@ -27,9 +28,8 @@ function DashBoardRight() {
           {activeFunction && activeFunction === "Duplicate" && (
             <DatasetDuplicates />
           )}
-          {activeFunction && activeFunction === "Group" && (
-            <DatasetGroup />
-          )}
+          {activeFunction && activeFunction === "Group" && <DatasetGroup />}
+          {activeFunction && activeFunction === "Bar Plot" && <BarPlot />}
         </>
       ) : (
         <div className="w-full h-full grid place-content-center">

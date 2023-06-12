@@ -46,7 +46,44 @@ const functionTreeData = [
     key: "1",
     label: "EDA",
     icon: <SlMagnifier size={"20"} />,
-    children: [],
+    children: [
+      {
+        key: "1-0",
+        label: "Bar Plot",
+      },
+      {
+        key: "1-1",
+        label: "Pie Plot",
+      },
+      {
+        key: "1-2",
+        label: "Count Plot",
+      },
+      {
+        key: "1-3",
+        label: "Histogram",
+      },
+      {
+        key: "1-4",
+        label: "Box Plot",
+      },
+      {
+        key: "1-5",
+        label: "Violin Plot",
+      },
+      {
+        key: "1-6",
+        label: "Scatter Plot",
+      },
+      {
+        key: "1-7",
+        label: "Reg Plot",
+      },
+      {
+        key: "1-8",
+        label: "Line Plot",
+      },
+    ],
   },
   {
     key: "2",

@@ -1,61 +1,39 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useState } from "react";
+import { fetchDataFromIndexedDB } from "./util/indexDB";
 
 function DropdownMenu() {
-  const [filter, setFilter] = useState('');
-  const [menuItems, setMenuItems] = useState([
-    'Apple',
-    'Banana',
-    'Cherry',
-    'Durian',
-    'Elderberry',
-    'Fig',
-  ]);
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef(null);
-
+  const [image, setImage] = useState("");
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsOpen(false);
-      }
-    };
+    const fetchData = async () => {
+      const res = await fetchDataFromIndexedDB("IRIS.csv");
 
-    window.addEventListener('click', handleClickOutside);
-
-    return () => {
-      window.removeEventListener('click', handleClickOutside);
+      const resp = await fetch("http://127.0.0.1:8000/api/eda_barplot/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          cat: "species",
+          num: "sepal_length",
+          hue: "species",
+          orient: "Vertical",
+          annote: "true",
+          file: res,
+        }),
+      });
+      let data = await resp.blob();
+      const imageUrl = URL.createObjectURL(data);
+      console.log(imageUrl)
+      setImage(imageUrl);
     };
+    fetchData();
   }, []);
 
-  const handleInputChange = (event) => {
-    const newFilter = event.target.value;
-    setFilter(newFilter);
-    setIsOpen(true);
-  };
-
-  const filteredItems = menuItems.filter((item) =>
-    item.toLowerCase().includes(filter.toLowerCase())
-  );
-
   return (
-    <div ref={dropdownRef}>
-      <input
-        type="text"
-        value={filter}
-        onChange={handleInputChange}
-        onFocus={() => setIsOpen(true)}
-      />
-
-      {isOpen && (
-        <ul>
-          {filteredItems.map((item) => (
-            <li key={item} onClick={() => console.log('first')}>{item}</li>
-          ))}
-        </ul>
-      )}
+    <div>
+      <img src={image} alt="" className="w-96 h-96" />
     </div>
   );
 }
 
-
-export default DropdownMenu
+export default DropdownMenu;

@@ -6,6 +6,10 @@ import DatasetGroup from "../../Functions/Dataset/DatasetGroup";
 import DatasetInformation from "../../Functions/Dataset/DatasetInformation";
 import DatasetStatistics from "../../Functions/Dataset/DatasetStatistics";
 import BarPlot from "../../Functions/EDA/BarPlot";
+import BoxPlot from "../../Functions/EDA/BoxPlot";
+import CountPlot from "../../Functions/EDA/CountPlot";
+import PiePlot from "../../Functions/EDA/PiePlot";
+import Histogram from "../../Functions/EDA/Histogram";
 
 function DashBoardRight() {
   const activeFunction = useSelector((state) => state.sideBar.activeFunction);
@@ -30,6 +34,10 @@ function DashBoardRight() {
           )}
           {activeFunction && activeFunction === "Group" && <DatasetGroup />}
           {activeFunction && activeFunction === "Bar Plot" && <BarPlot />}
+          {activeFunction && activeFunction === "Pie Plot" && <PiePlot />}
+          {activeFunction && activeFunction === "Count Plot" && <CountPlot />}
+          {activeFunction && activeFunction === "Box Plot" && <BoxPlot />}
+          {activeFunction && activeFunction === "Histogram" && <Histogram />}
         </>
       ) : (
         <div className="w-full h-full grid place-content-center">

@@ -1,25 +1,23 @@
 import { Checkbox, Input, Loading } from "@nextui-org/react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import SingleDropDown from "../../Components/SingleDropDown/SingleDropDown";
 import { fetchDataFromIndexedDB } from "../../util/indexDB";
 
-function BarPlot() {
+function PiePlot() {
   const [csvData, setCsvData] = useState();
   const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
-  const [image, setImage] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const [stringColumn, setStringColumn] = useState([]);
-  const [numberColumn, setNumberColumn] = useState([]);
   const [activeStringColumn, setActiveStringColumn] = useState("");
-  const [activeNumberColumn, setActiveNumberColumn] = useState("");
-  const [activeHueColumn, setActiveHueColumn] = useState("");
-  const [orientation, setOrientation] = useState("Vertical");
+  const [stringColumn, setStringColumn] = useState([]);
   const [showTitle, setShowTitle] = useState(false);
   const [titleValue, setTitleValue] = useState("");
-  const [title, setTitle] = useState();
-  const [annotate, setAnnotate] = useState(false);
+  const [title, setTitle] = useState("");
+  const [image, setImage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [label, setLabel] = useState(true);
+  const [percentage, setPercentage] = useState(true);
+  const gapRef = useRef();
+  const [gap, setGap] = useState(0);
 
   useEffect(() => {
     if (activeCsvFile && activeCsvFile.name) {
@@ -28,15 +26,12 @@ function BarPlot() {
         setCsvData(res);
 
         const tempStringColumn = [];
-        const tempNumberColumn = [];
 
         Object.entries(res[0]).forEach(([key, value]) => {
           if (typeof res[0][key] === "string") tempStringColumn.push(key);
-          else tempNumberColumn.push(key);
         });
 
         setStringColumn(tempStringColumn);
-        setNumberColumn(tempNumberColumn);
       };
 
       getData();
@@ -44,23 +39,22 @@ function BarPlot() {
   }, [activeCsvFile]);
 
   useEffect(() => {
-    if (activeNumberColumn && activeStringColumn && csvData) {
+    if (activeStringColumn && csvData) {
       const fetchData = async () => {
         setLoading(true);
         setImage("");
-        const resp = await fetch("http://127.0.0.1:8000/api/eda_barplot/", {
+        const resp = await fetch("http://127.0.0.1:8000/api/eda_pieplot/", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
             cat: activeStringColumn || "-",
-            num: activeNumberColumn || "-",
-            hue: activeHueColumn || "-",
-            orient: orientation,
-            annote: annotate,
-            title: title || '',
             file: csvData,
+            title,
+            label,
+            percentage,
+            gap,
           }),
         });
         let data = await resp.blob();
@@ -71,15 +65,7 @@ function BarPlot() {
 
       fetchData();
     }
-  }, [
-    activeNumberColumn,
-    activeHueColumn,
-    activeStringColumn,
-    orientation,
-    title,
-    annotate,
-    csvData,
-  ]);
+  }, [activeStringColumn, title, csvData, gap, label, percentage]);
 
   return (
     <div>
@@ -93,46 +79,46 @@ function BarPlot() {
             onValueChange={setActiveStringColumn}
           />
         </div>
-        <div className="w-full">
-          <p className="text-lg font-medium tracking-wide">
-            Numerical Variable
-          </p>
-          <SingleDropDown
-            columnNames={numberColumn}
-            onValueChange={setActiveNumberColumn}
-          />
-        </div>
-        <div className="w-full">
-          <p className="text-lg font-medium tracking-wide">Hue</p>
-          <SingleDropDown
-            onValueChange={setActiveHueColumn}
-            columnNames={stringColumn}
-          />
-        </div>
+
         <div className="w-full flex flex-col gap-1">
           <label htmlFor="" className="text-lg font-medium tracking-wide">
-            Orientation
+            Explode Value
           </label>
-          <select
-            name=""
-            id=""
-            value={orientation}
-            className="bg-transparent p-2 focus:border-[#06603b] border-2 rounded-lg"
-            onChange={(e) => setOrientation(e.target.value)}
-          >
-            <option value="Vertical">Vertical</option>
-            <option value="Horizontal">Horizontal</option>
-          </select>
+          <Input
+            ref={gapRef}
+            type="number"
+            bordered
+            min={0}
+            max={0.1}
+            color="success"
+            placeholder="Expected value (0 - 0.1)."
+            step={"0.01"}
+            helperText="Press Enter to apply"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                setGap(gapRef.current.value);
+              }
+            }}
+          />
         </div>
       </div>
-      <div className="flex items-center gap-4 mt-4 tracking-wider">
-        <Checkbox color="success" onChange={(e) => setShowTitle(e.valueOf())}>
+
+      <div className="mt-8 flex gap-10">
+        <Checkbox color="success" onChange={() => setShowTitle(!showTitle)}>
           Title
         </Checkbox>
-        <Checkbox color="success" onChange={(e) => setAnnotate(e.valueOf())}>
-          Annotate
+        <Checkbox color="success" isSelected={label} onChange={() => setLabel(!label)}>
+          Label
+        </Checkbox>
+        <Checkbox
+          color="success"
+          isSelected={percentage}
+          onChange={() => setPercentage(!percentage)}
+        >
+          Percentage
         </Checkbox>
       </div>
+
       {showTitle && (
         <div className="mt-4">
           <Input
@@ -166,6 +152,6 @@ function BarPlot() {
       )}
     </div>
   );
-} 
+}
 
-export default BarPlot;
+export default PiePlot;

@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import SingleDropDown from "../../Components/SingleDropDown/SingleDropDown";
 import { fetchDataFromIndexedDB } from "../../util/indexDB";
 
-function BarPlot() {
+function BoxPlot() {
   const [csvData, setCsvData] = useState();
   const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
   const [image, setImage] = useState("");
@@ -19,7 +19,7 @@ function BarPlot() {
   const [showTitle, setShowTitle] = useState(false);
   const [titleValue, setTitleValue] = useState("");
   const [title, setTitle] = useState();
-  const [annotate, setAnnotate] = useState(false);
+  const [dodge, setDodge] = useState(false);
 
   useEffect(() => {
     if (activeCsvFile && activeCsvFile.name) {
@@ -44,11 +44,11 @@ function BarPlot() {
   }, [activeCsvFile]);
 
   useEffect(() => {
-    if (activeNumberColumn && activeStringColumn && csvData) {
+    if (activeNumberColumn && csvData) {
       const fetchData = async () => {
         setLoading(true);
         setImage("");
-        const resp = await fetch("http://127.0.0.1:8000/api/eda_barplot/", {
+        const resp = await fetch("http://127.0.0.1:8000/api/eda_boxplot/", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -58,8 +58,8 @@ function BarPlot() {
             num: activeNumberColumn || "-",
             hue: activeHueColumn || "-",
             orient: orientation,
-            annote: annotate,
-            title: title || '',
+            dodge: dodge,
+            title: title || "",
             file: csvData,
           }),
         });
@@ -77,7 +77,7 @@ function BarPlot() {
     activeStringColumn,
     orientation,
     title,
-    annotate,
+    dodge,
     csvData,
   ]);
 
@@ -129,8 +129,8 @@ function BarPlot() {
         <Checkbox color="success" onChange={(e) => setShowTitle(e.valueOf())}>
           Title
         </Checkbox>
-        <Checkbox color="success" onChange={(e) => setAnnotate(e.valueOf())}>
-          Annotate
+        <Checkbox color="success" onChange={(e) => setDodge(e.valueOf())}>
+          Dodge
         </Checkbox>
       </div>
       {showTitle && (
@@ -166,6 +166,6 @@ function BarPlot() {
       )}
     </div>
   );
-} 
+}
 
-export default BarPlot;
+export default BoxPlot;

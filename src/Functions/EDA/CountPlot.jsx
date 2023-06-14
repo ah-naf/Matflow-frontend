@@ -4,16 +4,14 @@ import { useSelector } from "react-redux";
 import SingleDropDown from "../../Components/SingleDropDown/SingleDropDown";
 import { fetchDataFromIndexedDB } from "../../util/indexDB";
 
-function BarPlot() {
+function CountPlot() {
   const [csvData, setCsvData] = useState();
   const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
   const [image, setImage] = useState("");
   const [loading, setLoading] = useState(false);
 
   const [stringColumn, setStringColumn] = useState([]);
-  const [numberColumn, setNumberColumn] = useState([]);
   const [activeStringColumn, setActiveStringColumn] = useState("");
-  const [activeNumberColumn, setActiveNumberColumn] = useState("");
   const [activeHueColumn, setActiveHueColumn] = useState("");
   const [orientation, setOrientation] = useState("Vertical");
   const [showTitle, setShowTitle] = useState(false);
@@ -28,15 +26,12 @@ function BarPlot() {
         setCsvData(res);
 
         const tempStringColumn = [];
-        const tempNumberColumn = [];
 
         Object.entries(res[0]).forEach(([key, value]) => {
           if (typeof res[0][key] === "string") tempStringColumn.push(key);
-          else tempNumberColumn.push(key);
         });
 
         setStringColumn(tempStringColumn);
-        setNumberColumn(tempNumberColumn);
       };
 
       getData();
@@ -44,22 +39,21 @@ function BarPlot() {
   }, [activeCsvFile]);
 
   useEffect(() => {
-    if (activeNumberColumn && activeStringColumn && csvData) {
+    if (activeStringColumn && csvData) {
       const fetchData = async () => {
         setLoading(true);
         setImage("");
-        const resp = await fetch("http://127.0.0.1:8000/api/eda_barplot/", {
+        const resp = await fetch("http://127.0.0.1:8000/api/eda_countplot/", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
             cat: activeStringColumn || "-",
-            num: activeNumberColumn || "-",
             hue: activeHueColumn || "-",
             orient: orientation,
             annote: annotate,
-            title: title || '',
+            title: title || "",
             file: csvData,
           }),
         });
@@ -72,7 +66,6 @@ function BarPlot() {
       fetchData();
     }
   }, [
-    activeNumberColumn,
     activeHueColumn,
     activeStringColumn,
     orientation,
@@ -93,15 +86,7 @@ function BarPlot() {
             onValueChange={setActiveStringColumn}
           />
         </div>
-        <div className="w-full">
-          <p className="text-lg font-medium tracking-wide">
-            Numerical Variable
-          </p>
-          <SingleDropDown
-            columnNames={numberColumn}
-            onValueChange={setActiveNumberColumn}
-          />
-        </div>
+
         <div className="w-full">
           <p className="text-lg font-medium tracking-wide">Hue</p>
           <SingleDropDown
@@ -166,6 +151,6 @@ function BarPlot() {
       )}
     </div>
   );
-} 
+}
 
-export default BarPlot;
+export default CountPlot;

@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import SingleDropDown from "../../Components/SingleDropDown/SingleDropDown";
 import { fetchDataFromIndexedDB } from "../../util/indexDB";
+import Plot from "react-plotly.js";
 
 function Histogram() {
   const [csvData, setCsvData] = useState();
@@ -26,7 +27,7 @@ function Histogram() {
   const [KDE, setKDE] = useState(false);
   const [legend, setLegend] = useState(false);
   const [showAutoBin, setShowAutoBin] = useState(true);
-  const [autoBinValue, setAutoBinValue] = useState(10)
+  const [autoBinValue, setAutoBinValue] = useState(10);
 
   useEffect(() => {
     if (activeCsvFile && activeCsvFile.name) {
@@ -69,12 +70,12 @@ function Histogram() {
             agg: aggregate,
             autoBin: !showAutoBin ? autoBinValue : 0,
             kde: KDE,
-            legend: legend
+            legend: legend,
           }),
         });
-        let data = await resp.blob();
-        const imageUrl = URL.createObjectURL(data);
-        setImage(imageUrl);
+        let data = await resp.json();
+        data = JSON.parse(data);
+        setImage(data);
         setLoading(false);
       };
 
@@ -148,7 +149,11 @@ function Histogram() {
         <Checkbox color="success" onChange={(e) => setShowTitle(e.valueOf())}>
           Title
         </Checkbox>
-        <Checkbox color="success" isSelected={showAutoBin} onChange={(e) => setShowAutoBin(e.valueOf())}>
+        <Checkbox
+          color="success"
+          isSelected={showAutoBin}
+          onChange={(e) => setShowAutoBin(e.valueOf())}
+        >
           Auto Bin
         </Checkbox>
         <Checkbox color="success" onChange={(e) => setKDE(e.valueOf())}>
@@ -169,7 +174,7 @@ function Histogram() {
               step={1}
               defaultValue={10}
               value={autoBinValue}
-              onChange={e => setAutoBinValue(e.target.value)}
+              onChange={(e) => setAutoBinValue(e.target.value)}
               valueLabelDisplay="on"
               color="primary"
             />
@@ -204,8 +209,8 @@ function Histogram() {
         </div>
       )}
       {image && (
-        <div className="py-8 flex justify-center">
-          <img src={image} alt="" className="w-full max-w-[800px]" />
+        <div className="flex justify-center mt-4">
+          <Plot data={image?.data} layout={image?.layout} />
         </div>
       )}
     </div>

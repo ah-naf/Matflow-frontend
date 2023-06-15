@@ -4,11 +4,10 @@ import { Checkbox, Input, Loading } from "@nextui-org/react";
 import React, { useEffect, useRef, useState } from "react";
 // import Plot from "react-plotly.js";
 // import createPlotlyComponent from "react-plotly.js/factory";
-import Plotly from 'plotly.js-dist-min'
+import Plot from "react-plotly.js";
 import { useSelector } from "react-redux";
 import SingleDropDown from "./Components/SingleDropDown/SingleDropDown";
 import { fetchDataFromIndexedDB } from "./util/indexDB";
-import Plot from "react-plotly.js";
 
 // const Plot = createPlotlyComponent(Plotly);
 
@@ -80,9 +79,10 @@ function Histogram() {
           }),
         });
         let data = await resp.json();
-        
-        console.log(data)
-  
+
+        console.log(JSON.parse(data));
+        setImage(JSON.parse(data));
+
         setLoading(false);
       };
 
@@ -221,7 +221,7 @@ function Histogram() {
         </div>
       )} */}
       {image && (
-        <div >
+        <div className="w-[500px] h-[500px]">
           <Plot data={image?.data} layout={image?.layout} />
         </div>
       )}

@@ -8,12 +8,12 @@ import DatasetStatistics from "../../Functions/Dataset/DatasetStatistics";
 import BarPlot from "../../Functions/EDA/BarPlot";
 import BoxPlot from "../../Functions/EDA/BoxPlot";
 import CountPlot from "../../Functions/EDA/CountPlot";
-import PiePlot from "../../Functions/EDA/PiePlot";
 import Histogram from "../../Functions/EDA/Histogram";
-import ViolinPlot from "../../Functions/EDA/ViolinPlot";
-import ScatterPlot from "../../Functions/EDA/ScatterPlot";
-import RegPlot from "../../Functions/EDA/RegPlot";
 import LinePlot from "../../Functions/EDA/LinePlot";
+import PiePlot from "../../Functions/EDA/PiePlot";
+import RegPlot from "../../Functions/EDA/RegPlot";
+import ScatterPlot from "../../Functions/EDA/ScatterPlot";
+import ViolinPlot from "../../Functions/EDA/ViolinPlot";
 
 function DashBoardRight() {
   const activeFunction = useSelector((state) => state.sideBar.activeFunction);
@@ -23,10 +23,12 @@ function DashBoardRight() {
     <div className="flex-grow h-full overflow-y-auto px-6">
       {activeFunction && activeFile ? (
         <>
-
           {/* Dataset Functions */}
 
-          {activeFunction && activeFunction === "Display" && <DatasetDisplay />}
+          {activeFunction &&
+            (activeFunction === "Display" || activeFunction === "Dataset") && (
+              <DatasetDisplay />
+            )}
           {activeFunction && activeFunction === "Information" && (
             <DatasetInformation />
           )}
@@ -39,17 +41,22 @@ function DashBoardRight() {
           {activeFunction && activeFunction === "Duplicate" && (
             <DatasetDuplicates />
           )}
+          {activeFunction && activeFunction === "Group" && <DatasetGroup />}
 
           {/* EDA Functions */}
 
-          {activeFunction && activeFunction === "Group" && <DatasetGroup />}
-          {activeFunction && activeFunction === "Bar Plot" && <BarPlot />}
+          {activeFunction &&
+            (activeFunction === "Bar Plot" || activeFunction === "EDA") && (
+              <BarPlot />
+            )}
           {activeFunction && activeFunction === "Pie Plot" && <PiePlot />}
           {activeFunction && activeFunction === "Count Plot" && <CountPlot />}
           {activeFunction && activeFunction === "Box Plot" && <BoxPlot />}
           {activeFunction && activeFunction === "Histogram" && <Histogram />}
           {activeFunction && activeFunction === "Violin Plot" && <ViolinPlot />}
-          {activeFunction && activeFunction === "Scatter Plot" && <ScatterPlot />}
+          {activeFunction && activeFunction === "Scatter Plot" && (
+            <ScatterPlot />
+          )}
           {activeFunction && activeFunction === "Reg Plot" && <RegPlot />}
           {activeFunction && activeFunction === "Line Plot" && <LinePlot />}
         </>

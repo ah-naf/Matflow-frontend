@@ -67,7 +67,7 @@ function Histogram() {
             title: title || "",
             file: csvData,
             agg: aggregate,
-            autoBin: autoBinValue,
+            autoBin: !showAutoBin ? autoBinValue : 0,
             kde: KDE,
             legend: legend
           }),
@@ -86,6 +86,7 @@ function Histogram() {
     orientation,
     title,
     autoBinValue,
+    showAutoBin,
     KDE,
     legend,
     aggregate,

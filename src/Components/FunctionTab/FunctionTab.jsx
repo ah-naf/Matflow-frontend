@@ -89,7 +89,56 @@ const functionTreeData = [
     key: "2",
     label: "Feature Engineering",
     icon: <RxGear size={"20"} />,
-    children: [],
+    children: [
+      {
+        key: '2-0',
+        label: 'Add/Modify'
+      },
+      {
+        key: '2-1',
+        label: 'Change Dtype'
+      },
+      {
+        key: '2-2',
+        label: 'Alter Field Name'
+      },
+      {
+        key: '2-3',
+        label: 'Imputation'
+      },
+      {
+        key: '2-4',
+        label: 'Encoding'
+      },
+      {
+        key: '2-5',
+        label: 'Scaling'
+      },
+      {
+        key: '2-6',
+        label: 'Drop Column'
+      },
+      {
+        key: '2-7',
+        label: 'Drop Rows'
+      },
+      {
+        key: '2-8',
+        label: 'Merge Dataset'
+      },
+      {
+        key: '2-9',
+        label: 'Append Dataset'
+      },
+      {
+        key: '2-10',
+        label: 'Feature Selection'
+      },
+      {
+        key: '2-11',
+        label: 'Cluster'
+      }
+    ],
   },
   {
     key: "3",

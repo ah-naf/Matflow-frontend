@@ -14,6 +14,7 @@ import PiePlot from "../../Functions/EDA/PiePlot";
 import RegPlot from "../../Functions/EDA/RegPlot";
 import ScatterPlot from "../../Functions/EDA/ScatterPlot";
 import ViolinPlot from "../../Functions/EDA/ViolinPlot";
+import AddModify from "../../Functions/Feature Engineering/AddModify/AddModify";
 
 function DashBoardRight() {
   const activeFunction = useSelector((state) => state.sideBar.activeFunction);
@@ -59,6 +60,12 @@ function DashBoardRight() {
           )}
           {activeFunction && activeFunction === "Reg Plot" && <RegPlot />}
           {activeFunction && activeFunction === "Line Plot" && <LinePlot />}
+
+          {/* Feature Engineering Functions */}
+
+          {activeFunction &&
+            (activeFunction === "Add/Modify" ||
+              activeFunction === "Feature Engineering") && <AddModify />}
         </>
       ) : (
         <div className="w-full h-full grid place-content-center">

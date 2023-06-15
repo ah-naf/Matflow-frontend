@@ -53,7 +53,7 @@ function SingleDropDown({ columnNames, onValueChange }) {
               key={ind}
               onClick={() => {
                 setFilter1(item);
-                onValueChange(item)
+                onValueChange(item);
                 setIsOpen1(false);
               }}
               className="text-lg tracking-wider cursor-pointer"

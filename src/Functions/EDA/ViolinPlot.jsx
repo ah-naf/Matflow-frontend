@@ -1,12 +1,10 @@
-import styled from "@emotion/styled";
-import { Slider, Stack } from "@mui/material";
 import { Checkbox, Input, Loading } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import SingleDropDown from "../../Components/SingleDropDown/SingleDropDown";
 import { fetchDataFromIndexedDB } from "../../util/indexDB";
 
-function Histogram() {
+function ViolinPlot() {
   const [csvData, setCsvData] = useState();
   const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
   const [image, setImage] = useState("");
@@ -22,11 +20,7 @@ function Histogram() {
   const [titleValue, setTitleValue] = useState("");
   const [title, setTitle] = useState();
   const [dodge, setDodge] = useState(false);
-  const [aggregate, setAggregate] = useState("count");
-  const [KDE, setKDE] = useState(false);
-  const [legend, setLegend] = useState(false);
-  const [showAutoBin, setShowAutoBin] = useState(true);
-  const [autoBinValue, setAutoBinValue] = useState(10)
+  const [split, setSplit] = useState(false);
 
   useEffect(() => {
     if (activeCsvFile && activeCsvFile.name) {
@@ -55,21 +49,20 @@ function Histogram() {
       const fetchData = async () => {
         setLoading(true);
         setImage("");
-        const resp = await fetch("http://127.0.0.1:8000/api/eda_histogram/", {
+        const resp = await fetch("http://127.0.0.1:8000/api/eda_violinplot/", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            var: activeNumberColumn || "-",
+            cat: activeStringColumn || "-",
+            num: activeNumberColumn || "-",
             hue: activeHueColumn || "-",
             orient: orientation,
+            dodge: dodge,
             title: title || "",
             file: csvData,
-            agg: aggregate,
-            autoBin: autoBinValue,
-            kde: KDE,
-            legend: legend
+            split,
           }),
         });
         let data = await resp.blob();
@@ -83,23 +76,33 @@ function Histogram() {
   }, [
     activeNumberColumn,
     activeHueColumn,
+    activeStringColumn,
     orientation,
     title,
-    autoBinValue,
-    KDE,
-    legend,
-    aggregate,
+    dodge,
     csvData,
+    split,
   ]);
 
   return (
     <div>
       <div className="flex items-center gap-8 mt-8">
         <div className="w-full">
-          <p className="text-lg font-medium tracking-wide">Variable</p>
+          <p className="text-lg font-medium tracking-wide">
+            Numerical Variable
+          </p>
           <SingleDropDown
             columnNames={numberColumn}
             onValueChange={setActiveNumberColumn}
+          />
+        </div>
+        <div className="w-full">
+          <p className="text-lg font-medium tracking-wide">
+            Categorical Variable
+          </p>
+          <SingleDropDown
+            columnNames={stringColumn}
+            onValueChange={setActiveStringColumn}
           />
         </div>
         <div className="w-full">
@@ -108,24 +111,6 @@ function Histogram() {
             onValueChange={setActiveHueColumn}
             columnNames={stringColumn}
           />
-        </div>
-        <div className="w-full flex flex-col gap-1">
-          <label htmlFor="" className="text-lg font-medium tracking-wide">
-            Aggregate Statistics
-          </label>
-          <select
-            name=""
-            id=""
-            value={aggregate}
-            className="bg-transparent p-2 focus:border-[#06603b] border-2 rounded-lg"
-            onChange={(e) => setAggregate(e.target.value)}
-          >
-            <option value="probability">Probability</option>
-            <option value="count">Count</option>
-            <option value="frequency">Frequency</option>
-            <option value="percent">Percent</option>
-            <option value="density">Density</option>
-          </select>
         </div>
         <div className="w-full flex flex-col gap-1">
           <label htmlFor="" className="text-lg font-medium tracking-wide">
@@ -147,35 +132,13 @@ function Histogram() {
         <Checkbox color="success" onChange={(e) => setShowTitle(e.valueOf())}>
           Title
         </Checkbox>
-        <Checkbox color="success" isSelected={showAutoBin} onChange={(e) => setShowAutoBin(e.valueOf())}>
-          Auto Bin
+        <Checkbox color="success" onChange={(e) => setDodge(e.valueOf())}>
+          Dodge
         </Checkbox>
-        <Checkbox color="success" onChange={(e) => setKDE(e.valueOf())}>
-          KDE
-        </Checkbox>
-        <Checkbox color="success" onChange={(e) => setLegend(e.valueOf())}>
-          Legend
+        <Checkbox color="success" onChange={(e) => setSplit(e.valueOf())}>
+          Split
         </Checkbox>
       </div>
-      {!showAutoBin && (
-        <div className="mt-12">
-          <Stack spacing={1} direction="row" sx={{ mb: 1 }} alignItems="center">
-            <span>1</span>
-            <PrettoSlider
-              aria-label="Auto Bin Slider"
-              min={1}
-              max={35}
-              step={1}
-              defaultValue={10}
-              value={autoBinValue}
-              onChange={e => setAutoBinValue(e.target.value)}
-              valueLabelDisplay="on"
-              color="primary"
-            />
-            <span>35</span>
-          </Stack>
-        </div>
-      )}
       {showTitle && (
         <div className="mt-4">
           <Input
@@ -211,43 +174,4 @@ function Histogram() {
   );
 }
 
-const PrettoSlider = styled(Slider)({
-  color: "#52af77",
-  height: 8,
-  "& .MuiSlider-track": {
-    border: "none",
-  },
-  "& .MuiSlider-thumb": {
-    height: 24,
-    width: 24,
-    backgroundColor: "#fff",
-    border: "2px solid currentColor",
-    "&:focus, &:hover, &.Mui-active, &.Mui-focusVisible": {
-      boxShadow: "inherit",
-    },
-    "&:before": {
-      display: "none",
-    },
-  },
-  "& .MuiSlider-valueLabel": {
-    lineHeight: 1.2,
-    fontSize: 12,
-    background: "unset",
-    padding: 0,
-    width: 32,
-    height: 32,
-    borderRadius: "50% 50% 50% 0",
-    backgroundColor: "#52af77",
-    transformOrigin: "bottom left",
-    transform: "translate(50%, -100%) rotate(-45deg) scale(0)",
-    "&:before": { display: "none" },
-    "&.MuiSlider-valueLabelOpen": {
-      transform: "translate(50%, -100%) rotate(-45deg) scale(1)",
-    },
-    "& > *": {
-      transform: "rotate(45deg)",
-    },
-  },
-});
-
-export default Histogram;
+export default ViolinPlot;

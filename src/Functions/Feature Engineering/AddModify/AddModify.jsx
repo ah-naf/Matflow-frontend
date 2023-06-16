@@ -1,9 +1,37 @@
 import { Checkbox, Input } from "@nextui-org/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import SingleDropDown from "../../../Components/SingleDropDown/SingleDropDown";
+import { fetchDataFromIndexedDB } from "../../../util/indexDB";
+import Add_NewColumn from "./Component/Add_NewColumn";
+import Add_MathOperation from "./Component/Add_MathOperation";
+import Add_ExtractText from "./Component/Add_ExtractText";
+import Add_GroupNumerical from "./Component/Add_GroupNumerical";
 
 function AddModify() {
   const [currentOption, setCurrentOption] = useState("Add");
+  const [currentMethod, setCurrentMethod] = useState("New Column");
+  const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
+  const [csvData, setCsvData] = useState();
+  const [savedAsNewDataset, setSavedAsNewDataset] = useState(false);
+
+  useEffect(() => {
+    if (activeCsvFile && activeCsvFile.name) {
+      const getData = async () => {
+        const res = await fetchDataFromIndexedDB(activeCsvFile.name);
+        setCsvData(res);
+      };
+
+      getData();
+    }
+  }, [activeCsvFile]);
+
+  const handleOptionClicked = (e) => {
+    setCurrentOption(e.target.value);
+    if (e.target.value === "Add") setCurrentMethod("New Column");
+    else setCurrentMethod("Math Operation");
+  };
+
   return (
     <div>
       <div className="flex justify-between items-end gap-8 mt-8">
@@ -19,7 +47,7 @@ function AddModify() {
             id="option"
             className="py-[0.6rem] rounded-xl px-3"
             value={currentOption}
-            onChange={(e) => setCurrentOption(e.target.value)}
+            onChange={handleOptionClicked}
           >
             <option value="Add">Add</option>
             <option value="Modify">Modify</option>
@@ -46,7 +74,8 @@ function AddModify() {
             name=""
             id="method"
             className="py-[0.6rem] rounded-xl px-3"
-            onChange={(e) => console.log(e.target.value)}
+            value={currentMethod}
+            onChange={(e) => setCurrentMethod(e.target.value)}
           >
             {currentOption === "Add" && (
               <option value="New Column">New Column</option>
@@ -71,6 +100,36 @@ function AddModify() {
             Show Sample
           </button>
         </div>
+      </div>
+      <div className="mt-8">
+        {csvData && currentMethod === "New Column" && (
+          <Add_NewColumn csvData={csvData} />
+        )}
+        {csvData && currentMethod === "Math Operation" && (
+          <Add_MathOperation csvData={csvData} />
+        )}
+        {csvData && currentMethod === "Extract Text" && (
+          <Add_ExtractText csvData={csvData} />
+        )}
+        {csvData && currentMethod === "Group Numerical" && (
+          <Add_GroupNumerical csvData={csvData} />
+        )}
+      </div>
+      <div className="mt-4 flex flex-col gap-4">
+        <Checkbox
+          color="success"
+          onChange={(e) => setSavedAsNewDataset(e.valueOf())}
+        >
+          Save as New Dataset
+        </Checkbox>
+        {savedAsNewDataset && (
+          <div>
+            <Input label="New Dataset Name" fullWidth clearable />
+          </div>
+        )}
+        <button className="self-start border-2 px-6 tracking-wider bg-primary-btn text-white font-medium rounded-md py-2">
+          Save
+        </button>
       </div>
     </div>
   );

@@ -2,10 +2,10 @@ import styled from "@emotion/styled";
 import { Slider, Stack } from "@mui/material";
 import { Checkbox, Input, Loading } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
+import Plot from "react-plotly.js";
 import { useSelector } from "react-redux";
 import SingleDropDown from "../../Components/SingleDropDown/SingleDropDown";
 import { fetchDataFromIndexedDB } from "../../util/indexDB";
-import Plot from "react-plotly.js";
 
 function Histogram() {
   const [csvData, setCsvData] = useState();
@@ -210,7 +210,11 @@ function Histogram() {
       )}
       {image && (
         <div className="flex justify-center mt-4">
-          <Plot data={image?.data} layout={image?.layout} />
+          <Plot
+            data={image?.data}
+            layout={{...image.layout, showlegend: true}}
+            config={{ scrollZoom: true , editable: true, responsive: true}}
+          />
         </div>
       )}
     </div>

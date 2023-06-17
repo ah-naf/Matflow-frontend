@@ -1,36 +1,27 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
-const FilterableList = () => {
+const MultipleDropDown = ({ columnNames, setSelectedColumns }) => {
   const [inputValue, setInputValue] = useState("");
   const [filteredItems, setFilteredItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
-
-  const names = [
-    "John",
-    "Jane",
-    "Michael",
-    "Sarah",
-    "David",
-    "Emily",
-    "Daniel",
-    "Olivia",
-    "Matthew",
-    "Emma",
-  ];
+  const dropdownRef = useRef(null);
 
   const handleInputChange = (event) => {
     const value = event.target.value;
     setInputValue(value);
 
-    const filtered = names.filter((name) =>
+    const filtered = columnNames.filter((name) =>
       name.toLowerCase().includes(value.toLowerCase())
     );
     setFilteredItems(filtered);
+
+    // setDropdownOpen(false); // Close the dropdown when input value changes
   };
 
   const handleItemSelect = (name) => {
     if (!selectedItems.includes(name)) {
       setSelectedItems([...selectedItems, name]);
+      setSelectedColumns([...selectedItems, name]);
       setInputValue("");
     }
   };
@@ -40,11 +31,15 @@ const FilterableList = () => {
       (selectedItem) => selectedItem !== name
     );
     setSelectedItems(updatedItems);
+    setSelectedColumns(updatedItems);
   };
 
+
   useEffect(() => {
-    const handleWindowClick = () => {
-      setFilteredItems([]);
+    const handleWindowClick = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setFilteredItems([]);
+      }
     };
 
     window.addEventListener("click", handleWindowClick);
@@ -55,15 +50,15 @@ const FilterableList = () => {
   }, []);
 
   return (
-    <div className="w-full mx-auto mt-8">
-      <div className="relative">
-        <div className="flex gap-2 w-full bg-slate-300 flex-wrap">
+    <div className="w-full mx-auto mt-1 " ref={dropdownRef}>
+      <div className="relative border-2 border-gray-300 px-2 pr-2 py-1 rounded-xl hover:border-primary-btn">
+        <div className="flex gap-2 w-full flex-wrap">
           {selectedItems.length > 0 &&
             selectedItems.map((name) => (
               <button
                 key={name}
                 onClick={() => handleItemDelete(name)}
-                className="px-2 py-1 flex text-sm text-white bg-blue-500 rounded"
+                className="px-2 flex items-center text-xs text-white bg-primary-btn rounded"
               >
                 {name} <span className="ml-1">×</span>
               </button>
@@ -72,8 +67,9 @@ const FilterableList = () => {
             type="text"
             value={inputValue}
             onChange={handleInputChange}
-            onFocus={() => setFilteredItems([])}
-            className="flex-1 min-w-[20px] px-4 py-2 border border-blue-500 rounded focus:outline-none"
+            onFocus={handleInputChange}
+            className="flex-1 min-w-[30px] p-2 py-1"
+            placeholder="Choose an option"
           />
         </div>
 
@@ -91,8 +87,16 @@ const FilterableList = () => {
           </div>
         )}
       </div>
+      {selectedItems.length > 0 && (
+        <button
+          className="text-xs float-right mt-1 underline text-red-600"
+          onClick={() => setSelectedItems([])}
+        >
+          Delete All
+        </button>
+      )}
     </div>
   );
 };
 
-export default FilterableList;
+export default MultipleDropDown;

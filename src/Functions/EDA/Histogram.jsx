@@ -10,7 +10,7 @@ import { fetchDataFromIndexedDB } from "../../util/indexDB";
 function Histogram() {
   const [csvData, setCsvData] = useState();
   const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
-  const [image, setImage] = useState("");
+  const [plotlyData, setPlotyData] = useState();
   const [loading, setLoading] = useState(false);
 
   const [stringColumn, setStringColumn] = useState([]);
@@ -55,7 +55,6 @@ function Histogram() {
     if (activeNumberColumn && csvData) {
       const fetchData = async () => {
         setLoading(true);
-        setImage("");
         const resp = await fetch("http://127.0.0.1:8000/api/eda_histogram/", {
           method: "POST",
           headers: {
@@ -75,7 +74,7 @@ function Histogram() {
         });
         let data = await resp.json();
         data = JSON.parse(data);
-        setImage(data);
+        setPlotyData(data);
         setLoading(false);
       };
 
@@ -208,12 +207,12 @@ function Histogram() {
           </Loading>
         </div>
       )}
-      {image && (
+      {plotlyData && (
         <div className="flex justify-center mt-4">
           <Plot
-            data={image?.data}
-            layout={{...image.layout, showlegend: true}}
-            config={{ scrollZoom: true , editable: true, responsive: true}}
+            data={plotlyData?.data}
+            layout={{ ...plotlyData.layout, showlegend: true }}
+            config={{ scrollZoom: true, editable: true, responsive: true }}
           />
         </div>
       )}

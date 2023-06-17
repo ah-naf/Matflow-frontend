@@ -3,11 +3,12 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import SingleDropDown from "../../Components/SingleDropDown/SingleDropDown";
 import { fetchDataFromIndexedDB } from "../../util/indexDB";
+import Plot from "react-plotly.js";
 
 function BoxPlot() {
   const [csvData, setCsvData] = useState();
   const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
-  const [image, setImage] = useState("");
+  const [plotlyData, setPlotlyData] = useState();
   const [loading, setLoading] = useState(false);
 
   const [stringColumn, setStringColumn] = useState([]);
@@ -47,7 +48,7 @@ function BoxPlot() {
     if (activeNumberColumn && csvData) {
       const fetchData = async () => {
         setLoading(true);
-        setImage("");
+        setPlotlyData("");
         const resp = await fetch("http://127.0.0.1:8000/api/eda_boxplot/", {
           method: "POST",
           headers: {
@@ -63,9 +64,9 @@ function BoxPlot() {
             file: csvData,
           }),
         });
-        let data = await resp.blob();
-        const imageUrl = URL.createObjectURL(data);
-        setImage(imageUrl);
+        let data = await resp.json();
+        data = JSON.parse(data);
+        setPlotlyData(data);
         setLoading(false);
       };
 
@@ -159,9 +160,13 @@ function BoxPlot() {
           </Loading>
         </div>
       )}
-      {image && (
-        <div className="py-8 flex justify-center">
-          <img src={image} alt="" className="w-full max-w-[800px]" />
+      {plotlyData && (
+        <div className="flex justify-center mt-4">
+          <Plot
+            data={plotlyData?.data}
+            layout={{ ...plotlyData.layout, showlegend: true }}
+            config={{ scrollZoom: true, editable: true, responsive: true }}
+          />
         </div>
       )}
     </div>

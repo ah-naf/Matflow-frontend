@@ -15,6 +15,7 @@ import RegPlot from "../../Functions/EDA/RegPlot";
 import ScatterPlot from "../../Functions/EDA/ScatterPlot";
 import ViolinPlot from "../../Functions/EDA/ViolinPlot";
 import AddModify from "../../Functions/Feature Engineering/AddModify/AddModify";
+import CustomPlot from "../../Functions/EDA/CustomPlot";
 
 function DashBoardRight() {
   const activeFunction = useSelector((state) => state.sideBar.activeFunction);
@@ -60,6 +61,7 @@ function DashBoardRight() {
           )}
           {activeFunction && activeFunction === "Reg Plot" && <RegPlot />}
           {activeFunction && activeFunction === "Line Plot" && <LinePlot />}
+          {activeFunction && activeFunction === "Custom Plot" && <CustomPlot />}
 
           {/* Feature Engineering Functions */}
 

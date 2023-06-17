@@ -2,7 +2,7 @@ import { Checkbox, Input } from "@nextui-org/react";
 import React, { useState } from "react";
 import SingleDropDown from "../../../../Components/SingleDropDown/SingleDropDown";
 
-function Add_GroupNumerical({ csvData }) {
+function Add_GroupCategorical({ csvData }) {
   const [nGroups, setNGroups] = useState(2);
   const columnNames = Object.keys(csvData[0]).filter(
     (val) => typeof csvData[0][val] === "number"
@@ -30,25 +30,24 @@ function Add_GroupNumerical({ csvData }) {
   };
 
   return (
-    <div>
+    <div className="mt-12">
       <div className="flex gap-8 mb-4">
         <Input
           label="N Groups"
           value={nGroups}
           onChange={(e) => {
             setNGroups(e.target.value);
-            setNGroupData([
-              ...nGroupData,
-              { "1st": "", "2nd": "", operator: false },
-            ]);
           }}
           type="number"
         />
         <div className="flex-grow">
-          <p>Bin Column</p>
+          <p>Group Column</p>
           <SingleDropDown columnNames={columnNames} />
         </div>
-        <Checkbox color="success">Show Bin Dict</Checkbox>
+        <div className="flex flex-col gap-2">
+          <Checkbox defaultSelected={true} color="success">Sort Value</Checkbox>
+          <Checkbox color="success">Show Group</Checkbox>
+        </div>
       </div>
       <div className="mt-8">
         {Array.from({ length: nGroups }, (_, index) => {
@@ -95,4 +94,4 @@ function Add_GroupNumerical({ csvData }) {
   );
 }
 
-export default Add_GroupNumerical;
+export default Add_GroupCategorical;

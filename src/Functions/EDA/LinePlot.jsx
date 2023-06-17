@@ -1,5 +1,6 @@
 import { Checkbox, Input, Loading } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
+import Plot from "react-plotly.js";
 import { useSelector } from "react-redux";
 import SingleDropDown from "../../Components/SingleDropDown/SingleDropDown";
 import { fetchDataFromIndexedDB } from "../../util/indexDB";
@@ -7,19 +8,19 @@ import { fetchDataFromIndexedDB } from "../../util/indexDB";
 function LinePlot() {
   const [csvData, setCsvData] = useState();
   const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
-  const [image, setImage] = useState("");
+  const [plotlyData, setPlotlyData] = useState();
   const [loading, setLoading] = useState(false);
 
   const [stringColumn, setStringColumn] = useState([]);
   const [numberColumn, setNumberColumn] = useState([]);
   const [x_var, setX_var] = useState("");
   const [y_var, setY_var] = useState("");
-  const [style, setStyle] = useState('')
+  const [style, setStyle] = useState("");
   const [activeHueColumn, setActiveHueColumn] = useState("");
   const [showTitle, setShowTitle] = useState(false);
   const [titleValue, setTitleValue] = useState("");
   const [title, setTitle] = useState();
-  const [legend, setLegend] = useState(true)
+  const [legend, setLegend] = useState(true);
 
   useEffect(() => {
     if (activeCsvFile && activeCsvFile.name) {
@@ -35,7 +36,7 @@ function LinePlot() {
           else tempNumberColumn.push(key);
         });
 
-        setStringColumn(tempStringColumn)
+        setStringColumn(tempStringColumn);
         setNumberColumn(tempNumberColumn);
       };
 
@@ -47,7 +48,7 @@ function LinePlot() {
     if (x_var && y_var && csvData) {
       const fetchData = async () => {
         setLoading(true);
-        setImage("");
+        setPlotlyData("");
         const resp = await fetch("http://127.0.0.1:8000/api/eda_lineplot/", {
           method: "POST",
           headers: {
@@ -57,15 +58,15 @@ function LinePlot() {
             x_var,
             y_var,
             hue: activeHueColumn || "-",
-            style,
+            style: style || "-",
             legend,
             title: title || "",
             file: csvData,
           }),
         });
-        let data = await resp.blob();
-        const imageUrl = URL.createObjectURL(data);
-        setImage(imageUrl);
+        let data = await resp.json();
+        data = JSON.parse(data);
+        setPlotlyData(data);
         setLoading(false);
       };
 
@@ -93,17 +94,18 @@ function LinePlot() {
         </div>
         <div className="w-full">
           <p className="text-lg font-medium tracking-wide">Style</p>
-          <SingleDropDown
-            onValueChange={setStyle}
-            columnNames={stringColumn}
-          />
+          <SingleDropDown onValueChange={setStyle} columnNames={stringColumn} />
         </div>
       </div>
       <div className="flex items-center gap-4 mt-4 tracking-wider">
         <Checkbox color="success" onChange={(e) => setShowTitle(e.valueOf())}>
           Title
         </Checkbox>
-        <Checkbox color="success" defaultSelected onChange={(e) => setLegend(e.valueOf())}>
+        <Checkbox
+          color="success"
+          defaultSelected
+          onChange={(e) => setLegend(e.valueOf())}
+        >
           Legend
         </Checkbox>
       </div>
@@ -133,9 +135,13 @@ function LinePlot() {
           </Loading>
         </div>
       )}
-      {image && (
-        <div className="py-8 flex justify-center">
-          <img src={image} alt="" className="w-full max-w-[800px]" />
+      {plotlyData && (
+        <div className="flex justify-center mt-4">
+          <Plot
+            data={plotlyData?.data}
+            layout={{ ...plotlyData.layout, showlegend: true }}
+            config={{ scrollZoom: true, editable: true, responsive: true }}
+          />
         </div>
       )}
     </div>

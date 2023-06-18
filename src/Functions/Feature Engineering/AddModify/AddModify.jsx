@@ -79,10 +79,12 @@ function AddModify() {
       if (fileExist.length === 0) {
         uploadedFiles.push({ name: fileName });
       }
+      console.log(data)
       localStorage.setItem("uploadedFiles", JSON.stringify(uploadedFiles));
 
       const temp = await fetchDataFromIndexedDB(fileName);
       await updateDataInIndexedDB(fileName, data);
+      
 
       toast.success(
         `Data ${currentOption === "Add" ? "added" : "modified"} successfully!`,

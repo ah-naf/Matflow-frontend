@@ -1,6 +1,7 @@
 import { Checkbox, Input } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
 import SingleDropDown from "../../../Components/SingleDropDown/SingleDropDown";
 import {
   setAddToPipeline,
@@ -11,7 +12,10 @@ import {
   setOption,
   setSaveAsNew,
 } from "../../../Slices/FeatureEngineeringSlice";
-import { fetchDataFromIndexedDB } from "../../../util/indexDB";
+import {
+  fetchDataFromIndexedDB,
+  updateDataInIndexedDB,
+} from "../../../util/indexDB";
 import Add_ExtractText from "./Component/Add_ExtractText";
 import Add_GroupCategorical from "./Component/Add_GroupCategorical";
 import Add_GroupNumerical from "./Component/Add_GroupNumerical";
@@ -51,15 +55,61 @@ function AddModify() {
   };
 
   const handleSave = async () => {
-    const res = await fetch("http://127.0.0.1:8000/api/feature_creation/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(featureData),
-    });
-    const data = await res.json()
-    console.log(data)
+    try {
+      const res = await fetch("http://127.0.0.1:8000/api/feature_creation/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(featureData),
+      });
+      let data = await res.json();
+
+      let fileName = activeCsvFile.name;
+
+      if (featureData.save_as_new) {
+        fileName = featureData.dataset_name;
+      }
+
+      // console.log(featureData)
+
+      const uploadedFiles = JSON.parse(localStorage.getItem("uploadedFiles"));
+      const fileExist = uploadedFiles.filter((val) => val.name === fileName);
+
+      if (fileExist.length === 0) {
+        uploadedFiles.push({ name: fileName });
+      }
+      localStorage.setItem("uploadedFiles", JSON.stringify(uploadedFiles));
+
+      const temp = await fetchDataFromIndexedDB(fileName);
+      await updateDataInIndexedDB(fileName, data);
+
+      toast.success(
+        `Data ${currentOption === "Add" ? "added" : "modified"} successfully!`,
+        {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        }
+      );
+    } catch (error) {
+
+      toast.error("Something went wrong. Please try again", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+    }
   };
 
   return (

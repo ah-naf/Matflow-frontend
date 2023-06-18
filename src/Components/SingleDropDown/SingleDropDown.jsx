@@ -1,10 +1,14 @@
 import { Input } from "@nextui-org/react";
 import React, { useEffect, useRef, useState } from "react";
 
-function SingleDropDown({ columnNames, onValueChange }) {
+function SingleDropDown({ columnNames, onValueChange, initValue }) {
   const [filter1, setFilter1] = useState("");
   const [isOpen1, setIsOpen1] = useState(false);
   const dropdownRef1 = useRef(null);
+
+  useEffect(() => {
+    if(initValue) setFilter1(initValue)
+  }, [initValue])
 
   useEffect(() => {
     const handleClickOutside = (event) => {

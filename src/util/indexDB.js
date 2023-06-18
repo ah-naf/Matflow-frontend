@@ -38,6 +38,29 @@ const fetchDataFromIndexedDB = (name) => {
   });
 };
 
+const checkNameExistInIndexedDB = (name) => {
+  return new Promise((resolve, reject) => {
+    const request = window.indexedDB.open(name);
+
+    request.onerror = (event) => {
+      console.error("IndexedDB error:", event.target.error);
+      reject(event.target.error);
+    };
+
+    request.onsuccess = (event) => {
+      const db = event.target.result;
+      db.close();
+      resolve(true); // Name exists in IndexedDB
+    };
+
+    request.onupgradeneeded = (event) => {
+      event.target.result.close();
+      resolve(event.oldVersion === 0); // Check if the database doesn't exist
+    };
+  });
+};
+
+
 const storeDataInIndexedDB = (data, name) => {
   return new Promise((resolve, reject) => {
     const request = window.indexedDB.open(name, 1);
@@ -76,6 +99,46 @@ const storeDataInIndexedDB = (data, name) => {
     };
   });
 };
+
+const updateDataInIndexedDB = (name, data) => {
+  return new Promise((resolve, reject) => {
+    const request = window.indexedDB.open(name, 1);
+
+    request.onerror = (event) => {
+      console.error("IndexedDB error:", event.target.error);
+      reject(event.target.error);
+    };
+
+    request.onsuccess = (event) => {
+      const db = event.target.result;
+
+      const transaction = db.transaction(["data"], "readwrite");
+      const objectStore = transaction.objectStore("data");
+
+      transaction.onerror = (event) => {
+        console.error("IndexedDB transaction error:", event.target.error);
+        reject(event.target.error);
+      };
+
+      transaction.oncomplete = () => {
+        resolve();
+      };
+
+      data.forEach((item) => {
+        objectStore.put(item);
+      });
+    };
+
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+
+      if (!db.objectStoreNames.contains("data")) {
+        db.createObjectStore("data", { keyPath: "id", autoIncrement: true });
+      }
+    };
+  });
+};
+
 
 const deleteIndexedDB = (name) => {
   return new Promise((resolve, reject) => {
@@ -187,10 +250,12 @@ function fixMismatchedColumns(parsedData) {
 }
 
 export {
+  checkNameExistInIndexedDB,
+  deleteIndexedDB,
   fetchDataFromIndexedDB,
-  storeDataInIndexedDB,
+  fixMismatchedColumns,
   parseCsv,
   parseExcel,
-  deleteIndexedDB,
-  fixMismatchedColumns,
+  storeDataInIndexedDB,
+  updateDataInIndexedDB
 };

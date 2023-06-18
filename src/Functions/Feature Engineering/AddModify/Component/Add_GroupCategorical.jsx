@@ -1,5 +1,6 @@
 import { Checkbox, Input } from "@nextui-org/react";
 import React, { useState } from "react";
+import MultipleDropDown from "../../../../Components/MultipleDropDown/MultipleDropDown";
 import SingleDropDown from "../../../../Components/SingleDropDown/SingleDropDown";
 
 function Add_GroupCategorical({ csvData }) {
@@ -9,14 +10,12 @@ function Add_GroupCategorical({ csvData }) {
   );
   const [nGroupData, setNGroupData] = useState([
     {
-      "1st": 0,
-      "2nd": 0,
-      operator: false,
+      group_name: 0,
+      group_members: 0,
     },
     {
-      "1st": 0,
-      "2nd": 0,
-      operator: false,
+      group_name: 0,
+      group_members: 0,
     },
   ]);
 
@@ -45,7 +44,9 @@ function Add_GroupCategorical({ csvData }) {
           <SingleDropDown columnNames={columnNames} />
         </div>
         <div className="flex flex-col gap-2">
-          <Checkbox defaultSelected={true} color="success">Sort Value</Checkbox>
+          <Checkbox defaultSelected={true} color="success">
+            Sort Value
+          </Checkbox>
           <Checkbox color="success">Show Group</Checkbox>
         </div>
       </div>
@@ -53,39 +54,13 @@ function Add_GroupCategorical({ csvData }) {
         {Array.from({ length: nGroups }, (_, index) => {
           return (
             <div key={index} className="flex gap-8 mt-4">
-              <div className="flex w-full gap-8">
-                {nGroupData[index].operator ? (
-                  <>
-                    <div className="w-full flex flex-col">
-                      <label htmlFor="" className="mb-2 text-sm">
-                        Operator
-                      </label>
-                      <select name="" id="" className="p-2 rounded-lg">
-                        <option value="==">==</option>
-                        <option value="!=">!=</option>
-                        <option value="<">{"<"}</option>
-                        <option value=">">{">"}</option>
-                        <option value="<=">{"<="}</option>
-                        <option value=">=">{">="}</option>
-                      </select>
-                    </div>
-                    <Input label="Value" type="number" fullWidth />
-                  </>
-                ) : (
-                  <>
-                    <Input label="Min Value" type="number" fullWidth />
-                    <Input label="Min Value" type="number" fullWidth />
-                  </>
-                )}
-                <Input label="Bin Value" type="number" fullWidth />
+              <div>
+                <Input label="Group Name" fullWidth />
               </div>
-              <Checkbox
-                color="success"
-                className="w-60"
-                onChange={(e) => handleOperatorClick(e, index)}
-              >
-                Use Operator
-              </Checkbox>
+              <div className="flex-grow">
+                <p>Group Members</p>
+                <MultipleDropDown columnNames={['0.38']} />
+              </div>
             </div>
           );
         })}

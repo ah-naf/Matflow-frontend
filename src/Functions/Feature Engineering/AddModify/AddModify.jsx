@@ -21,6 +21,8 @@ import Add_GroupCategorical from "./Component/Add_GroupCategorical";
 import Add_GroupNumerical from "./Component/Add_GroupNumerical";
 import Add_MathOperation from "./Component/Add_MathOperation";
 import Add_NewColumn from "./Component/Add_NewColumn";
+import Modify_ReplaceValue from "./Component/Modify_ReplaceValue";
+import Modify_ProgressApply from "./Component/Modify_ProgressApply";
 
 function AddModify() {
   const [currentOption, setCurrentOption] = useState("Add");
@@ -79,13 +81,11 @@ function AddModify() {
       if (fileExist.length === 0) {
         uploadedFiles.push({ name: fileName });
       }
-      console.log(data)
       localStorage.setItem("uploadedFiles", JSON.stringify(uploadedFiles));
 
       const temp = await fetchDataFromIndexedDB(fileName);
       await updateDataInIndexedDB(fileName, data);
       
-
       toast.success(
         `Data ${currentOption === "Add" ? "added" : "modified"} successfully!`,
         {
@@ -212,6 +212,12 @@ function AddModify() {
         )}
         {csvData && currentMethod === "Group Numerical" && (
           <Add_GroupNumerical csvData={csvData} />
+        )}
+        {csvData && currentMethod === "Replace Values" && (
+          <Modify_ReplaceValue csvData={csvData} />
+        )}
+        {csvData && currentMethod === "Progress Apply" && (
+          <Modify_ProgressApply csvData={csvData} />
         )}
       </div>
       <div className="mt-4 flex flex-col gap-4">

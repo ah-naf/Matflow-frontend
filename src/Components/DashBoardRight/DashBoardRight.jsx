@@ -8,6 +8,7 @@ import DatasetStatistics from "../../Functions/Dataset/DatasetStatistics";
 import BarPlot from "../../Functions/EDA/BarPlot";
 import BoxPlot from "../../Functions/EDA/BoxPlot";
 import CountPlot from "../../Functions/EDA/CountPlot";
+import CustomPlot from "../../Functions/EDA/CustomPlot";
 import Histogram from "../../Functions/EDA/Histogram";
 import LinePlot from "../../Functions/EDA/LinePlot";
 import PiePlot from "../../Functions/EDA/PiePlot";
@@ -15,7 +16,8 @@ import RegPlot from "../../Functions/EDA/RegPlot";
 import ScatterPlot from "../../Functions/EDA/ScatterPlot";
 import ViolinPlot from "../../Functions/EDA/ViolinPlot";
 import AddModify from "../../Functions/Feature Engineering/AddModify/AddModify";
-import CustomPlot from "../../Functions/EDA/CustomPlot";
+import ChangeDType from "../../Functions/Feature Engineering/ChangeDType/ChangeDType";
+import AlterFieldName from "../../Functions/Feature Engineering/AlterFieldName/AlterFieldName";
 
 function DashBoardRight() {
   const activeFunction = useSelector((state) => state.sideBar.activeFunction);
@@ -68,6 +70,8 @@ function DashBoardRight() {
           {activeFunction &&
             (activeFunction === "Add/Modify" ||
               activeFunction === "Feature Engineering") && <AddModify />}
+          {activeFunction && activeFunction === "Change Dtype" && <ChangeDType />}
+          {activeFunction && activeFunction === "Alter Field Name" && <AlterFieldName />}
         </>
       ) : (
         <div className="w-full h-full grid place-content-center">

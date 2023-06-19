@@ -19,6 +19,8 @@ function Add_GroupNumerical({ csvData }) {
       operator: false,
     },
   ]);
+  const [bin_column, setBin_column] = useState('')
+  const [show_bin_dict, setShow_bin_dict] = useState(false)
 
   const handleOperatorClick = (e, ind) => {
     let tempNGroupData = JSON.parse(JSON.stringify(nGroupData));
@@ -28,6 +30,8 @@ function Add_GroupNumerical({ csvData }) {
     });
     setNGroupData(tempNGroupData);
   };
+
+  
 
   return (
     <div>
@@ -46,9 +50,9 @@ function Add_GroupNumerical({ csvData }) {
         />
         <div className="flex-grow">
           <p>Bin Column</p>
-          <SingleDropDown columnNames={columnNames} />
+          <SingleDropDown columnNames={columnNames} onValueChange={setBin_column} />
         </div>
-        <Checkbox color="success">Show Bin Dict</Checkbox>
+        <Checkbox color="success" onChange={e => setShow_bin_dict(e.valueOf())}>Show Bin Dict</Checkbox>
       </div>
       <div className="mt-8">
         {Array.from({ length: nGroups }, (_, index) => {
@@ -75,7 +79,7 @@ function Add_GroupNumerical({ csvData }) {
                 ) : (
                   <>
                     <Input label="Min Value" type="number" fullWidth />
-                    <Input label="Min Value" type="number" fullWidth />
+                    <Input label="Max Value" type="number" fullWidth />
                   </>
                 )}
                 <Input label="Bin Value" type="number" fullWidth />

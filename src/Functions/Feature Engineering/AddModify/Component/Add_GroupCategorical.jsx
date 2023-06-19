@@ -1,7 +1,9 @@
 import { Checkbox, Input } from "@nextui-org/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import MultipleDropDown from "../../../../Components/MultipleDropDown/MultipleDropDown";
 import SingleDropDown from "../../../../Components/SingleDropDown/SingleDropDown";
+import { useDispatch } from "react-redux";
+import { setData } from "../../../../Slices/FeatureEngineeringSlice";
 
 function Add_GroupCategorical({ csvData }) {
   const [nGroups, setNGroups] = useState(2);
@@ -10,22 +12,57 @@ function Add_GroupCategorical({ csvData }) {
   );
   const [nGroupData, setNGroupData] = useState([
     {
-      group_name: 0,
-      group_members: 0,
+      group_name: '',
+      group_members: [],
     },
     {
-      group_name: 0,
-      group_members: 0,
+      group_name: '',
+      group_members: [],
     },
   ]);
+  const [groupColumn, setGroupColumn] = useState("");
+  const [groupMembers, setGroupMembers] = useState();
+  const [sort_value, setSort_value] = useState(true);
+  const [show_group, setShow_group] = useState(false);
+  const dispatch = useDispatch()
 
-  const handleOperatorClick = (e, ind) => {
-    let tempNGroupData = JSON.parse(JSON.stringify(nGroupData));
-    tempNGroupData = tempNGroupData.map((val, i) => {
-      if (i === ind) return { ...val, operator: e.valueOf() };
+  useEffect(() => {
+    dispatch(setData({
+      n_groups: nGroups,
+      group_column: groupColumn,
+      n_group_data: nGroupData,
+      sort_value,
+      show_group 
+    }))
+  }, [nGroups, nGroupData, sort_value, show_group, groupColumn, dispatch]);
+
+  useEffect(() => {
+    if (groupColumn) {
+      let temp = csvData.map((val) => val[groupColumn].toString());
+      let temp1 = new Set(temp);
+      temp1 = [...temp1];
+      setGroupMembers(temp1);
+    }
+  }, [groupColumn, csvData]);
+
+  const handleChange = (e, ind) => {
+    const temp = nGroupData.map((val, i) => {
+      if (i === ind) {
+        return { ...val, group_name: e.target.value };
+      }
       return val;
     });
-    setNGroupData(tempNGroupData);
+    setNGroupData(temp);
+  };
+
+  const handleMultipleDropdown = (colName, index = 0) => {
+    const temp = nGroupData.map((val, i) => {
+      if (i === index) {
+        return { ...val, group_members: colName };
+      }
+      return val;
+    });
+    setNGroupData(temp);
   };
 
   return (
@@ -41,13 +78,25 @@ function Add_GroupCategorical({ csvData }) {
         />
         <div className="flex-grow">
           <p>Group Column</p>
-          <SingleDropDown columnNames={columnNames} />
+          <SingleDropDown
+            columnNames={columnNames}
+            onValueChange={setGroupColumn}
+          />
         </div>
         <div className="flex flex-col gap-2">
-          <Checkbox defaultSelected={true} color="success">
+          <Checkbox
+            defaultSelected={true}
+            color="success"
+            onChange={(e) => setSort_value(e.valueOf())}
+          >
             Sort Value
           </Checkbox>
-          <Checkbox color="success">Show Group</Checkbox>
+          <Checkbox
+            color="success"
+            onChange={(e) => setShow_group(e.valueOf())}
+          >
+            Show Group
+          </Checkbox>
         </div>
       </div>
       <div className="mt-8">
@@ -55,11 +104,19 @@ function Add_GroupCategorical({ csvData }) {
           return (
             <div key={index} className="flex gap-8 mt-4">
               <div>
-                <Input label="Group Name" fullWidth />
+                <Input
+                  label="Group Name"
+                  fullWidth
+                  onChange={(e) => handleChange(e, index)}
+                />
               </div>
               <div className="flex-grow">
                 <p>Group Members</p>
-                <MultipleDropDown columnNames={['0.38']} />
+                <MultipleDropDown
+                  columnNames={groupMembers || []}
+                  setSelectedColumns={handleMultipleDropdown}
+                  curInd={index}
+                />
               </div>
             </div>
           );

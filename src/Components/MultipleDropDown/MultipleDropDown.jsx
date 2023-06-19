@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 
-const MultipleDropDown = ({ columnNames, setSelectedColumns }) => {
+const MultipleDropDown = ({ columnNames, setSelectedColumns, curInd=0 }) => {
   const [inputValue, setInputValue] = useState("");
   const [filteredItems, setFilteredItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
@@ -21,7 +21,7 @@ const MultipleDropDown = ({ columnNames, setSelectedColumns }) => {
   const handleItemSelect = (name) => {
     if (!selectedItems.includes(name)) {
       setSelectedItems([...selectedItems, name]);
-      setSelectedColumns([...selectedItems, name]);
+      setSelectedColumns([...selectedItems, name], curInd);
       setInputValue("");
     }
   };
@@ -74,7 +74,7 @@ const MultipleDropDown = ({ columnNames, setSelectedColumns }) => {
         </div>
 
         {filteredItems.length > 0 && (
-          <div className="absolute z-10 w-full bg-white border border-gray-300 rounded mt-2">
+          <div className="absolute h-64 overflow-y-auto z-[1000] w-full bg-white border border-gray-300 rounded mt-2">
             {filteredItems.map((name) => (
               <div
                 key={name}
@@ -90,7 +90,10 @@ const MultipleDropDown = ({ columnNames, setSelectedColumns }) => {
       {selectedItems.length > 0 && (
         <button
           className="text-xs float-right mt-1 underline text-red-600"
-          onClick={() => setSelectedItems([])}
+          onClick={() => {
+            setSelectedItems([])
+            setSelectedColumns([], curInd)
+          }}
         >
           Delete All
         </button>

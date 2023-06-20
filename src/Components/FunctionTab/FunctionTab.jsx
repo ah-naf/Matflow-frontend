@@ -160,7 +160,28 @@ const functionTreeData = [
     key: "5",
     label: "Model Building",
     icon: <TbBrain size={"20"} />,
-    children: [],
+    children: [
+      {
+        key: "5-0",
+        label: "Split Dataset",
+      },
+      {
+        key: "5-1",
+        label: "Build Model",
+      },
+      {
+        key: "5-2",
+        label: "Model Evaluation",
+      },
+      {
+        key: "5-3",
+        label: "Model Prediction",
+      },
+      {
+        key: "5-4",
+        label: "Models",
+      },
+    ],
   },
   {
     key: "6",

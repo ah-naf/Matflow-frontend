@@ -15,14 +15,12 @@ function Histogram() {
 
   const [stringColumn, setStringColumn] = useState([]);
   const [numberColumn, setNumberColumn] = useState([]);
-  const [activeStringColumn, setActiveStringColumn] = useState("");
   const [activeNumberColumn, setActiveNumberColumn] = useState("");
   const [activeHueColumn, setActiveHueColumn] = useState("");
   const [orientation, setOrientation] = useState("Vertical");
   const [showTitle, setShowTitle] = useState(false);
   const [titleValue, setTitleValue] = useState("");
   const [title, setTitle] = useState();
-  const [dodge, setDodge] = useState(false);
   const [aggregate, setAggregate] = useState("count");
   const [KDE, setKDE] = useState(false);
   const [legend, setLegend] = useState(false);

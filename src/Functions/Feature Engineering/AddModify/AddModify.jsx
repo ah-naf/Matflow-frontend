@@ -7,10 +7,10 @@ import {
   setAddToPipeline,
   setColumnName,
   setDatasetName,
-  setFile,
   setMethod,
   setOption,
   setSaveAsNew,
+  setSelectColumn,
 } from "../../../Slices/FeatureEngineeringSlice";
 import {
   fetchDataFromIndexedDB,
@@ -21,35 +21,35 @@ import Add_GroupCategorical from "./Component/Add_GroupCategorical";
 import Add_GroupNumerical from "./Component/Add_GroupNumerical";
 import Add_MathOperation from "./Component/Add_MathOperation";
 import Add_NewColumn from "./Component/Add_NewColumn";
-import Modify_ReplaceValue from "./Component/Modify_ReplaceValue";
 import Modify_ProgressApply from "./Component/Modify_ProgressApply";
+import Modify_ReplaceValue from "./Component/Modify_ReplaceValue";
 
-function AddModify() {
+function AddModify({ csvData }) {
   const [currentOption, setCurrentOption] = useState("Add");
   const [currentMethod, setCurrentMethod] = useState("New Column");
   const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
-  const [csvData, setCsvData] = useState();
   const [savedAsNewDataset, setSavedAsNewDataset] = useState(false);
   const dispatch = useDispatch();
   const featureData = useSelector((state) => state.featureEngineering);
+  const [selectedColumn, setSelectedColumn] = useState('')
 
   useEffect(() => {
-    if (activeCsvFile && activeCsvFile.name) {
-      const getData = async () => {
-        const res = await fetchDataFromIndexedDB(activeCsvFile.name);
-        setCsvData(res);
-        dispatch(setFile(res));
-      };
-
-      getData();
-    }
-  }, [activeCsvFile, dispatch]);
+    dispatch(setSelectColumn(selectedColumn))
+  }, [selectedColumn, dispatch])
 
   const handleOptionClicked = (e) => {
     setCurrentOption(e.target.value);
-    if (e.target.value === "Add") setCurrentMethod("New Column");
-    else setCurrentMethod("Math Operation");
+    let meth;
+    if (e.target.value === "Add") {
+      setCurrentMethod("New Column");
+      meth = 'New Column'
+    }
+    else {
+      setCurrentMethod("Math Operation");
+      meth = 'Math Operation'
+    }
     dispatch(setOption(e.target.value));
+    dispatch(setMethod(meth))
   };
 
   const handleInputChange = (e) => {
@@ -85,7 +85,7 @@ function AddModify() {
 
       const temp = await fetchDataFromIndexedDB(fileName);
       await updateDataInIndexedDB(fileName, data);
-      
+
       toast.success(
         `Data ${currentOption === "Add" ? "added" : "modified"} successfully!`,
         {
@@ -100,7 +100,6 @@ function AddModify() {
         }
       );
     } catch (error) {
-
       toast.error("Something went wrong. Please try again", {
         position: "bottom-right",
         autoClose: 5000,
@@ -147,7 +146,7 @@ function AddModify() {
               onChange={handleInputChange}
             />
           ) : (
-            <SingleDropDown columnNames={["s"]} />
+            <SingleDropDown columnNames={Object.keys(csvData[0])} onValueChange={setSelectedColumn} />
           )}
         </div>
         <div className="w-full flex flex-col">

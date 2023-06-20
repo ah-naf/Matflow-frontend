@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 
-const MultipleDropDown = ({ columnNames, setSelectedColumns, curInd=0 }) => {
+const MultipleDropDown = ({ columnNames, setSelectedColumns, curInd=0, disabled=false }) => {
   const [inputValue, setInputValue] = useState("");
   const [filteredItems, setFilteredItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
@@ -51,7 +51,7 @@ const MultipleDropDown = ({ columnNames, setSelectedColumns, curInd=0 }) => {
 
   return (
     <div className="w-full mx-auto mt-1 " ref={dropdownRef}>
-      <div className="relative border-2 border-gray-300 px-2 pr-2 py-1 rounded-xl hover:border-primary-btn">
+      <div className={`relative border-2 border-gray-300 px-2 pr-2 py-1 rounded-xl hover:border-primary-btn ${disabled && 'hover:border-transparent border-transparent bg-gray-200'}`}>
         <div className="flex gap-2 w-full flex-wrap">
           {selectedItems.length > 0 &&
             selectedItems.map((name) => (
@@ -68,8 +68,9 @@ const MultipleDropDown = ({ columnNames, setSelectedColumns, curInd=0 }) => {
             value={inputValue}
             onChange={handleInputChange}
             onFocus={handleInputChange}
-            className="flex-1 min-w-[30px] p-2 py-1"
+            className={`flex-1 min-w-[30px] p-2 py-1 ${disabled ? 'cursor-not-allowed' : ''}`}
             placeholder="Choose an option"
+            disabled={disabled}
           />
         </div>
 

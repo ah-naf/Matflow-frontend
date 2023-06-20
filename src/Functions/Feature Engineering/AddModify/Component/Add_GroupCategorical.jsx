@@ -1,8 +1,8 @@
 import { Checkbox, Input } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import MultipleDropDown from "../../../../Components/MultipleDropDown/MultipleDropDown";
 import SingleDropDown from "../../../../Components/SingleDropDown/SingleDropDown";
-import { useDispatch } from "react-redux";
 import { setData } from "../../../../Slices/FeatureEngineeringSlice";
 
 function Add_GroupCategorical({ csvData }) {
@@ -12,28 +12,32 @@ function Add_GroupCategorical({ csvData }) {
   );
   const [nGroupData, setNGroupData] = useState([
     {
-      group_name: '',
+      group_name: "",
       group_members: [],
+      others: false,
     },
     {
-      group_name: '',
+      group_name: "",
       group_members: [],
+      others: false,
     },
   ]);
   const [groupColumn, setGroupColumn] = useState("");
   const [groupMembers, setGroupMembers] = useState();
   const [sort_value, setSort_value] = useState(true);
   const [show_group, setShow_group] = useState(false);
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(setData({
-      n_groups: nGroups,
-      group_column: groupColumn,
-      n_group_data: nGroupData,
-      sort_value,
-      show_group 
-    }))
+    dispatch(
+      setData({
+        n_groups: nGroups,
+        group_column: groupColumn,
+        n_group_data: nGroupData,
+        sort_value,
+        show_group,
+      })
+    );
   }, [nGroups, nGroupData, sort_value, show_group, groupColumn, dispatch]);
 
   useEffect(() => {
@@ -61,6 +65,16 @@ function Add_GroupCategorical({ csvData }) {
         return { ...val, group_members: colName };
       }
       return val;
+    });
+    setNGroupData(temp);
+  };
+
+  const handleOtherChange = (val, ind) => {
+    const temp = nGroupData.map((d, i) => {
+      if (i === ind) {
+        return { ...d, others: val };
+      }
+      return d;
     });
     setNGroupData(temp);
   };
@@ -102,7 +116,7 @@ function Add_GroupCategorical({ csvData }) {
       <div className="mt-8">
         {Array.from({ length: nGroups }, (_, index) => {
           return (
-            <div key={index} className="flex gap-8 mt-4">
+            <div key={index} className="flex gap-8 mt-4 items-center ">
               <div>
                 <Input
                   label="Group Name"
@@ -116,8 +130,16 @@ function Add_GroupCategorical({ csvData }) {
                   columnNames={groupMembers || []}
                   setSelectedColumns={handleMultipleDropdown}
                   curInd={index}
+                  disabled={nGroupData[index].others}
                 />
               </div>
+              {index === nGroups - 1 && (
+                <Checkbox
+                  onChange={(e) => handleOtherChange(e.valueOf(), index)}
+                >
+                  Others
+                </Checkbox>
+              )}
             </div>
           );
         })}

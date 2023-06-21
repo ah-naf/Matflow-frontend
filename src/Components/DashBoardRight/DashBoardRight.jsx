@@ -23,6 +23,13 @@ import SplitDataset from "../../Functions/Model Building/SplitDataset/SplitDatas
 import { fetchDataFromIndexedDB } from "../../util/indexDB";
 import BuildModel from "../../Functions/Model Building/BuildModel/BuildModel";
 import { setFile } from "../../Slices/FeatureEngineeringSlice";
+import Encoding from "../../Functions/Feature Engineering/Encoding/Encoding";
+import Scaling from "../../Functions/Feature Engineering/Scaling/Scaling";
+import DropColumn from "../../Functions/Feature Engineering/DropColumn/DropColumn";
+import DropRow from "../../Functions/Feature Engineering/DropRow/DropRow";
+import MergeDataset from "../../Functions/Feature Engineering/MergeDataset/MergeDataset";
+import AppendDataset from "../../Functions/Feature Engineering/AppendDataset/AppendDataset";
+import Cluster from "../../Functions/Feature Engineering/Cluster/Cluster";
 
 function DashBoardRight() {
   const activeFunction = useSelector((state) => state.sideBar.activeFunction);
@@ -94,6 +101,27 @@ function DashBoardRight() {
           )}
           {activeFunction && activeFunction === "Alter Field Name" && (
             <AlterFieldName />
+          )}
+          {csvData && activeFunction && activeFunction === "Encoding" && (
+            <Encoding csvData={csvData} />
+          )}
+          {csvData && activeFunction && activeFunction === "Scaling" && (
+            <Scaling csvData={csvData} />
+          )}
+          {csvData && activeFunction && activeFunction === "Drop Column" && (
+            <DropColumn csvData={csvData} />
+          )}
+          {csvData && activeFunction && activeFunction === "Drop Rows" && (
+            <DropRow csvData={csvData} />
+          )}
+          {csvData && activeFunction && activeFunction === "Merge Dataset" && (
+            <MergeDataset csvData={csvData} />
+          )}
+          {csvData && activeFunction && activeFunction === "Append Dataset" && (
+            <AppendDataset csvData={csvData} />
+          )}
+          {csvData && activeFunction && activeFunction === "Cluster" && (
+            <Cluster csvData={csvData} />
           )}
 
           {/* Model Building */}

@@ -1,10 +1,20 @@
 import React, { useEffect, useRef, useState } from "react";
 
-const MultipleDropDown = ({ columnNames, setSelectedColumns, curInd=0, disabled=false }) => {
+const MultipleDropDown = ({
+  columnNames,
+  setSelectedColumns,
+  curInd = 0,
+  disabled = false,
+  defaultValue = [],
+}) => {
   const [inputValue, setInputValue] = useState("");
   const [filteredItems, setFilteredItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
   const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    setSelectedItems(defaultValue)
+  }, [defaultValue])
 
   const handleInputChange = (event) => {
     const value = event.target.value;
@@ -34,7 +44,6 @@ const MultipleDropDown = ({ columnNames, setSelectedColumns, curInd=0, disabled=
     setSelectedColumns(updatedItems);
   };
 
-
   useEffect(() => {
     const handleWindowClick = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -51,7 +60,11 @@ const MultipleDropDown = ({ columnNames, setSelectedColumns, curInd=0, disabled=
 
   return (
     <div className="w-full mx-auto mt-1 " ref={dropdownRef}>
-      <div className={`relative border-2 border-gray-300 px-2 pr-2 py-1 rounded-xl hover:border-primary-btn ${disabled && 'hover:border-transparent border-transparent bg-gray-200'}`}>
+      <div
+        className={`relative border-2 border-gray-300 px-2 pr-2 py-1 rounded-xl hover:border-primary-btn ${
+          disabled && "hover:border-transparent border-transparent bg-gray-200"
+        }`}
+      >
         <div className="flex gap-2 w-full flex-wrap">
           {selectedItems.length > 0 &&
             selectedItems.map((name) => (
@@ -68,7 +81,9 @@ const MultipleDropDown = ({ columnNames, setSelectedColumns, curInd=0, disabled=
             value={inputValue}
             onChange={handleInputChange}
             onFocus={handleInputChange}
-            className={`flex-1 min-w-[30px] p-2 py-1 ${disabled ? 'cursor-not-allowed' : ''}`}
+            className={`flex-1 min-w-[30px] p-2 py-1 ${
+              disabled ? "cursor-not-allowed" : ""
+            }`}
             placeholder="Choose an option"
             disabled={disabled}
           />
@@ -92,8 +107,8 @@ const MultipleDropDown = ({ columnNames, setSelectedColumns, curInd=0, disabled=
         <button
           className="text-xs float-right mt-1 underline text-red-600"
           onClick={() => {
-            setSelectedItems([])
-            setSelectedColumns([], curInd)
+            setSelectedItems([]);
+            setSelectedColumns([], curInd);
           }}
         >
           Delete All

@@ -1,17 +1,27 @@
 import styled from "@emotion/styled";
 import { Slider, Stack } from "@mui/material";
 import { Checkbox, Input } from "@nextui-org/react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import SingleDropDown from "../../../Components/SingleDropDown/SingleDropDown";
 
 function SplitDataset({ csvData }) {
   const columnNames = Object.keys(csvData[0]);
+  const [target_variable, setTargetVariable] = useState('')
+  const [whatKind, setWhatKind] = useState('')
+
+  useEffect(() => {
+    if(target_variable) {
+      const temp = typeof(csvData[0][target_variable]) === 'number' ? "Continuous" : 'Categorical'
+      setWhatKind(temp)
+    }
+  }, [target_variable, csvData])
+
   return (
     <div className="mt-8">
       <div className="flex items-center gap-8">
         <div className="w-full">
-          <p>Target Variable</p>
-          <SingleDropDown columnNames={columnNames} />
+          <p>Target Variable <span className="font-bold tracking-wide text-primary-btn text-lg">({whatKind})</span> </p>
+          <SingleDropDown columnNames={columnNames} onValueChange={setTargetVariable} />
         </div>
         <div className="w-full">
           <p>Stratify</p>

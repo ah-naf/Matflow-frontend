@@ -1,18 +1,27 @@
 import { Checkbox, Input } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
 import SingleDropDown from "../../../Components/SingleDropDown/SingleDropDown";
-import { setDatasetName, setFile, setSaveAsNew } from "../../../Slices/FeatureEngineeringSlice";
-import { fetchDataFromIndexedDB } from "../../../util/indexDB";
+import {
+  setDatasetName,
+  setFile,
+  setSaveAsNew,
+} from "../../../Slices/FeatureEngineeringSlice";
+import {
+  fetchDataFromIndexedDB,
+  updateDataInIndexedDB,
+} from "../../../util/indexDB";
 
 function AlterFieldName() {
   const dispatch = useDispatch();
-  const featureData = useSelector((state) => state.featureEngineering);
   const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
   const [csvData, setCsvData] = useState();
   const [numberOfColumns, setNumberOfColumns] = useState(1);
   const [columnNames, setColumnNames] = useState();
-  const [savedAsNewDataset, setSavedAsNewDataset] = useState(false)
+  const [savedAsNewDataset, setSavedAsNewDataset] = useState(false);
+  const [data, setData] = useState([{ column_name: "", new_field_name: "" }]);
+  const featureData = useSelector((state) => state.featureEngineering);
 
   useEffect(() => {
     if (activeCsvFile && activeCsvFile.name) {
@@ -26,6 +35,71 @@ function AlterFieldName() {
       getData();
     }
   }, [activeCsvFile, dispatch]);
+
+  const handleChange = (val, index, key) => {
+    const temp = data.map((d, ind) => {
+      if (ind === index) return { ...d, [key]: val };
+      return d;
+    });
+    setData(temp);
+  };
+
+  const handleSave = async () => {
+    try {
+      const res = await fetch("http://127.0.0.1:8000/api/alter_field_name/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          number_of_columns: numberOfColumns,
+          data,
+        }),
+      });
+      let Data = await res.json();
+
+      let fileName = activeCsvFile.name;
+
+      if (featureData.save_as_new) {
+        fileName = featureData.dataset_name;
+      }
+
+      // console.log(featureData)
+
+      const uploadedFiles = JSON.parse(localStorage.getItem("uploadedFiles"));
+      const fileExist = uploadedFiles.filter((val) => val.name === fileName);
+
+      if (fileExist.length === 0) {
+        uploadedFiles.push({ name: fileName });
+      }
+      localStorage.setItem("uploadedFiles", JSON.stringify(uploadedFiles));
+
+      const temp = await fetchDataFromIndexedDB(fileName);
+      await updateDataInIndexedDB(fileName, Data);
+
+      toast.success(`Data updated successfully!`, {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+    } catch (error) {
+      toast.error("Something went wrong. Please try again", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+    }
+  };
 
   return (
     <div className="my-8">
@@ -46,17 +120,24 @@ function AlterFieldName() {
       </div>
       <div className="mt-8">
         {csvData &&
-          Array.from({ length: numberOfColumns }, (_, index) => {
+          data.map((val, index) => {
             return (
               <div key={index} className="flex items-end gap-8 mt-6">
                 <div className="w-full">
                   <p>Column {index + 1}</p>
-                  <SingleDropDown columnNames={columnNames} />
+                  <SingleDropDown
+                    columnNames={columnNames}
+                    onValueChange={(e) => handleChange(e, index, "column_name")}
+                  />
                 </div>
                 <Input
                   fullWidth
                   label="New Field Name"
                   placeholder="New name."
+                  value={val.new_field_name}
+                  onChange={(e) =>
+                    handleChange(e.target.value, index, "new_field_name")
+                  }
                 />
               </div>
             );
@@ -86,7 +167,7 @@ function AlterFieldName() {
         )}
         <button
           className="self-start border-2 px-6 tracking-wider bg-primary-btn text-white font-medium rounded-md py-2"
-        //   onClick={handleSave}
+          onClick={handleSave}
         >
           Save
         </button>

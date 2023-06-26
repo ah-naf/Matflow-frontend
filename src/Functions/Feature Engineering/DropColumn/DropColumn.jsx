@@ -50,6 +50,7 @@ function DropColumn({ csvData }) {
         body: JSON.stringify({
           default_value: defaultValue,
           select_columns: selectedColumns,
+          file: csvData
         }),
       });
       let Data = await res.json();

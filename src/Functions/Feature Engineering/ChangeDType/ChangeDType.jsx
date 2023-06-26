@@ -55,6 +55,7 @@ function ChangeDType() {
         body: JSON.stringify({
           number_of_columns: numberOfColumns,
           data,
+          file: csvData
         }),
       });
       let Data = await res.json();

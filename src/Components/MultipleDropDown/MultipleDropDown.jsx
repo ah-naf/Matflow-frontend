@@ -14,7 +14,8 @@ const MultipleDropDown = ({
 
   useEffect(() => {
     setSelectedItems(defaultValue)
-  }, [defaultValue])
+    // console.log('first')
+  }, [])
 
   const handleInputChange = (event) => {
     const value = event.target.value;

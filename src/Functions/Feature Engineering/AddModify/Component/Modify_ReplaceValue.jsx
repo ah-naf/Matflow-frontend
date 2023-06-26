@@ -1,6 +1,8 @@
 import { Input } from "@nextui-org/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import SingleDropDown from "../../../../Components/SingleDropDown/SingleDropDown";
+import { setData } from "../../../../Slices/FeatureEngineeringSlice";
 
 function Modify_ReplaceValue({ csvData }) {
   const columnNames = Object.keys(csvData[0]);
@@ -8,6 +10,36 @@ function Modify_ReplaceValue({ csvData }) {
   const [fillNullMethod, setFillNullMethod] = useState("Custom Value");
   const [stringOperationMethod, setStringOperationMethod] =
     useState("Uppercase");
+
+  const [data, setdata] = useState({ old_value: "", new_value: "" });
+  const [from_another_column, setFromAnotherColumn] = useState("");
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (from_another_column)
+      setdata({ ...data, select_column: from_another_column });
+  }, [from_another_column]);
+
+  useEffect(() => {
+    dispatch(
+      setData({
+        ...data,
+        sub_method: subMethod,
+      })
+    );
+  }, [data, dispatch, subMethod]);
+
+  const handleSubMethod = (val) => {
+    setSubMethod(val);
+    if (val === "Text Input") setdata({ old_value: "", new_value: "" });
+    if (val === "Numpy Operations")
+      setdata({ select_an_operation: "np.log10" });
+    if (val === "Fill Null")
+      setdata({ fill_null_values: "Custom Value", enter_custom_value: "" });
+    if (val === "String Operations")
+      setdata({ select_an_operation: "Uppercase" });
+  };
+
   return (
     <div>
       <div className="flex flex-col gap-1">
@@ -17,7 +49,7 @@ function Modify_ReplaceValue({ csvData }) {
           id=""
           value={subMethod}
           className="px-2 py-3 rounded-lg"
-          onChange={(e) => setSubMethod(e.target.value)}
+          onChange={(e) => handleSubMethod(e.target.value)}
         >
           <option value="Text Input">Text Input</option>
           <option value="Numpy Operations">Numpy Operations</option>
@@ -28,14 +60,32 @@ function Modify_ReplaceValue({ csvData }) {
       <div className="my-8">
         {subMethod === "Text Input" && (
           <>
-            <Input fullWidth label="Old Value" className="mb-3" />
-            <Input label="New Value" fullWidth />
+            <Input
+              fullWidth
+              label="Old Value"
+              className="mb-3"
+              value={data.old_value || ""}
+              onChange={(e) => setdata({ ...data, old_value: e.target.value })}
+            />
+            <Input
+              label="New Value"
+              fullWidth
+              value={data.new_value || ""}
+              onChange={(e) => setdata({ ...data, new_value: e.target.value })}
+            />
           </>
         )}
         {subMethod === "Numpy Operations" && (
           <div className="flex flex-col gap-1">
             <label htmlFor="">Select an operation</label>
-            <select name="" id="" className="px-2 py-3 rounded-lg">
+            <select
+              name=""
+              id=""
+              className="px-2 py-3 rounded-lg"
+              onChange={(e) =>
+                setdata({ ...data, select_an_operation: e.target.value })
+              }
+            >
               <option value="np.log10">np.log10</option>
               <option value="np.sin">np.sin</option>
               <option value="np.cos">np.cos</option>
@@ -53,7 +103,10 @@ function Modify_ReplaceValue({ csvData }) {
                 id=""
                 className="px-2 py-3 rounded-lg"
                 value={fillNullMethod}
-                onChange={(e) => setFillNullMethod(e.target.value)}
+                onChange={(e) => {
+                  setFillNullMethod(e.target.value);
+                  setdata({ ...data, fill_null_values: e.target.value });
+                }}
               >
                 <option value="Custom Value">Custom Value</option>
                 <option value="Mean">Mean</option>
@@ -64,12 +117,22 @@ function Modify_ReplaceValue({ csvData }) {
             </div>
             <div className="mt-4">
               {fillNullMethod === "Custom Value" && (
-                <Input fullWidth label="Enter Custom Value" />
+                <Input
+                  fullWidth
+                  label="Enter Custom Value"
+                  value={data.enter_custom_value || ""}
+                  onChange={(e) =>
+                    setdata({ ...data, enter_custom_value: e.target.value })
+                  }
+                />
               )}
               {fillNullMethod === "From Another Column" && (
                 <div>
                   <p>Select column</p>
-                  <SingleDropDown columnNames={columnNames} />
+                  <SingleDropDown
+                    columnNames={columnNames}
+                    onValueChange={setFromAnotherColumn}
+                  />
                 </div>
               )}
             </div>
@@ -84,7 +147,10 @@ function Modify_ReplaceValue({ csvData }) {
                 id=""
                 className="px-2 py-3 rounded-lg"
                 value={stringOperationMethod}
-                onChange={(e) => setStringOperationMethod(e.target.value)}
+                onChange={(e) => {
+                  setStringOperationMethod(e.target.value);
+                  setdata({ ...data, select_an_operation: e.target.value });
+                }}
               >
                 <option value="Uppercase">Uppercase</option>
                 <option value="Lowercase">Lowercase</option>
@@ -101,7 +167,19 @@ function Modify_ReplaceValue({ csvData }) {
                 <option value="Remove Characters">Remove Characters</option>
               </select>
             </div>
-            {stringOperationMethod === 'Remove Characters' && <Input fullWidth label="Enter character to remove" />}
+            {stringOperationMethod === "Remove Characters" && (
+              <Input
+                fullWidth
+                label="Enter character to remove"
+                value={data.enter_character_to_remove || ""}
+                onChange={(e) =>
+                  setdata({
+                    ...data,
+                    enter_character_to_remove: e.target.value,
+                  })
+                }
+              />
+            )}
           </>
         )}
       </div>

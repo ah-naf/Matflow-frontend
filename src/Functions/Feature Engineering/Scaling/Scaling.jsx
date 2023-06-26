@@ -1,12 +1,20 @@
 import { Checkbox, Radio } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
 import MultipleDropDown from "../../../Components/MultipleDropDown/MultipleDropDown";
+import {
+  fetchDataFromIndexedDB,
+  updateDataInIndexedDB,
+} from "../../../util/indexDB";
 
 function Scaling({ csvData }) {
   const allColumns = Object.keys(csvData[0]);
   const [selectedColumns, setSelectedColumns] = useState();
   const [option, setOption] = useState("Select Columns");
   const [defaultValue, setDefaultValue] = useState("Blank");
+  const [method, setMethod] = useState("Min-Max Scaler");
+  const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
 
   useEffect(() => {
     if (defaultValue === "Blank") setSelectedColumns([]);
@@ -24,6 +32,60 @@ function Scaling({ csvData }) {
         )
       );
   }, [defaultValue, csvData]);
+
+  const handleSave = async () => {
+    try {
+      const res = await fetch("http://127.0.0.1:8000/api/scaling/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          options: option,
+          method,
+          default_value: defaultValue,
+          select_column: selectedColumns,
+        }),
+      });
+      let Data = await res.json();
+
+      let fileName = activeCsvFile.name;
+      // console.log(featureData)
+
+      const uploadedFiles = JSON.parse(localStorage.getItem("uploadedFiles"));
+      const fileExist = uploadedFiles.filter((val) => val.name === fileName);
+
+      if (fileExist.length === 0) {
+        uploadedFiles.push({ name: fileName });
+      }
+      localStorage.setItem("uploadedFiles", JSON.stringify(uploadedFiles));
+
+      const temp = await fetchDataFromIndexedDB(fileName);
+      await updateDataInIndexedDB(fileName, Data);
+
+      toast.success(`Data updated successfully!`, {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+    } catch (error) {
+      toast.error("Something went wrong. Please try again", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+    }
+  };
 
   return (
     <div className="mt-8">
@@ -51,6 +113,8 @@ function Scaling({ csvData }) {
             className="px-2 py-3 rounded-md bg-transparent border-2 border-gray-300 cursor-pointer hover:border-primary-btn"
             name=""
             id=""
+            value={method}
+            onChange={(e) => setMethod(e.target.value)}
           >
             <option value="Min-Max Scaler">Min-Max Scaler</option>
             <option value="Standard Scaler">Standard Scaler</option>
@@ -88,7 +152,7 @@ function Scaling({ csvData }) {
       </div>
       <button
         className="self-start border-2 px-6 tracking-wider bg-primary-btn text-white font-medium rounded-md py-2 mt-8"
-        // onClick={handleSave}
+        onClick={handleSave}
       >
         Submit
       </button>

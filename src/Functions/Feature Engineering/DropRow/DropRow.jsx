@@ -1,11 +1,16 @@
 import { Checkbox, Input, Radio } from "@nextui-org/react";
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
 import MultipleDropDown from "../../../Components/MultipleDropDown/MultipleDropDown";
 import {
   setDatasetName,
   setSaveAsNew,
 } from "../../../Slices/FeatureEngineeringSlice";
+import {
+  fetchDataFromIndexedDB,
+  updateDataInIndexedDB,
+} from "../../../util/indexDB";
 
 function DropRow({ csvData }) {
   const [defaultValue, setDefaultValue] = useState("With Null");
@@ -14,6 +19,65 @@ function DropRow({ csvData }) {
   const [savedAsNewDataset, setSavedAsNewDataset] = useState(false);
   const dispatch = useDispatch();
   const [add_to_pipeline, setAddToPipeline] = useState(false);
+  const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
+  const featureData = useSelector((state) => state.featureEngineering);
+
+  const handleSave = async () => {
+    try {
+      const res = await fetch("http://127.0.0.1:8000/api/drop_rows/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          default_value: defaultValue,
+          select_columns: selectedColumns,
+        }),
+      });
+      let Data = await res.json();
+
+      let fileName = activeCsvFile.name;
+
+      if (featureData.save_as_new) {
+        fileName = featureData.dataset_name;
+      }
+
+      // console.log(featureData)
+
+      const uploadedFiles = JSON.parse(localStorage.getItem("uploadedFiles"));
+      const fileExist = uploadedFiles.filter((val) => val.name === fileName);
+
+      if (fileExist.length === 0) {
+        uploadedFiles.push({ name: fileName });
+      }
+      localStorage.setItem("uploadedFiles", JSON.stringify(uploadedFiles));
+
+      const temp = await fetchDataFromIndexedDB(fileName);
+      await updateDataInIndexedDB(fileName, Data);
+
+      toast.success(`Data updated successfully!`, {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+    } catch (error) {
+      toast.error("Something went wrong. Please try again", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+    }
+  };
 
   return (
     <div className="mt-8">
@@ -72,7 +136,7 @@ function DropRow({ csvData }) {
         )}
         <button
           className="self-start border-2 px-6 tracking-wider bg-primary-btn text-white font-medium rounded-md py-2"
-          //   onClick={handleSave}
+          onClick={handleSave}
         >
           Save
         </button>

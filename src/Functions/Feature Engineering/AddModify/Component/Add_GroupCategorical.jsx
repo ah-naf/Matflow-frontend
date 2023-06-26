@@ -45,6 +45,7 @@ function Add_GroupCategorical({ csvData }) {
       let temp = csvData.map((val) => val[groupColumn].toString());
       let temp1 = new Set(temp);
       temp1 = [...temp1];
+      // console.log(temp1)
       setGroupMembers(temp1);
     }
 

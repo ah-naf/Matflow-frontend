@@ -5,7 +5,7 @@ const MultipleDropDown = ({
   setSelectedColumns,
   curInd = 0,
   disabled = false,
-  defaultValue = [],
+  defaultValue,
 }) => {
   const [inputValue, setInputValue] = useState("");
   const [filteredItems, setFilteredItems] = useState([]);
@@ -13,9 +13,9 @@ const MultipleDropDown = ({
   const dropdownRef = useRef(null);
 
   useEffect(() => {
-    setSelectedItems(defaultValue)
+    if (defaultValue) setSelectedItems(defaultValue);
     // console.log('first')
-  }, [])
+  }, [defaultValue]);
 
   const handleInputChange = (event) => {
     const value = event.target.value;

@@ -18,7 +18,7 @@ export const FeatureEngineeringSlice = createSlice({
       state.option = payload;
     },
     setColumnName: (state, {payload}) => {
-        state.column_name = payload
+        state.select_column = payload
     },
     setMethod: (state, {payload}) => {
         state.method = payload

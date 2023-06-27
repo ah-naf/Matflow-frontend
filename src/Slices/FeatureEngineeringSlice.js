@@ -11,40 +11,58 @@ export const FeatureEngineeringSlice = createSlice({
     data: {},
     save_as_new: false,
     dataset_name: "",
-    file: []
+    file: [],
+    feature_selection: {
+      data_type: "",
+      target_variable: "",
+    },
   },
   reducers: {
     setOption: (state, { payload }) => {
       state.option = payload;
     },
-    setColumnName: (state, {payload}) => {
-        state.select_column = payload
+    setColumnName: (state, { payload }) => {
+      state.select_column = payload;
     },
-    setMethod: (state, {payload}) => {
-        state.method = payload
+    setMethod: (state, { payload }) => {
+      state.method = payload;
     },
-    setData: (state, {payload}) => {
-        state.data = payload
+    setData: (state, { payload }) => {
+      state.data = payload;
     },
-    setAddToPipeline: (state, {payload}) => {
-        state.add_to_pipeline = payload
+    setAddToPipeline: (state, { payload }) => {
+      state.add_to_pipeline = payload;
     },
-    setSaveAsNew: (state, {payload}) => {
-        state.save_as_new = payload
+    setSaveAsNew: (state, { payload }) => {
+      state.save_as_new = payload;
     },
-    setDatasetName: (state, {payload}) => {
-        state.dataset_name = payload
+    setDatasetName: (state, { payload }) => {
+      state.dataset_name = payload;
     },
-    setFile: (state, {payload}) => {
-        state.file = payload
+    setFile: (state, { payload }) => {
+      state.file = payload;
     },
-    setSelectColumn: (state, {payload}) => {
-      state.select_column = payload
-  }
+    setSelectColumn: (state, { payload }) => {
+      state.select_column = payload;
+    },
+    setFeatureSelection: (state, {payload}) => {
+      state.feature_selection = payload
+    }
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { setOption, setColumnName, setMethod, setData, setAddToPipeline, setSaveAsNew, setDatasetName, setFile, setSelectColumn } = FeatureEngineeringSlice.actions;
+export const {
+  setOption,
+  setColumnName,
+  setMethod,
+  setData,
+  setAddToPipeline,
+  setSaveAsNew,
+  setDatasetName,
+  setFile,
+  setSelectColumn,
+  setFeatureSelection
+} = FeatureEngineeringSlice.actions;
 
 export default FeatureEngineeringSlice.reducer;

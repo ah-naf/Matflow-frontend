@@ -32,7 +32,7 @@ function AppendDataset({ csvData }) {
 
   const handleSave = async () => {
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/merge_dataset/", {
+      const res = await fetch("http://127.0.0.1:8000/api/append_dataset/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

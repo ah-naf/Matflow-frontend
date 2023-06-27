@@ -45,6 +45,7 @@ function Scaling({ csvData }) {
           method,
           default_value: defaultValue,
           select_column: selectedColumns,
+          file: csvData
         }),
       });
       let Data = await res.json();

@@ -30,6 +30,7 @@ import DropRow from "../../Functions/Feature Engineering/DropRow/DropRow";
 import MergeDataset from "../../Functions/Feature Engineering/MergeDataset/MergeDataset";
 import AppendDataset from "../../Functions/Feature Engineering/AppendDataset/AppendDataset";
 import Cluster from "../../Functions/Feature Engineering/Cluster/Cluster";
+import FeatureSelection from "../../Functions/Feature Engineering/FeatureSelection/FeatureSelection";
 
 function DashBoardRight() {
   const activeFunction = useSelector((state) => state.sideBar.activeFunction);
@@ -122,6 +123,9 @@ function DashBoardRight() {
           )}
           {csvData && activeFunction && activeFunction === "Cluster" && (
             <Cluster csvData={csvData} />
+          )}
+          {csvData && activeFunction && activeFunction === "Feature Selection" && (
+            <FeatureSelection csvData={csvData} />
           )}
 
           {/* Model Building */}

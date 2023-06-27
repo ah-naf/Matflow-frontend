@@ -89,7 +89,20 @@ function Add_GroupCategorical({ csvData }) {
           label="N Groups"
           value={nGroups}
           onChange={(e) => {
-            setNGroups(e.target.value);
+            const val = e.target.value;
+            setNGroups(val);
+            if (val < nGroupData.length) setNGroupData(nGroupData.slice(0, val));
+            else {
+              const temp = JSON.parse(JSON.stringify(nGroupData));
+              while (val - temp.length > 0) {
+                temp.push({
+                  group_name: "",
+                  group_members: [],
+                  others: false,
+                });
+              }
+              setNGroupData(temp);
+            }
           }}
           type="number"
         />
@@ -117,7 +130,7 @@ function Add_GroupCategorical({ csvData }) {
         </div>
       </div>
       <div className="mt-8">
-        {Array.from({ length: nGroups }, (_, index) => {
+        {nGroupData.map((val, index) => {
           return (
             <div key={index} className="flex gap-8 mt-4 items-center ">
               <div>

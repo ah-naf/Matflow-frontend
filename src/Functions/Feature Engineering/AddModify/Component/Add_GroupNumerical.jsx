@@ -57,18 +57,24 @@ function Add_GroupNumerical({ csvData }) {
           label="N Groups"
           value={nGroups}
           onChange={(e) => {
-            setNGroups(e.target.value);
-            setNGroupData([
-              ...nGroupData,
-              {
-                min_value: 0,
-                max_value: 0,
-                operator: "==",
-                value: 0,
-                bin_value: 0,
-                use_operator: false,
-              },
-            ]);
+            const val = e.target.value;
+            setNGroups(val);
+            if (val < nGroupData.length)
+              setNGroupData(nGroupData.slice(0, val));
+            else {
+              const temp = JSON.parse(JSON.stringify(nGroupData));
+              while (val - temp.length > 0) {
+                temp.push({
+                  min_value: 0,
+                  max_value: 0,
+                  operator: "==",
+                  value: 0,
+                  bin_value: 0,
+                  use_operator: false,
+                });
+              }
+              setNGroupData(temp);
+            }
           }}
           type="number"
         />
@@ -87,11 +93,11 @@ function Add_GroupNumerical({ csvData }) {
         </Checkbox>
       </div>
       <div className="mt-8">
-        {Array.from({ length: nGroups }, (_, index) => {
+        {nGroupData.map((val, index) => {
           return (
             <div key={index} className="flex gap-8 mt-4">
               <div className="flex w-full gap-8">
-                {nGroupData[index].use_operator ? (
+                {val.use_operator ? (
                   <>
                     <div className="w-full flex flex-col">
                       <label htmlFor="" className="mb-2 text-sm">
@@ -101,7 +107,7 @@ function Add_GroupNumerical({ csvData }) {
                         name=""
                         id=""
                         className="p-2 rounded-lg"
-                        value={nGroupData[index].operator}
+                        value={val.operator}
                         onChange={(e) =>
                           handleValueChange(e.target.value, index, "operator")
                         }
@@ -117,7 +123,7 @@ function Add_GroupNumerical({ csvData }) {
                     <Input
                       label="Value"
                       type="number"
-                      value={nGroupData[index].value}
+                      value={val.value}
                       fullWidth
                       onChange={(e) =>
                         handleValueChange(e.target.value, index, "value")
@@ -130,7 +136,7 @@ function Add_GroupNumerical({ csvData }) {
                       label="Min Value"
                       type="number"
                       fullWidth
-                      value={nGroupData[index].min_value}
+                      value={val.min_value}
                       onChange={(e) =>
                         handleValueChange(e.target.value, index, "min_value")
                       }
@@ -139,7 +145,7 @@ function Add_GroupNumerical({ csvData }) {
                       label="Max Value"
                       type="number"
                       fullWidth
-                      value={nGroupData[index].max_value}
+                      value={val.max_value}
                       onChange={(e) =>
                         handleValueChange(e.target.value, index, "max_value")
                       }
@@ -150,7 +156,7 @@ function Add_GroupNumerical({ csvData }) {
                   label="Bin Value"
                   type="number"
                   fullWidth
-                  value={nGroupData[index].bin_value}
+                  value={val.bin_value}
                   onChange={(e) =>
                     handleValueChange(e.target.value, index, "bin_value")
                   }
@@ -174,5 +180,3 @@ function Add_GroupNumerical({ csvData }) {
 }
 
 export default Add_GroupNumerical;
-
-

@@ -54,7 +54,7 @@ function AlterFieldName() {
         body: JSON.stringify({
           number_of_columns: numberOfColumns,
           data,
-          file: csvData
+          file: csvData,
         }),
       });
       let Data = await res.json();
@@ -109,7 +109,21 @@ function AlterFieldName() {
           <Input
             label="Number of columns"
             value={numberOfColumns}
-            onChange={(e) => setNumberOfColumns(e.target.value)}
+            onChange={(e) => {
+              const val = e.target.value;
+              setNumberOfColumns(val);
+              if (val < data.length) setData(data.slice(0, val));
+              else {
+                const temp = JSON.parse(JSON.stringify(data));
+                while (val - temp.length > 0) {
+                  temp.push({
+                    column_name: "",
+                    new_field_name: ''
+                  });
+                }
+                setData(temp);
+              }
+            }}
             type="number"
             step={1}
             fullWidth

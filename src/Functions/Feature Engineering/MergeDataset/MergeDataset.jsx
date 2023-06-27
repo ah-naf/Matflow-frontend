@@ -35,10 +35,8 @@ function MergeDataset({ csvData }) {
           how,
           left_dataframe: leftDataframeValue,
           right_dataframe: rightDataframeValue,
-          dataset: {
-            [activeCsvFile.name]: csvData,
-            [secondDatasetName]: anotherCsvData,
-          },
+          file: csvData,
+          file2: anotherCsvData
         }),
       });
       let Data = await res.json();

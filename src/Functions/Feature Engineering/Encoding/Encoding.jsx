@@ -41,7 +41,8 @@ function Encoding({ csvData }) {
         body: JSON.stringify({
           select_column: stringColumn,
           method,
-          data
+          data,
+          file: csvData
         }),
       });
       let Data = await res.json();

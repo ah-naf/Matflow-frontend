@@ -1,9 +1,12 @@
 import { Input } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import SingleDropDown from "../../../Components/SingleDropDown/SingleDropDown";
-import { fetchDataFromIndexedDB, updateDataInIndexedDB } from "../../../util/indexDB";
 import { toast } from "react-toastify";
+import SingleDropDown from "../../../Components/SingleDropDown/SingleDropDown";
+import {
+  fetchDataFromIndexedDB,
+  updateDataInIndexedDB,
+} from "../../../util/indexDB";
 
 const HOW = ["left", "right", "outer", "inner", "cross"];
 
@@ -19,6 +22,7 @@ function MergeDataset({ csvData }) {
   const [how, setHow] = useState();
   const [leftDataframeValue, setLeftDataframeValue] = useState();
   const [rightDataframeValue, setRightDataframeValue] = useState();
+  const [secondDatasetName, setSecondDatasetName] = useState("");
 
   const handleSave = async () => {
     try {
@@ -31,8 +35,10 @@ function MergeDataset({ csvData }) {
           how,
           left_dataframe: leftDataframeValue,
           right_dataframe: rightDataframeValue,
-          file: csvData,
-          file2: anotherCsvData
+          dataset: {
+            [activeCsvFile.name]: csvData,
+            [secondDatasetName]: anotherCsvData,
+          },
         }),
       });
       let Data = await res.json();
@@ -92,6 +98,7 @@ function MergeDataset({ csvData }) {
     const data = await fetchDataFromIndexedDB(val);
     setRightDataframe(Object.keys(data[0]));
     setAnotherCsvData(data);
+    setSecondDatasetName(val);
   };
 
   return (

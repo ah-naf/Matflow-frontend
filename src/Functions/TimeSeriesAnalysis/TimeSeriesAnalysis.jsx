@@ -11,23 +11,21 @@ function TimeSeriesAnalysis({ csvData }) {
   const [target_variable, setTargetVariable] = useState("");
 
   useEffect(() => {
-    if (target_variable) {
-      const fetchData = async () => {
-        const res = await fetch("http://127.0.0.1:8000/api/time_series/", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            file: csvData,
-            select_column: target_variable
-          }),
-        });
-        const data = await res.json()
-        console.log(data)
-      };
-      fetchData();
-    }
+    const fetchData = async () => {
+      const res = await fetch("http://127.0.0.1:8000/api/time_series/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          file: csvData,
+          select_column: target_variable,
+        }),
+      });
+      const data = await res.json();
+      console.log(data);
+    };
+    fetchData();
   }, [target_variable, csvData]);
 
   useEffect(() => {

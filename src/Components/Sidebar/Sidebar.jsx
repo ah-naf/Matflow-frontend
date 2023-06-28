@@ -30,7 +30,14 @@ const Sidebar = () => {
                 onDragStart={(event) => onDragStart(event, "output_graph")}
                 draggable
               >
-                Graoh
+                Graph
+              </button>
+              <button
+                className="border-2 px-2 py-3 rounded-md shadow text-sm "
+                onDragStart={(event) => onDragStart(event, "output_table")}
+                draggable
+              >
+                Table
               </button>
             </div>
           </Collapse>

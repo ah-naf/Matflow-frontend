@@ -23,7 +23,10 @@ function TimeSeriesAnalysis({ csvData }) {
         }),
       });
       const data = await res.json();
-      console.log(data);
+      if(data.error) {
+        setDateTimeWarning(true)
+      }
+      console.log(data)
     };
     fetchData();
   }, [target_variable, csvData]);

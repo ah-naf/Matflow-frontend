@@ -18,19 +18,20 @@ import ScatterPlot from "../../Functions/EDA/ScatterPlot";
 import ViolinPlot from "../../Functions/EDA/ViolinPlot";
 import AddModify from "../../Functions/Feature Engineering/AddModify/AddModify";
 import AlterFieldName from "../../Functions/Feature Engineering/AlterFieldName/AlterFieldName";
+import AppendDataset from "../../Functions/Feature Engineering/AppendDataset/AppendDataset";
 import ChangeDType from "../../Functions/Feature Engineering/ChangeDType/ChangeDType";
-import SplitDataset from "../../Functions/Model Building/SplitDataset/SplitDataset";
-import { fetchDataFromIndexedDB } from "../../util/indexDB";
-import BuildModel from "../../Functions/Model Building/BuildModel/BuildModel";
-import { setFile } from "../../Slices/FeatureEngineeringSlice";
-import Encoding from "../../Functions/Feature Engineering/Encoding/Encoding";
-import Scaling from "../../Functions/Feature Engineering/Scaling/Scaling";
+import Cluster from "../../Functions/Feature Engineering/Cluster/Cluster";
 import DropColumn from "../../Functions/Feature Engineering/DropColumn/DropColumn";
 import DropRow from "../../Functions/Feature Engineering/DropRow/DropRow";
-import MergeDataset from "../../Functions/Feature Engineering/MergeDataset/MergeDataset";
-import AppendDataset from "../../Functions/Feature Engineering/AppendDataset/AppendDataset";
-import Cluster from "../../Functions/Feature Engineering/Cluster/Cluster";
+import Encoding from "../../Functions/Feature Engineering/Encoding/Encoding";
 import FeatureSelection from "../../Functions/Feature Engineering/FeatureSelection/FeatureSelection";
+import MergeDataset from "../../Functions/Feature Engineering/MergeDataset/MergeDataset";
+import Scaling from "../../Functions/Feature Engineering/Scaling/Scaling";
+import BuildModel from "../../Functions/Model Building/BuildModel/BuildModel";
+import SplitDataset from "../../Functions/Model Building/SplitDataset/SplitDataset";
+import { setFile } from "../../Slices/FeatureEngineeringSlice";
+import { fetchDataFromIndexedDB } from "../../util/indexDB";
+import TimeSeriesAnalysis from "../../Functions/TimeSeriesAnalysis/TimeSeriesAnalysis";
 
 function DashBoardRight() {
   const activeFunction = useSelector((state) => state.sideBar.activeFunction);
@@ -43,7 +44,7 @@ function DashBoardRight() {
       const getData = async () => {
         const res = await fetchDataFromIndexedDB(activeFile.name);
         setCsvData(res);
-        dispatch(setFile(res))
+        dispatch(setFile(res));
       };
 
       getData();
@@ -94,9 +95,12 @@ function DashBoardRight() {
 
           {/* Feature Engineering Functions */}
 
-          {csvData && activeFunction &&
+          {csvData &&
+            activeFunction &&
             (activeFunction === "Add/Modify" ||
-              activeFunction === "Feature Engineering") && <AddModify csvData={csvData} />}
+              activeFunction === "Feature Engineering") && (
+              <AddModify csvData={csvData} />
+            )}
           {activeFunction && activeFunction === "Change Dtype" && (
             <ChangeDType />
           )}
@@ -124,9 +128,11 @@ function DashBoardRight() {
           {csvData && activeFunction && activeFunction === "Cluster" && (
             <Cluster csvData={csvData} />
           )}
-          {csvData && activeFunction && activeFunction === "Feature Selection" && (
-            <FeatureSelection csvData={csvData} />
-          )}
+          {csvData &&
+            activeFunction &&
+            activeFunction === "Feature Selection" && (
+              <FeatureSelection csvData={csvData} />
+            )}
 
           {/* Model Building */}
 
@@ -138,6 +144,12 @@ function DashBoardRight() {
             )}
           {csvData && activeFunction && activeFunction === "Build Model" && (
             <BuildModel csvData={csvData} />
+          )}
+
+          {/* Time Series Analysis */}
+
+          {csvData && activeFunction && activeFunction === "Time Series Analysis" && (
+            <TimeSeriesAnalysis csvData={csvData} />
           )}
         </>
       ) : (

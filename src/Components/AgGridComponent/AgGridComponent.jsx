@@ -1,7 +1,7 @@
 import { AgGridReact } from "ag-grid-react";
 import { useCallback, useMemo, useRef } from "react";
 
-function AgGridComponent({ rowData, columnDefs }) {
+function AgGridComponent({ rowData, columnDefs, rowHeight = 50 }) {
   const gridRef = useRef();
 
   const defaultColDef = useMemo(() => {
@@ -38,7 +38,7 @@ function AgGridComponent({ rowData, columnDefs }) {
         ref={gridRef}
         rowData={rowData}
         columnDefs={columnDefs}
-        rowHeight={50}
+        rowHeight={rowHeight}
         pagination
         paginationPageSize={10}
         defaultColDef={defaultColDef}

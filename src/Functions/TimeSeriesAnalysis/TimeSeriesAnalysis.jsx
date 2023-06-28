@@ -1,13 +1,34 @@
-import { Collapse, Input } from "@nextui-org/react";
+import { Collapse } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import AgGridComponent from "../../Components/AgGridComponent/AgGridComponent";
 import SingleDropDown from "../../Components/SingleDropDown/SingleDropDown";
-import DateTime from "../../Components/DateTime/DateTime";
 
 function TimeSeriesAnalysis({ csvData }) {
+  const allColumnNames = Object.keys(csvData[0]);
   const [dataTimeWarning, setDateTimeWarning] = useState(false);
-  const [extend_time, setExtendTime] = useState(0.00)
+  const [extend_time, setExtendTime] = useState(0.0);
+  const [target_variable, setTargetVariable] = useState("");
+
+  useEffect(() => {
+    if (target_variable) {
+      const fetchData = async () => {
+        const res = await fetch("http://127.0.0.1:8000/api/time_series/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            file: csvData,
+            select_column: target_variable
+          }),
+        });
+        const data = await res.json()
+        console.log(data)
+      };
+      fetchData();
+    }
+  }, [target_variable, csvData]);
 
   useEffect(() => {
     if (dataTimeWarning) {
@@ -86,23 +107,12 @@ function TimeSeriesAnalysis({ csvData }) {
         <div className="mt-8">
           <div className="flex items-end gap-8">
             <div className="w-full">
-              <Input
-                fullWidth
-                type="number"
-                min={0}
-                step={0.01}
-                value={extend_time}
-                onChange={e => setExtendTime(e.target.value)}
-                label="Extend Time"
+              <p>Select Column</p>
+              <SingleDropDown
+                columnNames={allColumnNames}
+                onValueChange={setTargetVariable}
               />
             </div>
-            <div className="w-full">
-              <p>Select Column</p>
-              <SingleDropDown columnNames={["s"]} />
-            </div>
-          </div>
-          <div>
-            {/* <DateTime /> */}
           </div>
         </div>
       )}

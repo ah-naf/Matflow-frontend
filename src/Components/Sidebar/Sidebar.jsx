@@ -12,14 +12,25 @@ const Sidebar = () => {
         <h3 className="font-bold  text-3xl mb-2">Node Packet</h3>
         <p className=" mb-4">Drag and Drop nodes onto your editor.</p>
         <Collapse.Group bordered>
-          <Collapse title={<h1 className="font-medium tracking-wider">Input/Output Nodes</h1>}>
+          <Collapse
+            title={
+              <h1 className="font-medium tracking-wider">Input/Output Nodes</h1>
+            }
+          >
             <div className="grid grid-cols-3 gap-4">
               <button
-                className="border-2 px-2 py-3 rounded-sm  text-sm "
+                className="border-2 px-2 py-3 rounded-md shadow text-sm "
                 onDragStart={(event) => onDragStart(event, "upload")}
                 draggable
               >
                 Upload File
+              </button>
+              <button
+                className="border-2 px-2 py-3 rounded-md shadow text-sm "
+                onDragStart={(event) => onDragStart(event, "output_graph")}
+                draggable
+              >
+                Graoh
               </button>
             </div>
           </Collapse>

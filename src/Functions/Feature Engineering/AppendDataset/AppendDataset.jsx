@@ -1,9 +1,12 @@
 import { Input } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import SingleDropDown from "../../../Components/SingleDropDown/SingleDropDown";
-import { fetchDataFromIndexedDB, updateDataInIndexedDB } from "../../../util/indexDB";
 import { toast } from "react-toastify";
+import SingleDropDown from "../../../Components/SingleDropDown/SingleDropDown";
+import {
+  fetchDataFromIndexedDB,
+  updateDataInIndexedDB,
+} from "../../../util/indexDB";
 
 function AppendDataset({ csvData }) {
   const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
@@ -32,7 +35,7 @@ function AppendDataset({ csvData }) {
 
   const handleSave = async () => {
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/append_dataset/", {
+      const res = await fetch("http://127.0.0.1:8000/api/append/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -1,14 +1,12 @@
 import styled from "@emotion/styled";
 import { Slider, Stack } from "@mui/material";
 import { Input } from "@nextui-org/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import Plot from "react-plotly.js";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import AgGridComponent from "../../../Components/AgGridComponent/AgGridComponent";
 import SingleDropDown from "../../../Components/SingleDropDown/SingleDropDown";
-import {
-  fetchDataFromIndexedDB,
-  updateDataInIndexedDB,
-} from "../../../util/indexDB";
 
 function Cluster({ csvData }) {
   const allColumns = Object.keys(csvData[0]);
@@ -17,6 +15,25 @@ function Cluster({ csvData }) {
   const [target_variable, setTargetVariable] = useState("");
   const [data, setData] = useState(["", "", ""]);
   const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
+  const [graphTableData, setGraphTableData] = useState();
+  const [columnDefs, setColumnDefs] = useState();
+
+  useEffect(() => {
+    if (display_type === "Table") {
+      const tableData = graphTableData.table;
+      const tempColumnDefs =
+        tableData.length > 0
+          ? Object.keys(tableData[0]).map((key) => ({
+              headerName: key,
+              field: key,
+              valueGetter: (params) => {
+                return params.data[key];
+              },
+            }))
+          : [];
+      setColumnDefs(tempColumnDefs);
+    }
+  }, [display_type, graphTableData]);
 
   const handleSave = async () => {
     try {
@@ -33,30 +50,7 @@ function Cluster({ csvData }) {
         }),
       });
       let Data = await res.json();
-
-      let fileName = activeCsvFile.name;
-
-      const uploadedFiles = JSON.parse(localStorage.getItem("uploadedFiles"));
-      const fileExist = uploadedFiles.filter((val) => val.name === fileName);
-
-      if (fileExist.length === 0) {
-        uploadedFiles.push({ name: fileName });
-      }
-      localStorage.setItem("uploadedFiles", JSON.stringify(uploadedFiles));
-
-      const temp = await fetchDataFromIndexedDB(fileName);
-      await updateDataInIndexedDB(fileName, Data);
-
-      toast.success(`Data updated successfully!`, {
-        position: "bottom-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-      });
+      setGraphTableData(Data);
     } catch (error) {
       toast.error("Something went wrong. Please try again", {
         position: "bottom-right",
@@ -149,6 +143,36 @@ function Cluster({ csvData }) {
       >
         Submit
       </button>
+
+      <div className="mt-4">
+        {graphTableData &&
+          (display_type === "Graph" ? (
+            <div className="flex justify-center mt-4">
+              <Plot
+                data={JSON.parse(graphTableData.graph).data}
+                layout={{
+                  ...JSON.parse(graphTableData.graph).layout,
+                  showlegend: true,
+                }}
+                config={{ scrollZoom: true, editable: true, responsive: true }}
+              />
+            </div>
+          ) : (
+            <div className="mt-4 w-full">
+              {graphTableData.table.length > 0 && (
+                <div
+                  className="ag-theme-alpine"
+                  style={{ height: "600px", width: "100%" }}
+                >
+                  <AgGridComponent
+                    rowData={graphTableData.table}
+                    columnDefs={columnDefs}
+                  />
+                </div>
+              )}
+            </div>
+          ))}
+      </div>
     </div>
   );
 }

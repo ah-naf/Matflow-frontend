@@ -1,3 +1,7 @@
+import { DateTimePicker } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { Collapse } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
@@ -9,6 +13,35 @@ function TimeSeriesAnalysis({ csvData }) {
   const [dataTimeWarning, setDateTimeWarning] = useState(false);
   const [extend_time, setExtendTime] = useState(0.0);
   const [target_variable, setTargetVariable] = useState("");
+  const [timeSeriesData, setTimeSeriesData] = useState();
+  const [newTime, setNewTime] = useState();
+  const [time, setTime] = useState();
+
+  useEffect(() => {
+    if (time) {
+      // console.log(time);
+      let splittedFormat = timeSeriesData.format.split(" ");
+
+      let date = splittedFormat[0];
+      const separator = date[2];
+      date = date.split(separator);
+      let temp = "";
+      date.forEach((val) => {
+        if (val[1] === "Y") temp += time.$y;
+        if (val[1] === "m") temp += time.$M;
+        if (val[1] === "d") temp += time.$D;
+        temp += separator;
+      });
+      temp = temp.slice(0, -1);
+
+      if (splittedFormat.length > 1) {
+        temp += " ";
+        temp += time.$H + " " + time.$m + " " + time.$s;
+      }
+
+      setNewTime(temp);
+    }
+  }, [time, timeSeriesData]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -23,10 +56,9 @@ function TimeSeriesAnalysis({ csvData }) {
         }),
       });
       const data = await res.json();
-      if(data.error) {
-        setDateTimeWarning(true)
-      }
-      console.log(data)
+      if (data.error) {
+        setDateTimeWarning(true);
+      } else setTimeSeriesData(data);
     };
     fetchData();
   }, [target_variable, csvData]);
@@ -45,6 +77,38 @@ function TimeSeriesAnalysis({ csvData }) {
       });
     }
   }, [dataTimeWarning]);
+
+  const handleSave = async () => {
+    try {
+      const res = await fetch(
+        "http://127.0.0.1:8000/api/time_series_analysis/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            file: csvData,
+            date: newTime,
+            select_column: target_variable,
+          }),
+        }
+      );
+      const data = await res.json();
+      console.log(data);
+    } catch (error) {
+      toast.error("Something went wrong. Please try again", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+    }
+  };
 
   const initialColumnDefs =
     csvData.length > 0
@@ -115,6 +179,34 @@ function TimeSeriesAnalysis({ csvData }) {
               />
             </div>
           </div>
+          {timeSeriesData && timeSeriesData.format && (
+            <>
+              <div className="mt-4">
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DemoContainer components={["DateTimePicker"]}>
+                    <DateTimePicker
+                      views={[
+                        "year",
+                        "month",
+                        "day",
+                        "hours",
+                        "minutes",
+                        "seconds",
+                      ]}
+                      label={`Select a time. Format: (${timeSeriesData.format})`}
+                      onChange={(e) => setTime(e)}
+                    />
+                  </DemoContainer>
+                </LocalizationProvider>
+              </div>
+              <button
+                className="self-start mt-4 border-2 px-6 tracking-wider bg-primary-btn text-white font-medium rounded-md py-2"
+                onClick={handleSave}
+              >
+                Submit
+              </button>
+            </>
+          )}
         </div>
       )}
     </div>

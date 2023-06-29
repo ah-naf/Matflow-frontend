@@ -1,6 +1,7 @@
 import { Checkbox, Input } from "@nextui-org/react";
 import React from "react";
-import MultipleDropDown from "../../../../Components/MultipleDropDown/MultipleDropDown";
+import MultipleDropDown from "../../../../../Components/MultipleDropDown/MultipleDropDown";
+import SingleDropDown from "../../../../../Components/SingleDropDown/SingleDropDown";
 
 const DISPLAY_METRICES = [
   "R-Squared",
@@ -9,14 +10,22 @@ const DISPLAY_METRICES = [
   "Root Mean Squared Error",
 ];
 
-function LinearRegression() {
+const SOLVER = ["auto", "svd", "cholesky", "lsqr", "sparse_cg", "sag", "saga"];
+
+function RidgeRegression() {
   return (
     <div>
       <div>
         <h1 className="text-2xl font-medium tracking-wide mb-2">
           Hyperparameter Optimization Settings
         </h1>
-        <div className="flex gap-4 items-center">
+        <div className="grid grid-cols-2 gap-4 items-center">
+          <div className="w-full">
+            <p className="mb-1">
+              Number of iterations for hyperparameter search
+            </p>
+            <Input fullWidth bordered color="success" type="number" />
+          </div>
           <div className="w-full">
             <p className="mb-1">Number of cross-validation folds</p>
             <Input fullWidth bordered color="success" type="number" />
@@ -37,16 +46,38 @@ function LinearRegression() {
         <h1 className="text-2xl font-medium tracking-wide mb-3">
           Model Settings
         </h1>
-        <div className="flex items-center gap-8">
+        <div className="grid grid-cols-3 gap-8">
+          <Input
+            type="number"
+            fullWidth
+            bordered
+            color="success"
+            label="Alpha"
+            value={1}
+            step={0.1}
+          />
           <Input
             fullWidth
-            label="Number of jobs"
-            bordered
-            value={-1}
             type="number"
+            value={1000}
+            bordered
             color="success"
+            label="Max Iterations"
           />
-          <Checkbox defaultSelected color="success" className="w-[30%]">
+          <Input
+            fullWidth
+            bordered
+            color="success"
+            type="number"
+            value={0.0}
+            step={0.01}
+            label="Tolerance"
+          />
+          <div>
+            <p>Solver</p>
+            <SingleDropDown columnNames={SOLVER} initValue={SOLVER[0]} />
+          </div>
+          <Checkbox defaultSelected color="success">
             Fit Intercept
           </Checkbox>
         </div>
@@ -58,9 +89,8 @@ function LinearRegression() {
           />
         </div>
       </div>
-      
     </div>
   );
 }
 
-export default LinearRegression;
+export default RidgeRegression;

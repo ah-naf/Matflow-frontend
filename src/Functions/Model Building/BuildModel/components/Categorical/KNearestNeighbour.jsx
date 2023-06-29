@@ -1,18 +1,11 @@
-import { Checkbox, Input } from "@nextui-org/react";
+import { Input } from "@nextui-org/react";
 import React from "react";
-import MultipleDropDown from "../../../../Components/MultipleDropDown/MultipleDropDown";
-import SingleDropDown from "../../../../Components/SingleDropDown/SingleDropDown";
+import MultipleDropDown from "../../../../../Components/MultipleDropDown/MultipleDropDown";
+import SingleDropDown from "../../../../../Components/SingleDropDown/SingleDropDown";
 
-const DISPLAY_METRICES = [
-  "R-Squared",
-  "Mean Absolute Error",
-  "Mean Squared Error",
-  "Root Mean Squared Error",
-];
+const DISPLAY_METRICES = ["Accuracy", "Precision", "Recall", "F1-Score"];
 
-const CRITERION = ["mse", "friedman_mse", "mae"];
-
-function DecisionTreeRegression() {
+function KNearestNeighbour() {
   return (
     <div>
       <div>
@@ -52,34 +45,32 @@ function DecisionTreeRegression() {
             fullWidth
             bordered
             color="success"
-            label="Min. Samples Split"
-            value={2}
+            label="Number of neighbors"
+            value={5}
             step={1}
           />
-          <Input
-            fullWidth
-            type="number"
-            value={1}
-            bordered
-            color="success"
-            label="Min. Samples Leaf"
-          />
-          <Input
-            fullWidth
-            bordered
-            color="success"
-            type="number"
-            value={0}
-            step={1}
-            label="Random State"
-          />
+
           <div>
-            <p>Criterion</p>
-            <SingleDropDown columnNames={CRITERION} initValue={CRITERION[0]} />
+            <p>Weight Function</p>
+            <SingleDropDown
+              columnNames={["uniform", "distance"]}
+              initValue={"uniform"}
+            />
           </div>
-          <Checkbox defaultSelected color="success">
-            None
-          </Checkbox>
+          <div>
+            <p>Distance Metric</p>
+            <SingleDropDown
+              columnNames={["minkowski", "euclidean", "manhattan"]}
+              initValue={"minkowski"}
+            />
+          </div>
+          <div>
+            <p>Multiclass Average</p>
+            <SingleDropDown
+              columnNames={["micro", "macro", "weighted"]}
+              initValue={"micro"}
+            />
+          </div>
         </div>
         <div className="mt-4">
           <p className="mb-2">Display Metrices</p>
@@ -93,4 +84,4 @@ function DecisionTreeRegression() {
   );
 }
 
-export default DecisionTreeRegression;
+export default KNearestNeighbour;

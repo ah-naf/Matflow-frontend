@@ -1,18 +1,11 @@
-import { Checkbox, Input } from "@nextui-org/react";
+import { Input } from "@nextui-org/react";
 import React from "react";
-import MultipleDropDown from "../../../../Components/MultipleDropDown/MultipleDropDown";
-import SingleDropDown from "../../../../Components/SingleDropDown/SingleDropDown";
+import MultipleDropDown from "../../../../../Components/MultipleDropDown/MultipleDropDown";
+import SingleDropDown from "../../../../../Components/SingleDropDown/SingleDropDown";
 
-const DISPLAY_METRICES = [
-  "R-Squared",
-  "Mean Absolute Error",
-  "Mean Squared Error",
-  "Root Mean Squared Error",
-];
+const DISPLAY_METRICES = ["Accuracy", "Precision", "Recall", "F1-Score"];
 
-const SELECTION = ['cyclic', 'random']
-
-function LassoRegression() {
+function SupportVectorMachine() {
   return (
     <div>
       <div>
@@ -52,37 +45,50 @@ function LassoRegression() {
             fullWidth
             bordered
             color="success"
-            label="Alpha"
+            label="C"
             value={1}
-            step={0.1}
-          />
-          <Input
-            fullWidth
-            type="number"
-            value={1000}
-            bordered
-            color="success"
-            label="Max Iterations"
-          />
-          <Input
-            fullWidth
-            bordered
-            color="success"
-            type="number"
-            value={0.0}
             step={0.01}
-            label="Tolerance"
           />
+          <Input
+            type="number"
+            fullWidth
+            bordered
+            color="success"
+            label="Tolerance"
+            value={0.001}
+            step={0.001}
+          />
+          <Input
+            type="number"
+            fullWidth
+            bordered
+            color="success"
+            label="Polinomial Degree"
+            value={3}
+            step={1}
+          />
+
           <div>
-            <p>Solver</p>
-            <SingleDropDown columnNames={SELECTION} initValue={SELECTION[0]} />
+            <p>Kernel</p>
+            <SingleDropDown
+              columnNames={["linear", "poly", "rbf", "sigmoid"]}
+              initValue={"linear"}
+            />
           </div>
-          <Checkbox defaultSelected color="success">
-            Fit Intercept
-          </Checkbox>
-          <Checkbox defaultSelected color="success">
-            Warm Start
-          </Checkbox>
+          <div>
+            <p>Gamma</p>
+            <SingleDropDown
+              columnNames={["scale", "auto"]}
+              initValue={"scale"}
+            />
+          </div>
+          <div>
+            <p>Multiclass Average</p>
+            <SingleDropDown
+              columnNames={["micro", "macro", "weighted"]}
+              initValue={"micro"}
+            />
+          </div>
         </div>
         <div className="mt-4">
           <p className="mb-2">Display Metrices</p>
@@ -96,4 +102,4 @@ function LassoRegression() {
   );
 }
 
-export default LassoRegression;
+export default SupportVectorMachine;

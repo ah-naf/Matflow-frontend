@@ -1,7 +1,8 @@
-import { Input } from "@nextui-org/react";
+import { Checkbox, Input } from "@nextui-org/react";
 import React from "react";
-import MultipleDropDown from "../../../../Components/MultipleDropDown/MultipleDropDown";
-import SingleDropDown from "../../../../Components/SingleDropDown/SingleDropDown";
+import SingleDropDown from "../../../../../Components/SingleDropDown/SingleDropDown";
+import MultipleDropDown from "../../../../../Components/MultipleDropDown/MultipleDropDown";
+
 
 const DISPLAY_METRICES = [
   "R-Squared",
@@ -10,9 +11,9 @@ const DISPLAY_METRICES = [
   "Root Mean Squared Error",
 ];
 
-const KERNEL = ["linear", "rbf", "poly", "sigmoid"];
+const CRITERION = ["mse", "friedman_mse", "mae"];
 
-function SupportVectorRegressor() {
+function DecisionTreeRegression() {
   return (
     <div>
       <div>
@@ -21,7 +22,17 @@ function SupportVectorRegressor() {
         </h1>
         <div className="grid grid-cols-2 gap-4 items-center">
           <div className="w-full">
+            <p className="mb-1">
+              Number of iterations for hyperparameter search
+            </p>
+            <Input fullWidth bordered color="success" type="number" />
+          </div>
+          <div className="w-full">
             <p className="mb-1">Number of cross-validation folds</p>
+            <Input fullWidth bordered color="success" type="number" />
+          </div>
+          <div className="w-full">
+            <p className="mb-1">Random state for hyperparameter search</p>
             <Input fullWidth bordered color="success" type="number" />
           </div>
         </div>
@@ -42,24 +53,34 @@ function SupportVectorRegressor() {
             fullWidth
             bordered
             color="success"
-            label="C"
-            value={1}
-            step={0.1}
+            label="Min. Samples Split"
+            value={2}
+            step={1}
           />
           <Input
             fullWidth
             type="number"
-            value={0.1}
-            step={0.01}
+            value={1}
             bordered
             color="success"
-            label="Epsilon"
+            label="Min. Samples Leaf"
           />
-
+          <Input
+            fullWidth
+            bordered
+            color="success"
+            type="number"
+            value={0}
+            step={1}
+            label="Random State"
+          />
           <div>
-            <p>Kernel</p>
-            <SingleDropDown columnNames={KERNEL} initValue={KERNEL[0]} />
+            <p>Criterion</p>
+            <SingleDropDown columnNames={CRITERION} initValue={CRITERION[0]} />
           </div>
+          <Checkbox defaultSelected color="success">
+            None
+          </Checkbox>
         </div>
         <div className="mt-4">
           <p className="mb-2">Display Metrices</p>
@@ -73,4 +94,4 @@ function SupportVectorRegressor() {
   );
 }
 
-export default SupportVectorRegressor;
+export default DecisionTreeRegression;

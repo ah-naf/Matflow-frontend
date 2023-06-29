@@ -1,18 +1,11 @@
 import { Checkbox, Input } from "@nextui-org/react";
 import React from "react";
-import MultipleDropDown from "../../../../Components/MultipleDropDown/MultipleDropDown";
-import SingleDropDown from "../../../../Components/SingleDropDown/SingleDropDown";
+import MultipleDropDown from "../../../../../Components/MultipleDropDown/MultipleDropDown";
+import SingleDropDown from "../../../../../Components/SingleDropDown/SingleDropDown";
 
-const DISPLAY_METRICES = [
-  "R-Squared",
-  "Mean Absolute Error",
-  "Mean Squared Error",
-  "Root Mean Squared Error",
-];
+const DISPLAY_METRICES = ["Accuracy", "Precision", "Recall", "F1-Score"];
 
-const SOLVER = ["auto", "svd", "cholesky", "lsqr", "sparse_cg", "sag", "saga"];
-
-function RidgeRegression() {
+function DecisionTreeClassification() {
   return (
     <div>
       <div>
@@ -52,34 +45,44 @@ function RidgeRegression() {
             fullWidth
             bordered
             color="success"
-            label="Alpha"
-            value={1}
-            step={0.1}
+            label="Min. Samples Split"
+            value={2}
+            step={1}
           />
           <Input
-            fullWidth
             type="number"
-            value={1000}
-            bordered
-            color="success"
-            label="Max Iterations"
-          />
-          <Input
             fullWidth
             bordered
             color="success"
-            type="number"
-            value={0.0}
-            step={0.01}
-            label="Tolerance"
+            label="Min. Samples Leaf"
+            value={2}
+            step={1}
           />
+          <Input
+            type="number"
+            fullWidth
+            bordered
+            color="success"
+            label="Random State"
+            value={0}
+            step={1}
+          />
+
           <div>
-            <p>Solver</p>
-            <SingleDropDown columnNames={SOLVER} initValue={SOLVER[0]} />
+            <p>Criterion</p>
+            <SingleDropDown
+              columnNames={["gini", "entropy", "log_loss"]}
+              initValue={"gini"}
+            />
           </div>
-          <Checkbox defaultSelected color="success">
-            Fit Intercept
-          </Checkbox>
+          <div>
+            <p>Multiclass Average</p>
+            <SingleDropDown
+              columnNames={["micro", "macro", "weighted"]}
+              initValue={"micro"}
+            />
+          </div>
+          <Checkbox color="success">None</Checkbox>
         </div>
         <div className="mt-4">
           <p className="mb-2">Display Metrices</p>
@@ -93,4 +96,4 @@ function RidgeRegression() {
   );
 }
 
-export default RidgeRegression;
+export default DecisionTreeClassification;

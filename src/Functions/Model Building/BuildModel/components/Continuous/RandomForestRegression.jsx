@@ -1,9 +1,9 @@
+import styled from "@emotion/styled";
 import { Slider, Stack } from "@mui/material";
 import { Input } from "@nextui-org/react";
 import React from "react";
-import MultipleDropDown from "../../../../Components/MultipleDropDown/MultipleDropDown";
-import SingleDropDown from "../../../../Components/SingleDropDown/SingleDropDown";
-import styled from "@emotion/styled";
+import MultipleDropDown from "../../../../../Components/MultipleDropDown/MultipleDropDown";
+import SingleDropDown from "../../../../../Components/SingleDropDown/SingleDropDown";
 
 const DISPLAY_METRICES = [
   "R-Squared",

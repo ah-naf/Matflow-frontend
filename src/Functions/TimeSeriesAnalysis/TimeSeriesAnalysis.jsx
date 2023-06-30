@@ -4,6 +4,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { Collapse } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
+import Plot from "react-plotly.js";
 import { ToastContainer, toast } from "react-toastify";
 import AgGridComponent from "../../Components/AgGridComponent/AgGridComponent";
 import SingleDropDown from "../../Components/SingleDropDown/SingleDropDown";
@@ -18,6 +19,7 @@ function TimeSeriesAnalysis({ csvData }) {
   const [time, setTime] = useState();
 
   useEffect(() => {
+    console.log(timeSeriesData)
     if (time) {
       // console.log(time);
       let splittedFormat = timeSeriesData.format.split(" ");
@@ -95,7 +97,8 @@ function TimeSeriesAnalysis({ csvData }) {
         }
       );
       const data = await res.json();
-      console.log(data);
+      setTimeSeriesData(data);
+      console.log(data)
     } catch (error) {
       toast.error("Something went wrong. Please try again", {
         position: "bottom-right",
@@ -205,6 +208,22 @@ function TimeSeriesAnalysis({ csvData }) {
               >
                 Submit
               </button>
+              {timeSeriesData.graph && (
+                <div className="flex justify-center mt-4">
+                  <Plot
+                    data={JSON.parse(timeSeriesData.graph)?.data}
+                    layout={{
+                      ...JSON.parse(timeSeriesData.graph).layout,
+                      showlegend: true,
+                    }}
+                    config={{
+                      scrollZoom: true,
+                      editable: true,
+                      responsive: true,
+                    }}
+                  />
+                </div>
+              )}
             </>
           )}
         </div>

@@ -103,7 +103,7 @@ function CustomPlot() {
       )}
       {plotlyData && (
         <div className="flex justify-center mt-4">
-          <Plot
+          <Plot 
             data={plotlyData?.data}
             layout={{ ...plotlyData.layout, showlegend: true }}
             config={{ scrollZoom: true, editable: true, responsive: true }}

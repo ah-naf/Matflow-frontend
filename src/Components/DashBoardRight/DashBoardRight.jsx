@@ -28,10 +28,12 @@ import FeatureSelection from "../../Functions/Feature Engineering/FeatureSelecti
 import MergeDataset from "../../Functions/Feature Engineering/MergeDataset/MergeDataset";
 import Scaling from "../../Functions/Feature Engineering/Scaling/Scaling";
 import BuildModel from "../../Functions/Model Building/BuildModel/BuildModel";
+import ModelEvaluation from "../../Functions/Model Building/ModelEvaluation/ModelEvaluation";
+import ModelPrediction from "../../Functions/Model Building/ModelPrediction/ModelPrediction";
 import SplitDataset from "../../Functions/Model Building/SplitDataset/SplitDataset";
+import TimeSeriesAnalysis from "../../Functions/TimeSeriesAnalysis/TimeSeriesAnalysis";
 import { setFile } from "../../Slices/FeatureEngineeringSlice";
 import { fetchDataFromIndexedDB } from "../../util/indexDB";
-import TimeSeriesAnalysis from "../../Functions/TimeSeriesAnalysis/TimeSeriesAnalysis";
 
 function DashBoardRight() {
   const activeFunction = useSelector((state) => state.sideBar.activeFunction);
@@ -145,12 +147,24 @@ function DashBoardRight() {
           {csvData && activeFunction && activeFunction === "Build Model" && (
             <BuildModel csvData={csvData} />
           )}
+          {csvData &&
+            activeFunction &&
+            activeFunction === "Model Evaluation" && (
+              <ModelEvaluation csvData={csvData} />
+            )}
+          {csvData &&
+            activeFunction &&
+            activeFunction === "Model Prediction" && (
+              <ModelPrediction csvData={csvData} />
+            )}
 
           {/* Time Series Analysis */}
 
-          {csvData && activeFunction && activeFunction === "Time Series Analysis" && (
-            <TimeSeriesAnalysis csvData={csvData} />
-          )}
+          {csvData &&
+            activeFunction &&
+            activeFunction === "Time Series Analysis" && (
+              <TimeSeriesAnalysis csvData={csvData} />
+            )}
         </>
       ) : (
         <div className="w-full h-full grid place-content-center">

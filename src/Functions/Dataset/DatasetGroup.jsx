@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import AgGridComponent from "../../Components/AgGridComponent/AgGridComponent";
 import { fetchDataFromIndexedDB } from "../../util/indexDB";
 
-function DatasetGroup() {
+function DatasetGroup({csvData}) {
   const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
   const [initialData, setInitialData] = useState([]);
 
@@ -32,9 +32,10 @@ function DatasetGroup() {
     if (activeCsvFile) {
       const fetchCSVData = async () => {
         try {
-          const res = await fetchDataFromIndexedDB(activeCsvFile.name);
-          let tempColumns = Object.keys(res[0]);
-          setInitialData(res);
+          // const res = await fetchDataFromIndexedDB(activeCsvFile.name);
+          setRowData(csvData)
+          let tempColumns = Object.keys(csvData[0]);
+          setInitialData(csvData);
 
           tempColumns = tempColumns.filter((col) => col !== "id");
           setColumnNames(tempColumns);
@@ -46,7 +47,7 @@ function DatasetGroup() {
 
       fetchCSVData();
     }
-  }, [activeCsvFile]);
+  }, [activeCsvFile, csvData]);
 
   useEffect(() => {
     if (initialData && initialData.length) {
@@ -66,7 +67,7 @@ function DatasetGroup() {
 
           let { data } = await res.json();
           const tempData = JSON.parse(data);
-          setRowData(tempData);
+           setRowData(tempData);
         } catch (error) {
           console.error(error);
         }

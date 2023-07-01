@@ -1,12 +1,13 @@
 import { Input } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import SingleDropDown from "../../../Components/SingleDropDown/SingleDropDown";
 import {
   fetchDataFromIndexedDB,
   updateDataInIndexedDB,
 } from "../../../util/indexDB";
+import { setReRender } from "../../../Slices/UploadedFileSlice";
 
 const HOW = ["left", "right", "outer", "inner", "cross"];
 
@@ -23,6 +24,8 @@ function MergeDataset({ csvData }) {
   const [leftDataframeValue, setLeftDataframeValue] = useState();
   const [rightDataframeValue, setRightDataframeValue] = useState();
   const [secondDatasetName, setSecondDatasetName] = useState("");
+  const dispatch = useDispatch()
+  const render = useSelector((state) => state.uploadedFile.rerender);
 
   const handleSave = async () => {
     try {
@@ -66,6 +69,7 @@ function MergeDataset({ csvData }) {
         progress: undefined,
         theme: "colored",
       });
+      dispatch(setReRender(!render))
     } catch (error) {
       toast.error("Something went wrong. Please try again", {
         position: "bottom-right",

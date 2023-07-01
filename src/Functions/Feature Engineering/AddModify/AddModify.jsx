@@ -23,6 +23,7 @@ import Add_MathOperation from "./Component/Add_MathOperation";
 import Add_NewColumn from "./Component/Add_NewColumn";
 import Modify_ProgressApply from "./Component/Modify_ProgressApply";
 import Modify_ReplaceValue from "./Component/Modify_ReplaceValue";
+import { setReRender } from "../../../Slices/UploadedFileSlice";
 
 function AddModify({ csvData }) {
   const [currentOption, setCurrentOption] = useState("Add");
@@ -32,6 +33,7 @@ function AddModify({ csvData }) {
   const dispatch = useDispatch();
   const featureData = useSelector((state) => state.featureEngineering);
   const [selectedColumn, setSelectedColumn] = useState('')
+  const render = useSelector((state) => state.uploadedFile.rerender);
 
   useEffect(() => {
     dispatch(setSelectColumn(selectedColumn))
@@ -99,6 +101,7 @@ function AddModify({ csvData }) {
           theme: "colored",
         }
       );
+      dispatch(setReRender(!render))
     } catch (error) {
       toast.error("Something went wrong. Please try again", {
         position: "bottom-right",

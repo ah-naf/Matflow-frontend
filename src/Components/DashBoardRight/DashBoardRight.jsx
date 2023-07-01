@@ -40,6 +40,7 @@ function DashBoardRight() {
   const activeFile = useSelector((state) => state.uploadedFile.activeFile);
   const dispatch = useDispatch();
   const [csvData, setCsvData] = useState();
+  const render = useSelector((state) => state.uploadedFile.rerender);
 
   useEffect(() => {
     if (activeFile && activeFile.name) {
@@ -51,7 +52,7 @@ function DashBoardRight() {
 
       getData();
     }
-  }, [activeFile, dispatch]);
+  }, [activeFile, dispatch, render]);
 
   return (
     <div className="flex-grow h-full overflow-y-auto px-6">
@@ -59,41 +60,41 @@ function DashBoardRight() {
         <>
           {/* Dataset Functions */}
 
-          {activeFunction &&
+          {csvData && activeFunction &&
             (activeFunction === "Display" || activeFunction === "Dataset") && (
-              <DatasetDisplay />
+              <DatasetDisplay csvData={csvData} />
             )}
-          {activeFunction && activeFunction === "Information" && (
-            <DatasetInformation />
+          {csvData && activeFunction && activeFunction === "Information" && (
+            <DatasetInformation csvData={csvData} />
           )}
-          {activeFunction && activeFunction === "Statistics" && (
-            <DatasetStatistics />
+          {csvData && activeFunction && activeFunction === "Statistics" && (
+            <DatasetStatistics csvData={csvData} />
           )}
-          {activeFunction && activeFunction === "Corelation" && (
-            <DatasetCorrelation />
+          {csvData && activeFunction && activeFunction === "Corelation" && (
+            <DatasetCorrelation csvData={csvData} />
           )}
-          {activeFunction && activeFunction === "Duplicate" && (
-            <DatasetDuplicates />
+          {csvData && activeFunction && activeFunction === "Duplicate" && (
+            <DatasetDuplicates csvData={csvData} />
           )}
-          {activeFunction && activeFunction === "Group" && <DatasetGroup />}
+          {csvData && activeFunction && activeFunction === "Group" && <DatasetGroup csvData={csvData} />}
 
           {/* EDA Functions */}
 
-          {activeFunction &&
+          {csvData && activeFunction &&
             (activeFunction === "Bar Plot" || activeFunction === "EDA") && (
-              <BarPlot />
+              <BarPlot csvData={csvData} />
             )}
-          {activeFunction && activeFunction === "Pie Plot" && <PiePlot />}
-          {activeFunction && activeFunction === "Count Plot" && <CountPlot />}
-          {activeFunction && activeFunction === "Box Plot" && <BoxPlot />}
-          {activeFunction && activeFunction === "Histogram" && <Histogram />}
-          {activeFunction && activeFunction === "Violin Plot" && <ViolinPlot />}
-          {activeFunction && activeFunction === "Scatter Plot" && (
-            <ScatterPlot />
+          {csvData && activeFunction && activeFunction === "Pie Plot" && <PiePlot csvData={csvData} />}
+          {csvData && activeFunction && activeFunction === "Count Plot" && <CountPlot csvData={csvData} />}
+          {csvData && activeFunction && activeFunction === "Box Plot" && <BoxPlot csvData={csvData} />}
+          {csvData && activeFunction && activeFunction === "Histogram" && <Histogram csvData={csvData} />}
+          {csvData && activeFunction && activeFunction === "Violin Plot" && <ViolinPlot csvData={csvData} />}
+          {csvData && activeFunction && activeFunction === "Scatter Plot" && (
+            <ScatterPlot csvData={csvData} />
           )}
-          {activeFunction && activeFunction === "Reg Plot" && <RegPlot />}
-          {activeFunction && activeFunction === "Line Plot" && <LinePlot />}
-          {activeFunction && activeFunction === "Custom Plot" && <CustomPlot />}
+          {csvData && activeFunction && activeFunction === "Reg Plot" && <RegPlot csvData={csvData} />}
+          {csvData && activeFunction && activeFunction === "Line Plot" && <LinePlot csvData={csvData} />}
+          {csvData && activeFunction && activeFunction === "Custom Plot" && <CustomPlot csvData={csvData} />}
 
           {/* Feature Engineering Functions */}
 
@@ -103,11 +104,11 @@ function DashBoardRight() {
               activeFunction === "Feature Engineering") && (
               <AddModify csvData={csvData} />
             )}
-          {activeFunction && activeFunction === "Change Dtype" && (
-            <ChangeDType />
+          {csvData && activeFunction && activeFunction === "Change Dtype" && (
+            <ChangeDType csvData={csvData} />
           )}
-          {activeFunction && activeFunction === "Alter Field Name" && (
-            <AlterFieldName />
+          {csvData && activeFunction && activeFunction === "Alter Field Name" && (
+            <AlterFieldName csvData={csvData} />
           )}
           {csvData && activeFunction && activeFunction === "Encoding" && (
             <Encoding csvData={csvData} />

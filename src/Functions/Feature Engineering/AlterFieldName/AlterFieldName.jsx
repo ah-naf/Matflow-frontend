@@ -8,33 +8,33 @@ import {
   setFile,
   setSaveAsNew,
 } from "../../../Slices/FeatureEngineeringSlice";
+import { setReRender } from "../../../Slices/UploadedFileSlice";
 import {
   fetchDataFromIndexedDB,
   updateDataInIndexedDB,
 } from "../../../util/indexDB";
 
-function AlterFieldName() {
+function AlterFieldName({ csvData }) {
   const dispatch = useDispatch();
   const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
-  const [csvData, setCsvData] = useState();
+
   const [numberOfColumns, setNumberOfColumns] = useState(1);
   const [columnNames, setColumnNames] = useState();
   const [savedAsNewDataset, setSavedAsNewDataset] = useState(false);
   const [data, setData] = useState([{ column_name: "", new_field_name: "" }]);
   const featureData = useSelector((state) => state.featureEngineering);
+  const render = useSelector((state) => state.uploadedFile.rerender);
 
   useEffect(() => {
     if (activeCsvFile && activeCsvFile.name) {
       const getData = async () => {
-        const res = await fetchDataFromIndexedDB(activeCsvFile.name);
-        setCsvData(res);
-        setColumnNames(Object.keys(res[0]));
-        dispatch(setFile(res));
+        setColumnNames(Object.keys(csvData[0]));
+        dispatch(setFile(csvData));
       };
 
       getData();
     }
-  }, [activeCsvFile, dispatch]);
+  }, [activeCsvFile, dispatch, csvData]);
 
   const handleChange = (val, index, key) => {
     const temp = data.map((d, ind) => {
@@ -88,6 +88,7 @@ function AlterFieldName() {
         progress: undefined,
         theme: "colored",
       });
+      dispatch(setReRender(!render));
     } catch (error) {
       toast.error("Something went wrong. Please try again", {
         position: "bottom-right",
@@ -118,7 +119,7 @@ function AlterFieldName() {
                 while (val - temp.length > 0) {
                   temp.push({
                     column_name: "",
-                    new_field_name: ''
+                    new_field_name: "",
                   });
                 }
                 setData(temp);
@@ -134,7 +135,7 @@ function AlterFieldName() {
         </div>
       </div>
       <div className="mt-8">
-        {csvData &&
+        {csvData && columnNames &&
           data.map((val, index) => {
             return (
               <div key={index} className="flex items-end gap-8 mt-6">

@@ -2,10 +2,9 @@ import { Checkbox, Input, Popover } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import AgGridComponent from "../../Components/AgGridComponent/AgGridComponent";
-import { fetchDataFromIndexedDB } from "../../util/indexDB";
 
-function DatasetDuplicates() {
-  const [rowData, setRowData] = useState([]);
+function DatasetDuplicates({ csvData }) {
+  // const [rowData, setRowData] = useState([]);
   const [duplicateRows, setDuplicateRows] = useState([]);
   const [columnDefs, setColumnDefs] = useState([]);
   const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
@@ -13,6 +12,7 @@ function DatasetDuplicates() {
   const [searchValue, setSearchValue] = useState("");
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [columnNames, setColumnNames] = useState([]);
+  const render = useSelector((state) => state.uploadedFile.rerender);
 
   useEffect(() => {
     if (activeCsvFile) {
@@ -40,19 +40,15 @@ function DatasetDuplicates() {
       };
       const fetchCSVData = async () => {
         try {
-          const res = await fetchDataFromIndexedDB(activeCsvFile.name);
-
-          let cNames = Object.keys(res[0]);
+          let cNames = Object.keys(csvData[0]);
           cNames = cNames.filter((val) => val !== "id");
           setColumnNames(cNames);
 
-          const generatedColumnDefs = generateColumnDefs(res, excludeKeys);
+          const generatedColumnDefs = generateColumnDefs(csvData, excludeKeys);
           setColumnDefs(generatedColumnDefs);
 
-          setRowData(res);
-
           // Find duplicate rows
-          const duplicates = findDuplicateRows(res);
+          const duplicates = findDuplicateRows(csvData);
           setDuplicateRows(duplicates);
         } catch (error) {
           console.error("Error:", error);
@@ -61,10 +57,10 @@ function DatasetDuplicates() {
 
       fetchCSVData();
     }
-  }, [activeCsvFile, excludeKeys]);
+  }, [activeCsvFile, excludeKeys, csvData]);
 
   useEffect(() => {
-    if (rowData && rowData.length > 0) {
+    if (csvData && csvData.length > 0) {
       const findMissingValues = (firstList, secondList) => {
         const firstSet = new Set(firstList);
         const missingValues = [];
@@ -78,11 +74,11 @@ function DatasetDuplicates() {
       };
       const colShowing = findMissingValues(
         excludeKeys,
-        Object.keys(rowData[0])
+        Object.keys(csvData[0])
       );
       setSelectedColumns(colShowing);
     }
-  }, [excludeKeys, rowData]);
+  }, [excludeKeys, csvData]);
 
   // Function to generate column definitions dynamically
   const generateColumnDefs = (data, exKey) => {

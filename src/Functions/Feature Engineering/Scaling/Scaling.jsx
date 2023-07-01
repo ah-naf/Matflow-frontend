@@ -1,12 +1,13 @@
 import { Checkbox, Radio } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import MultipleDropDown from "../../../Components/MultipleDropDown/MultipleDropDown";
 import {
   fetchDataFromIndexedDB,
   updateDataInIndexedDB,
 } from "../../../util/indexDB";
+import { setReRender } from "../../../Slices/UploadedFileSlice";
 
 function Scaling({ csvData }) {
   const allColumns = Object.keys(csvData[0]);
@@ -15,6 +16,8 @@ function Scaling({ csvData }) {
   const [defaultValue, setDefaultValue] = useState("Blank");
   const [method, setMethod] = useState("Min-Max Scaler");
   const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
+  const render = useSelector((state) => state.uploadedFile.rerender);
+  const dispatch = useDispatch()
 
   useEffect(() => {
     if (defaultValue === "Blank") setSelectedColumns([]);
@@ -74,6 +77,7 @@ function Scaling({ csvData }) {
         progress: undefined,
         theme: "colored",
       });
+      dispatch(setReRender(!render))
     } catch (error) {
       toast.error("Something went wrong. Please try again", {
         position: "bottom-right",

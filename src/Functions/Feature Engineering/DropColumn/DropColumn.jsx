@@ -11,6 +11,7 @@ import {
   fetchDataFromIndexedDB,
   updateDataInIndexedDB,
 } from "../../../util/indexDB";
+import { setReRender } from "../../../Slices/UploadedFileSlice";
 
 function DropColumn({ csvData }) {
   const [defaultValue, setDefaultValue] = useState("Blank");
@@ -21,6 +22,7 @@ function DropColumn({ csvData }) {
   const [add_to_pipeline, setAddToPipeline] = useState(false);
   const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
   const featureData = useSelector((state) => state.featureEngineering);
+  const render = useSelector((state) => state.uploadedFile.rerender);
 
   useEffect(() => {
     if (defaultValue === "Blank" || defaultValue === "With Null")
@@ -84,6 +86,7 @@ function DropColumn({ csvData }) {
         progress: undefined,
         theme: "colored",
       });
+      dispatch(setReRender(!render))
     } catch (error) {
       toast.error("Something went wrong. Please try again", {
         position: "bottom-right",

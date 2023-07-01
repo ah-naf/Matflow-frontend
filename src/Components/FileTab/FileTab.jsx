@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { AiFillCloseCircle } from "react-icons/ai";
 import { BsFillPlayFill } from "react-icons/bs";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setActiveFunction } from "../../Slices/SideBarSlice";
 import { setActiveFile } from "../../Slices/UploadedFileSlice";
 import {
@@ -18,6 +18,7 @@ function FileTab() {
   const [uploadSectionHeight, setUploadSectionHeight] = useState(0);
   const inputRef = useRef();
   const uploadSection = useRef();
+  const render = useSelector((state) => state.uploadedFile.rerender);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -31,7 +32,7 @@ function FileTab() {
       dispatch(setActiveFile(JSON.parse(tempActiveFile)));
       setFileActiveId(JSON.parse(tempActiveFile).name);
     }
-  }, [dispatch]);
+  }, [dispatch, render]);
 
   const handleDrag = (e) => {
     e.preventDefault();

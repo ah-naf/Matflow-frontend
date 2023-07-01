@@ -2,21 +2,20 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import * as stats from "simple-statistics";
 import AgGridComponent from "../../Components/AgGridComponent/AgGridComponent";
-import { fetchDataFromIndexedDB } from "../../util/indexDB";
 
-function DatasetStatistics() {
+function DatasetStatistics({ csvData }) {
   const [columnStats, setColumnStats] = useState([]);
   const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
 
   useEffect(() => {
     if (activeCsvFile && activeCsvFile.name) {
       const fetchCSVData = async () => {
-        const res = await fetchDataFromIndexedDB(activeCsvFile.name);
-        setColumnStats(calculateColumnStats(res));
+        // const res = await fetchDataFromIndexedDB(activeCsvFile.name);
+        setColumnStats(calculateColumnStats(csvData));
       };
       fetchCSVData();
     }
-  }, [activeCsvFile]);
+  }, [activeCsvFile, csvData]);
 
   const calculateColumnStats = (rowData) => {
     if (!rowData || rowData.length === 0) return [];

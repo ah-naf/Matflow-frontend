@@ -11,6 +11,7 @@ import {
   fetchDataFromIndexedDB,
   updateDataInIndexedDB,
 } from "../../../util/indexDB";
+import { setReRender } from "../../../Slices/UploadedFileSlice";
 
 function DropRow({ csvData }) {
   const [defaultValue, setDefaultValue] = useState("With Null");
@@ -21,6 +22,7 @@ function DropRow({ csvData }) {
   const [add_to_pipeline, setAddToPipeline] = useState(false);
   const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
   const featureData = useSelector((state) => state.featureEngineering);
+  const render = useSelector((state) => state.uploadedFile.rerender);
 
   const handleSave = async () => {
     try {
@@ -66,6 +68,7 @@ function DropRow({ csvData }) {
         progress: undefined,
         theme: "colored",
       });
+      dispatch(setReRender(!render))
     } catch (error) {
       toast.error("Something went wrong. Please try again", {
         position: "bottom-right",

@@ -4,16 +4,17 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import SingleDropDown from "../../../Components/SingleDropDown/SingleDropDown";
 import { setFile } from "../../../Slices/FeatureEngineeringSlice";
+import { setReRender } from "../../../Slices/UploadedFileSlice";
 import {
   fetchDataFromIndexedDB,
   updateDataInIndexedDB,
 } from "../../../util/indexDB";
 
-function ChangeDType() {
+function ChangeDType({ csvData }) {
   const dispatch = useDispatch();
   const featureData = useSelector((state) => state.featureEngineering);
   const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
-  const [csvData, setCsvData] = useState();
+
   const [numberOfColumns, setNumberOfColumns] = useState(1);
   const [columnNames, setColumnNames] = useState();
   const [data, setdata] = useState([
@@ -23,19 +24,18 @@ function ChangeDType() {
       desired_bit_length: "8",
     },
   ]);
+  const render = useSelector((state) => state.uploadedFile.rerender);
 
   useEffect(() => {
     if (activeCsvFile && activeCsvFile.name) {
       const getData = async () => {
-        const res = await fetchDataFromIndexedDB(activeCsvFile.name);
-        setCsvData(res);
-        setColumnNames(Object.keys(res[0]));
-        dispatch(setFile(res));
+        setColumnNames(Object.keys(csvData[0]));
+        dispatch(setFile(csvData));
       };
 
       getData();
     }
-  }, [activeCsvFile, dispatch]);
+  }, [activeCsvFile, dispatch, csvData]);
 
   const handleChange = (val, index, key) => {
     const temp = data.map((d, ind) => {
@@ -55,7 +55,7 @@ function ChangeDType() {
         body: JSON.stringify({
           number_of_columns: numberOfColumns,
           data,
-          file: csvData
+          file: csvData,
         }),
       });
       let Data = await res.json();
@@ -84,6 +84,7 @@ function ChangeDType() {
         progress: undefined,
         theme: "colored",
       });
+      dispatch(setReRender(!render));
     } catch (error) {
       toast.error("Something went wrong. Please try again", {
         position: "bottom-right",
@@ -132,6 +133,7 @@ function ChangeDType() {
       </div>
       <div className="mt-8">
         {csvData &&
+          columnNames &&
           data.map((val, index) => {
             return (
               <div key={index} className="flex items-end gap-8 mt-6">

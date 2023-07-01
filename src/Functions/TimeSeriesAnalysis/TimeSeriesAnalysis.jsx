@@ -17,9 +17,9 @@ function TimeSeriesAnalysis({ csvData }) {
   const [timeSeriesData, setTimeSeriesData] = useState();
   const [newTime, setNewTime] = useState();
   const [time, setTime] = useState();
+  const [graphData, setGraphData] = useState();
 
   useEffect(() => {
-    console.log(timeSeriesData)
     if (time) {
       // console.log(time);
       let splittedFormat = timeSeriesData.format.split(" ");
@@ -60,7 +60,10 @@ function TimeSeriesAnalysis({ csvData }) {
       const data = await res.json();
       if (data.error) {
         setDateTimeWarning(true);
-      } else setTimeSeriesData(data);
+      } else {
+        setGraphData(JSON.parse(data.graph));
+        setTimeSeriesData(data);
+      }
     };
     fetchData();
   }, [target_variable, csvData]);
@@ -98,7 +101,7 @@ function TimeSeriesAnalysis({ csvData }) {
       );
       const data = await res.json();
       setTimeSeriesData(data);
-      console.log(data)
+      setGraphData(JSON.parse(data.graph));
     } catch (error) {
       toast.error("Something went wrong. Please try again", {
         position: "bottom-right",
@@ -208,12 +211,12 @@ function TimeSeriesAnalysis({ csvData }) {
               >
                 Submit
               </button>
-              {timeSeriesData.graph && (
+              {graphData && (
                 <div className="flex justify-center mt-4">
                   <Plot
-                    data={JSON.parse(timeSeriesData.graph)?.data}
+                    data={graphData.data}
                     layout={{
-                      ...JSON.parse(timeSeriesData.graph).layout,
+                      ...graphData.layout,
                       showlegend: true,
                     }}
                     config={{

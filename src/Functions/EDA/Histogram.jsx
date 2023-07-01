@@ -5,10 +5,9 @@ import React, { useEffect, useState } from "react";
 import Plot from "react-plotly.js";
 import { useSelector } from "react-redux";
 import SingleDropDown from "../../Components/SingleDropDown/SingleDropDown";
-import { fetchDataFromIndexedDB } from "../../util/indexDB";
 
-function Histogram() {
-  const [csvData, setCsvData] = useState();
+function Histogram({ csvData }) {
+  // const [csvData, setCsvData] = useState();
   const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
   const [plotlyData, setPlotyData] = useState();
   const [loading, setLoading] = useState(false);
@@ -30,14 +29,11 @@ function Histogram() {
   useEffect(() => {
     if (activeCsvFile && activeCsvFile.name) {
       const getData = async () => {
-        const res = await fetchDataFromIndexedDB(activeCsvFile.name);
-        setCsvData(res);
-
         const tempStringColumn = [];
         const tempNumberColumn = [];
 
-        Object.entries(res[0]).forEach(([key, value]) => {
-          if (typeof res[0][key] === "string") tempStringColumn.push(key);
+        Object.entries(csvData[0]).forEach(([key, value]) => {
+          if (typeof csvData[0][key] === "string") tempStringColumn.push(key);
           else tempNumberColumn.push(key);
         });
 
@@ -47,7 +43,7 @@ function Histogram() {
 
       getData();
     }
-  }, [activeCsvFile]);
+  }, [activeCsvFile, csvData]);
 
   useEffect(() => {
     if (activeNumberColumn && csvData) {

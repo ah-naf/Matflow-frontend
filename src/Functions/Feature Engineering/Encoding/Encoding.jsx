@@ -2,9 +2,10 @@ import { Checkbox } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
 import MultipleDropDown from "../../../Components/MultipleDropDown/MultipleDropDown";
 import SingleDropDown from "../../../Components/SingleDropDown/SingleDropDown";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchDataFromIndexedDB, updateDataInIndexedDB } from "../../../util/indexDB";
 import { toast } from "react-toastify";
+import { setReRender } from "../../../Slices/UploadedFileSlice";
 
 const Method = ["Ordinal Encoding", "One-Hot Encoding", "Target Encoding"];
 
@@ -21,6 +22,8 @@ function Encoding({ csvData }) {
   const [stringValues, setStringValues] = useState();
   const [data, setData] = useState({});
   const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
+  const render = useSelector((state) => state.uploadedFile.rerender);
+  const dispatch = useDispatch()
 
   useEffect(() => {
     if (method === Method[0]) {
@@ -74,6 +77,7 @@ function Encoding({ csvData }) {
           theme: "colored",
         }
       );
+      dispatch(setReRender(!render))
     } catch (error) {
       toast.error("Something went wrong. Please try again", {
         position: "bottom-right",

@@ -8,7 +8,7 @@ import ApexChart from "../../Components/ApexChart/ApexChat";
 import FeaturePair from "../../Components/FeaturePair/FeaturePair";
 import { fetchDataFromIndexedDB } from "../../util/indexDB";
 
-function DatasetCorrelation() {
+function DatasetCorrelation({csvData}) {
   const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
   const [columnDefs, setColumnDefs] = useState([]);
   const [rowData, setRowData] = useState([]);
@@ -18,7 +18,7 @@ function DatasetCorrelation() {
   const [relationMethod, setRelationMethod] = useState("pearson");
   const [displayType, setDisplayType] = useState("table");
   const [colWithInd, setColWithInd] = useState({});
-
+  const render = useSelector((state) => state.uploadedFile.rerender);
   const [searchValue, setSearchValue] = useState("");
   const [columnNames, setColumnNames] = useState([]);
   const [selectedColumns, setSelectedColumns] = useState([]);
@@ -95,7 +95,7 @@ function DatasetCorrelation() {
         try {
           const res = await fetchDataFromIndexedDB(activeCsvFile.name);
 
-          const correlations = calculateCorrelations(res);
+          const correlations = calculateCorrelations(csvData);
           const { columnDefs, rowData } = generateAgGridData(correlations);
 
           setColumnDefs(columnDefs);
@@ -118,7 +118,7 @@ function DatasetCorrelation() {
       };
       fetchCSVData();
     }
-  }, [activeCsvFile, relationMethod]);
+  }, [activeCsvFile, relationMethod, csvData]);
 
   useEffect(() => {
     if (relationMethod === "kendall") {

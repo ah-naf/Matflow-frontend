@@ -1,12 +1,11 @@
 import { Checkbox, Input, Loading } from "@nextui-org/react";
 import React, { useEffect, useRef, useState } from "react";
+import Plot from "react-plotly.js";
 import { useSelector } from "react-redux";
 import SingleDropDown from "../../Components/SingleDropDown/SingleDropDown";
-import { fetchDataFromIndexedDB } from "../../util/indexDB";
-import Plot from "react-plotly.js";
 
-function PiePlot() {
-  const [csvData, setCsvData] = useState();
+function PiePlot({ csvData }) {
+  // const [csvData, setCsvData] = useState();
   const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
   const [activeStringColumn, setActiveStringColumn] = useState("");
   const [stringColumn, setStringColumn] = useState([]);
@@ -23,13 +22,10 @@ function PiePlot() {
   useEffect(() => {
     if (activeCsvFile && activeCsvFile.name) {
       const getData = async () => {
-        const res = await fetchDataFromIndexedDB(activeCsvFile.name);
-        setCsvData(res);
-
         const tempStringColumn = [];
 
-        Object.entries(res[0]).forEach(([key, value]) => {
-          if (typeof res[0][key] === "string") tempStringColumn.push(key);
+        Object.entries(csvData[0]).forEach(([key, value]) => {
+          if (typeof csvData[0][key] === "string") tempStringColumn.push(key);
         });
 
         setStringColumn(tempStringColumn);
@@ -37,7 +33,7 @@ function PiePlot() {
 
       getData();
     }
-  }, [activeCsvFile]);
+  }, [activeCsvFile, csvData]);
 
   useEffect(() => {
     if (activeStringColumn && csvData) {
@@ -58,9 +54,9 @@ function PiePlot() {
             gap,
           }),
         });
-        let data = await resp.json()
-        data = JSON.parse(data)
-        setPlotlyData(data)
+        let data = await resp.json();
+        data = JSON.parse(data);
+        setPlotlyData(data);
         setLoading(false);
       };
 
@@ -108,7 +104,11 @@ function PiePlot() {
         <Checkbox color="success" onChange={() => setShowTitle(!showTitle)}>
           Title
         </Checkbox>
-        <Checkbox color="success" isSelected={label} onChange={() => setLabel(!label)}>
+        <Checkbox
+          color="success"
+          isSelected={label}
+          onChange={() => setLabel(!label)}
+        >
           Label
         </Checkbox>
         <Checkbox

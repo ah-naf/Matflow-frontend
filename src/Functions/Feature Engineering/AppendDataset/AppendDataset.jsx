@@ -1,8 +1,9 @@
 import { Input } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import SingleDropDown from "../../../Components/SingleDropDown/SingleDropDown";
+import { setReRender } from "../../../Slices/UploadedFileSlice";
 import {
   fetchDataFromIndexedDB,
   updateDataInIndexedDB,
@@ -15,6 +16,8 @@ function AppendDataset({ csvData }) {
   const [availableDatasets, setAvailableDatasets] = useState();
   const [anotherCsvData, setAnotherCsvData] = useState();
   const [new_dataset_name, setNewDatasetName] = useState("");
+  const render = useSelector((state) => state.uploadedFile.rerender);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     let temp = JSON.parse(localStorage.getItem("uploadedFiles"));
@@ -46,7 +49,7 @@ function AppendDataset({ csvData }) {
         }),
       });
       let Data = await res.json();
-
+      Data = JSON.parse(Data);
       let fileName = new_dataset_name;
 
       const uploadedFiles = JSON.parse(localStorage.getItem("uploadedFiles"));
@@ -70,6 +73,7 @@ function AppendDataset({ csvData }) {
         progress: undefined,
         theme: "colored",
       });
+      dispatch(setReRender(!render));
     } catch (error) {
       toast.error("Something went wrong. Please try again", {
         position: "bottom-right",

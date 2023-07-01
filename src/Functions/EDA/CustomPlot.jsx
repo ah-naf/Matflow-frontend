@@ -6,8 +6,8 @@ import MultipleDropDown from "../../Components/MultipleDropDown/MultipleDropDown
 import SingleDropDown from "../../Components/SingleDropDown/SingleDropDown";
 import { fetchDataFromIndexedDB } from "../../util/indexDB";
 
-function CustomPlot() {
-  const [csvData, setCsvData] = useState();
+function CustomPlot({csvData}) {
+  // const [csvData, setCsvData] = useState();
   const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
   const [numberColumn, setNumberColumn] = useState([]);
   const [stringColumn, setStringColumn] = useState([]);
@@ -20,14 +20,13 @@ function CustomPlot() {
   useEffect(() => {
     if (activeCsvFile && activeCsvFile.name) {
       const getData = async () => {
-        const res = await fetchDataFromIndexedDB(activeCsvFile.name);
-        setCsvData(res);
+       
 
         const tempStringColumn = [];
         const tempNumberColumn = [];
 
-        Object.entries(res[0]).forEach(([key, value]) => {
-          if (typeof res[0][key] === "string") tempStringColumn.push(key);
+        Object.entries(csvData[0]).forEach(([key, value]) => {
+          if (typeof csvData[0][key] === "string") tempStringColumn.push(key);
           else tempNumberColumn.push(key);
         });
 
@@ -38,7 +37,7 @@ function CustomPlot() {
 
       getData();
     }
-  }, [activeCsvFile]);
+  }, [activeCsvFile, csvData]);
 
   useEffect(() => {
     if (x_var && x_var.length > 0 && CanvasCaptureMediaStreamTrack) {

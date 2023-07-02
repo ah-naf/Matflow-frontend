@@ -1,11 +1,23 @@
 import { Checkbox, Input } from "@nextui-org/react";
 import React from "react";
+import { useDispatch, useSelector } from "react-redux";
 import MultipleDropDown from "../../../../../Components/MultipleDropDown/MultipleDropDown";
 import SingleDropDown from "../../../../../Components/SingleDropDown/SingleDropDown";
+import { setHyperparameterData } from "../../../../../Slices/ModelBuilding";
 
 const DISPLAY_METRICES = ["Accuracy", "Precision", "Recall", "F1-Score"];
 
-function DecisionTreeClassification() {
+function DecisionTreeClassification({ train, test }) {
+  const hyperparameterOption = useSelector(
+    (state) => state.modelBuilding.hyperparameter
+  );
+  const regressor = useSelector((state) => state.modelBuilding.regressor);
+  const type = useSelector((state) => state.modelBuilding.type);
+  const target_variable = useSelector(
+    (state) => state.modelBuilding.target_variable
+  );
+  const dispatch = useDispatch();
+
   return (
     <div>
       <div>
@@ -17,15 +29,45 @@ function DecisionTreeClassification() {
             <p className="mb-1">
               Number of iterations for hyperparameter search
             </p>
-            <Input fullWidth bordered color="success" type="number" />
+            <Input
+              fullWidth
+              bordered
+              color="success"
+              type="number"
+              onChange={(e) =>
+                dispatch(
+                  setHyperparameterData({
+                    ...hyperparameterOption,
+                    "Number of iterations for hyperparameter search":
+                      e.target.value,
+                  })
+                )
+              }
+            />
           </div>
           <div className="w-full">
             <p className="mb-1">Number of cross-validation folds</p>
-            <Input fullWidth bordered color="success" type="number" />
+            <Input fullWidth bordered color="success" type="number" onChange={(e) =>
+                dispatch(
+                  setHyperparameterData({
+                    ...hyperparameterOption,
+                    "Number of iterations for hyperparameter search":
+                      e.target.value,
+                  })
+                )
+              } />
           </div>
           <div className="w-full">
             <p className="mb-1">Random state for hyperparameter search</p>
-            <Input fullWidth bordered color="success" type="number" />
+            <Input fullWidth bordered color="success" type="number" onChange={(e) =>
+                dispatch(
+                  setHyperparameterData({
+                    ...hyperparameterOption,
+                    "Number of iterations for hyperparameter search":
+                      e.target.value,
+                  })
+                )
+              } />
           </div>
         </div>
         <button

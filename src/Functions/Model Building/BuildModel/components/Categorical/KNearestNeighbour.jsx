@@ -30,7 +30,7 @@ function KNearestNeighbour({ train, test }) {
           body: JSON.stringify({
             train,
             test,
-            regressor,
+            [type === 'regressor'? 'regressor': 'classifier']: regressor,
             type,
             target_variable,
             ...hyperparameterOption,

@@ -4,6 +4,8 @@ import { useDispatch } from "react-redux";
 import { ToastContainer, toast } from "react-toastify";
 import SingleDropDown from "../../../Components/SingleDropDown/SingleDropDown";
 import {
+  setHyperparameterData,
+  setModelSetting,
   setReg,
   setTargetVariable,
   setType,
@@ -82,6 +84,8 @@ function BuildModel({ csvData }) {
           dispatch(setType("classifier"));
         }
         dispatch(setTargetVariable(val[e][3]));
+        dispatch(setHyperparameterData({}))
+        dispatch(setModelSetting({}))
 
         const trainData = await fetchDataFromIndexedDB(val[e][1]);
         const testData = await fetchDataFromIndexedDB(val[e][2]);
@@ -137,12 +141,14 @@ function BuildModel({ csvData }) {
         <>
           <div className="flex items-center gap-8 mt-8">
             <div className="w-full">
-              <p>Regressor</p>
+              <p>{whatKind === 'Continuous' ? 'Regressor' : 'Classifier'}</p>
               <SingleDropDown
                 columnNames={allRegressor}
                 onValueChange={(e) => {
                   setRegressor(e);
                   dispatch(setReg(e));
+                  dispatch(setHyperparameterData({}))
+                  dispatch(setModelSetting({}))
                 }}
                 initValue={allRegressor[0]}
               />

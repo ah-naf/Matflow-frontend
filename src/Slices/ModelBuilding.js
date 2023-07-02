@@ -21,12 +21,15 @@ const ModelBuildingSlice = createSlice({
     },
     setType: (state, {payload}) => {
         state.type = payload
+    },
+    setModelSetting: (state, {payload}) => {
+        state.model_setting = payload
     }
   },
 });
 
 // Action creators are generated for each case reducer function
 // export const {} = ModelBuildingSlice.actions;
-export const { setReg, setHyperparameterData, setTargetVariable, setType } = ModelBuildingSlice.actions;
+export const { setReg, setHyperparameterData, setTargetVariable, setType, setModelSetting } = ModelBuildingSlice.actions;
 
 export default ModelBuildingSlice.reducer;

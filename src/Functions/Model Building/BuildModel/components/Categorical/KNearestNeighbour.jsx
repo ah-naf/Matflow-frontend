@@ -1,9 +1,12 @@
 import { Input } from "@nextui-org/react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import MultipleDropDown from "../../../../../Components/MultipleDropDown/MultipleDropDown";
 import SingleDropDown from "../../../../../Components/SingleDropDown/SingleDropDown";
-import { setHyperparameterData } from "../../../../../Slices/ModelBuilding";
+import {
+  setHyperparameterData,
+  setModelSetting,
+} from "../../../../../Slices/ModelBuilding";
 
 const DISPLAY_METRICES = ["Accuracy", "Precision", "Recall", "F1-Score"];
 
@@ -17,6 +20,13 @@ function KNearestNeighbour({ train, test }) {
     (state) => state.modelBuilding.target_variable
   );
   const dispatch = useDispatch();
+  const [optimized_data, setOptimizedData] = useState({
+    "Multiclass Average": "micro",
+  });
+
+  useEffect(() => {
+    dispatch(setModelSetting(optimized_data));
+  }, [optimized_data, dispatch]);
 
   const handleOptimization = async () => {
     try {
@@ -30,7 +40,7 @@ function KNearestNeighbour({ train, test }) {
           body: JSON.stringify({
             train,
             test,
-            [type === 'regressor'? 'regressor': 'classifier']: regressor,
+            [type === "regressor" ? "regressor" : "classifier"]: regressor,
             type,
             target_var: target_variable,
             ...hyperparameterOption,
@@ -38,7 +48,7 @@ function KNearestNeighbour({ train, test }) {
         }
       );
       const data = await res.json();
-      console.log(data);
+      setOptimizedData({ ...optimized_data, ...data });
     } catch (error) {
       console.log(error);
     }
@@ -124,7 +134,13 @@ function KNearestNeighbour({ train, test }) {
             bordered
             color="success"
             label="Number of neighbors"
-            value={5}
+            value={optimized_data.n_neighbors || "2"}
+            onChange={(e) =>
+              setOptimizedData({
+                ...optimized_data,
+                n_neighbors: e.target.value,
+              })
+            }
             step={1}
           />
 
@@ -132,14 +148,20 @@ function KNearestNeighbour({ train, test }) {
             <p>Weight Function</p>
             <SingleDropDown
               columnNames={["uniform", "distance"]}
-              initValue={"uniform"}
+              initValue={optimized_data.weights || "uniform"}
+              onValueChange={(e) =>
+                setOptimizedData({ ...optimized_data, weights: e })
+              }
             />
           </div>
           <div>
             <p>Distance Metric</p>
             <SingleDropDown
               columnNames={["minkowski", "euclidean", "manhattan"]}
-              initValue={"minkowski"}
+              initValue={optimized_data.metric || "minkowski"}
+              onValueChange={(e) =>
+                setOptimizedData({ ...optimized_data, metric: e })
+              }
             />
           </div>
           <div>
@@ -147,6 +169,9 @@ function KNearestNeighbour({ train, test }) {
             <SingleDropDown
               columnNames={["micro", "macro", "weighted"]}
               initValue={"micro"}
+              onValueChange={(e) =>
+                setOptimizedData({ ...optimized_data, "Multiclass Average": e })
+              }
             />
           </div>
         </div>
@@ -155,6 +180,9 @@ function KNearestNeighbour({ train, test }) {
           <MultipleDropDown
             columnNames={DISPLAY_METRICES}
             defaultValue={DISPLAY_METRICES}
+            setSelectedColumns={(e) =>
+              setOptimizedData({ ...optimized_data, "Display Metrices": e })
+            }
           />
         </div>
       </div>

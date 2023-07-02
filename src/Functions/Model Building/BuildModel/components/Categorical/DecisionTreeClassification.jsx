@@ -82,7 +82,7 @@ function DecisionTreeClassification({ train, test }) {
                 dispatch(
                   setHyperparameterData({
                     ...hyperparameterOption,
-                    "Number of iterations for hyperparameter search":
+                    "Number of cross-validation folds":
                       e.target.value,
                   })
                 )
@@ -100,7 +100,7 @@ function DecisionTreeClassification({ train, test }) {
                 dispatch(
                   setHyperparameterData({
                     ...hyperparameterOption,
-                    "Number of iterations for hyperparameter search":
+                    "Random state for hyperparameter search":
                       e.target.value,
                   })
                 )

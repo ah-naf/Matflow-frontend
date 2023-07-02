@@ -1,6 +1,6 @@
 import { Input } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { ToastContainer, toast } from "react-toastify";
 import SingleDropDown from "../../../Components/SingleDropDown/SingleDropDown";
 import {
@@ -52,6 +52,14 @@ function BuildModel({ csvData }) {
   const dispatch = useDispatch();
   const [train, setTrain] = useState();
   const [test, setTest] = useState();
+  const model_setting = useSelector(
+    (state) => state.modelBuilding.model_setting
+  );
+  const type = useSelector((state) => state.modelBuilding.type);
+  const target_variable = useSelector(
+    (state) => state.modelBuilding.target_variable
+  );
+  const reg = useSelector((state) => state.modelBuilding.regressor);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -84,8 +92,8 @@ function BuildModel({ csvData }) {
           dispatch(setType("classifier"));
         }
         dispatch(setTargetVariable(val[e][3]));
-        dispatch(setHyperparameterData({}))
-        dispatch(setModelSetting({}))
+        dispatch(setHyperparameterData({}));
+        dispatch(setModelSetting({}));
 
         const trainData = await fetchDataFromIndexedDB(val[e][1]);
         const testData = await fetchDataFromIndexedDB(val[e][2]);
@@ -108,6 +116,29 @@ function BuildModel({ csvData }) {
         }
       }
     });
+  };
+
+  const handleSave = async () => {
+    try {
+      const res = await fetch("http://127.0.0.1:8000/api/build_model/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          test,
+          train,
+          target_var: target_variable,
+          type,
+          [type === "regressor" ? "regressor" : "classifier"]: reg,
+          ...model_setting,
+        }),
+      });
+      const data = await res.json();
+      console.log(data)
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   if (loading) return <div>Loading...</div>;
@@ -141,14 +172,14 @@ function BuildModel({ csvData }) {
         <>
           <div className="flex items-center gap-8 mt-8">
             <div className="w-full">
-              <p>{whatKind === 'Continuous' ? 'Regressor' : 'Classifier'}</p>
+              <p>{whatKind === "Continuous" ? "Regressor" : "Classifier"}</p>
               <SingleDropDown
                 columnNames={allRegressor}
                 onValueChange={(e) => {
                   setRegressor(e);
                   dispatch(setReg(e));
-                  dispatch(setHyperparameterData({}))
-                  dispatch(setModelSetting({}))
+                  dispatch(setHyperparameterData({}));
+                  dispatch(setModelSetting({}));
                 }}
                 initValue={allRegressor[0]}
               />
@@ -206,7 +237,7 @@ function BuildModel({ csvData }) {
 
           <button
             className="self-start border-2 px-6 tracking-wider bg-primary-btn text-white font-medium rounded-md py-2 mt-8"
-            // onClick={handleSave}
+            onClick={handleSave}
           >
             Submit
           </button>

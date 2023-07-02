@@ -111,6 +111,16 @@ function SplitDataset({ csvData }) {
       ]);
 
       dispatch(setReRender(!render));
+      toast.success("Dataset Splitted Successfully!", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
     } catch (error) {
       toast.error(JSON.stringify(error.message), {
         position: "bottom-right",

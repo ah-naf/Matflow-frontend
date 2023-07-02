@@ -22,6 +22,9 @@ function KNearestNeighbour({ train, test }) {
   const dispatch = useDispatch();
   const [optimized_data, setOptimizedData] = useState({
     "Multiclass Average": "micro",
+    n_neighbors: 2,
+    weights: 'uniform',
+    metric: 'minkowski'
   });
 
   useEffect(() => {
@@ -134,7 +137,7 @@ function KNearestNeighbour({ train, test }) {
             bordered
             color="success"
             label="Number of neighbors"
-            value={optimized_data.n_neighbors || "2"}
+            value={optimized_data.n_neighbors || 2}
             onChange={(e) =>
               setOptimizedData({
                 ...optimized_data,

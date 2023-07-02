@@ -1,9 +1,12 @@
 import { Checkbox, Input } from "@nextui-org/react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import MultipleDropDown from "../../../../../Components/MultipleDropDown/MultipleDropDown";
 import SingleDropDown from "../../../../../Components/SingleDropDown/SingleDropDown";
-import { setHyperparameterData } from "../../../../../Slices/ModelBuilding";
+import {
+  setHyperparameterData,
+  setModelSetting,
+} from "../../../../../Slices/ModelBuilding";
 
 const DISPLAY_METRICES = ["Accuracy", "Precision", "Recall", "F1-Score"];
 
@@ -17,6 +20,18 @@ function DecisionTreeClassification({ train, test }) {
     (state) => state.modelBuilding.target_variable
   );
   const dispatch = useDispatch();
+  const [optimizedData, setOptimizedData] = useState({
+    "Multiclass Average": "micro",
+    min_samples_split: 2,
+    min_samples_leaf: 2,
+    random_state: 2,
+    criterion: "gini",
+    none: true,
+  });
+
+  useEffect(() => {
+    dispatch(setModelSetting(optimizedData));
+  }, [dispatch, optimizedData]);
 
   const handleOptimization = async () => {
     try {
@@ -38,7 +53,7 @@ function DecisionTreeClassification({ train, test }) {
         }
       );
       const data = await res.json();
-      console.log(data);
+      setOptimizedData(data);
     } catch (error) {
       console.log(error);
     }
@@ -82,8 +97,7 @@ function DecisionTreeClassification({ train, test }) {
                 dispatch(
                   setHyperparameterData({
                     ...hyperparameterOption,
-                    "Number of cross-validation folds":
-                      e.target.value,
+                    "Number of cross-validation folds": e.target.value,
                   })
                 )
               }
@@ -100,8 +114,7 @@ function DecisionTreeClassification({ train, test }) {
                 dispatch(
                   setHyperparameterData({
                     ...hyperparameterOption,
-                    "Random state for hyperparameter search":
-                      e.target.value,
+                    "Random state for hyperparameter search": e.target.value,
                   })
                 )
               }
@@ -126,7 +139,13 @@ function DecisionTreeClassification({ train, test }) {
             bordered
             color="success"
             label="Min. Samples Split"
-            value={2}
+            value={optimizedData.min_samples_split || 2}
+            onChange={(e) =>
+              setOptimizedData({
+                ...optimizedData,
+                min_samples_split: e.target.value,
+              })
+            }
             step={1}
           />
           <Input
@@ -135,7 +154,13 @@ function DecisionTreeClassification({ train, test }) {
             bordered
             color="success"
             label="Min. Samples Leaf"
-            value={2}
+            value={optimizedData.min_samples_leaf || 2}
+            onChange={(e) =>
+              setOptimizedData({
+                ...optimizedData,
+                min_samples_leaf: e.target.value,
+              })
+            }
             step={1}
           />
           <Input
@@ -144,7 +169,13 @@ function DecisionTreeClassification({ train, test }) {
             bordered
             color="success"
             label="Random State"
-            value={0}
+            value={optimizedData.random_state || 2}
+            onChange={(e) =>
+              setOptimizedData({
+                ...optimizedData,
+                random_state: e.target.value,
+              })
+            }
             step={1}
           />
 
@@ -152,7 +183,13 @@ function DecisionTreeClassification({ train, test }) {
             <p>Criterion</p>
             <SingleDropDown
               columnNames={["gini", "entropy", "log_loss"]}
-              initValue={"gini"}
+              initValue={optimizedData.criterion || "gini"}
+              onValueChange={(e) =>
+                setOptimizedData({
+                  ...optimizedData,
+                  criterion: e,
+                })
+              }
             />
           </div>
           <div>
@@ -160,9 +197,23 @@ function DecisionTreeClassification({ train, test }) {
             <SingleDropDown
               columnNames={["micro", "macro", "weighted"]}
               initValue={"micro"}
+              onValueChange={(e) =>
+                setOptimizedData({
+                  ...optimizedData,
+                  "Multiclass Average": e,
+                })
+              }
             />
           </div>
-          <Checkbox color="success">None</Checkbox>
+          <Checkbox
+            color="success"
+            defaultSelected
+            onChange={(e) =>
+              setOptimizedData({ ...optimizedData, none: e.valueOf() })
+            }
+          >
+            None
+          </Checkbox>
         </div>
         <div className="mt-4">
           <p className="mb-2">Display Metrices</p>

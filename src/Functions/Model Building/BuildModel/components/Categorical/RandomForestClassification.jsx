@@ -1,9 +1,12 @@
 import { Checkbox, Input } from "@nextui-org/react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import MultipleDropDown from "../../../../../Components/MultipleDropDown/MultipleDropDown";
 import SingleDropDown from "../../../../../Components/SingleDropDown/SingleDropDown";
-import { setHyperparameterData } from "../../../../../Slices/ModelBuilding";
+import {
+  setHyperparameterData,
+  setModelSetting,
+} from "../../../../../Slices/ModelBuilding";
 
 const DISPLAY_METRICES = ["Accuracy", "Precision", "Recall", "F1-Score"];
 
@@ -17,6 +20,20 @@ function RandomForestClassification({ train, test }) {
     (state) => state.modelBuilding.target_variable
   );
   const dispatch = useDispatch();
+  const [optimizedData, setOptimizedData] = useState({
+    "Multiclass Average": "micro",
+    n_estimators: 100,
+    min_samples_split: 2,
+    min_samples_leaf: 2,
+    random_state: 0,
+    criterion: 'gini',
+    max_depth: 'None',
+    auto: true
+  });
+
+  useEffect(() => {
+    dispatch(setModelSetting(optimizedData));
+  }, [optimizedData, dispatch]);
 
   const handleOptimization = async () => {
     try {
@@ -38,7 +55,7 @@ function RandomForestClassification({ train, test }) {
         }
       );
       const data = await res.json();
-      console.log(data);
+      setOptimizedData(data);
     } catch (error) {
       console.log(error);
     }
@@ -124,7 +141,13 @@ function RandomForestClassification({ train, test }) {
             bordered
             color="success"
             label="Number of Estimators"
-            value={100}
+            value={optimizedData.n_estimators || 100}
+            onChange={(e) =>
+              setOptimizedData({
+                ...optimizedData,
+                n_estimators: e.target.value,
+              })
+            }
             step={1}
           />
           <Input
@@ -133,7 +156,13 @@ function RandomForestClassification({ train, test }) {
             bordered
             color="success"
             label="Min. Samples Split"
-            value={2}
+            value={optimizedData.min_samples_split || 2}
+            onChange={(e) =>
+              setOptimizedData({
+                ...optimizedData,
+                min_samples_split: e.target.value,
+              })
+            }
             step={1}
           />
           <Input
@@ -142,7 +171,13 @@ function RandomForestClassification({ train, test }) {
             bordered
             color="success"
             label="Min. Samples Leaf"
-            value={2}
+            value={optimizedData.min_samples_leaf || 2}
+            onChange={(e) =>
+              setOptimizedData({
+                ...optimizedData,
+                min_samples_leaf: e.target.value,
+              })
+            }
             step={1}
           />
           <Input
@@ -151,7 +186,13 @@ function RandomForestClassification({ train, test }) {
             bordered
             color="success"
             label="Random State"
-            value={0}
+            value={optimizedData.random_state || 0}
+            onChange={(e) =>
+              setOptimizedData({
+                ...optimizedData,
+                random_state: e.target.value,
+              })
+            }
             step={1}
           />
 
@@ -159,7 +200,13 @@ function RandomForestClassification({ train, test }) {
             <p>Criterion</p>
             <SingleDropDown
               columnNames={["gini", "entropy", "log_loss"]}
-              initValue={"gini"}
+              initValue={optimizedData.criterion || "gini"}
+              onValueChange={(e) =>
+                setOptimizedData({
+                  ...optimizedData,
+                  criterion: e,
+                })
+              }
             />
           </div>
 
@@ -168,13 +215,34 @@ function RandomForestClassification({ train, test }) {
             <SingleDropDown
               columnNames={["micro", "macro", "weighted"]}
               initValue={"micro"}
+              onValueChange={(e) =>
+                setOptimizedData({
+                  ...optimizedData,
+                  "Multiclass Average": e,
+                })
+              }
             />
           </div>
           <div>
             <p>Max Depth</p>
-            <SingleDropDown columnNames={["None"]} initValue={"None"} />
+            <SingleDropDown
+              columnNames={["None"]}
+              disabled={true}
+              initValue={"None"}
+            />
           </div>
-          <Checkbox color="success">Auto</Checkbox>
+          <Checkbox
+            color="success"
+            defaultSelected
+            onChange={(e) =>
+              setOptimizedData({
+                ...optimizedData,
+                "auto": e.valueOf(),
+              })
+            }
+          >
+            Auto
+          </Checkbox>
         </div>
         <div className="mt-4">
           <p className="mb-2">Display Metrices</p>

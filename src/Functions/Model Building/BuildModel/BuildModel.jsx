@@ -10,7 +10,10 @@ import {
   setTargetVariable,
   setType,
 } from "../../../Slices/ModelBuilding";
-import { fetchDataFromIndexedDB } from "../../../util/indexDB";
+import {
+  fetchDataFromIndexedDB,
+  updateDataInIndexedDB,
+} from "../../../util/indexDB";
 import DecisionTreeClassification from "./components/Categorical/DecisionTreeClassification";
 import KNearestNeighbour from "./components/Categorical/KNearestNeighbour";
 import LogisticRegression from "./components/Categorical/LogisticRegression";
@@ -52,6 +55,7 @@ function BuildModel({ csvData }) {
   const dispatch = useDispatch();
   const [train, setTrain] = useState();
   const [test, setTest] = useState();
+  const [model_name, setModelName] = useState("");
   const model_setting = useSelector(
     (state) => state.modelBuilding.model_setting
   );
@@ -85,11 +89,13 @@ function BuildModel({ csvData }) {
           setRegressor(REGRESSOR[0]);
           dispatch(setReg(REGRESSOR[0]));
           dispatch(setType("regressor"));
+          setModelName("LR_Regression");
         } else {
           setAllRegressor(CLASSIFIER);
           setRegressor(CLASSIFIER[0]);
           dispatch(setReg(CLASSIFIER[0]));
           dispatch(setType("classifier"));
+          setModelName("KNN_Classification");
         }
         dispatch(setTargetVariable(val[e][3]));
         dispatch(setHyperparameterData({}));
@@ -120,6 +126,12 @@ function BuildModel({ csvData }) {
 
   const handleSave = async () => {
     try {
+      let tempModel = await fetchDataFromIndexedDB("models");
+      tempModel.forEach((val) => {
+        if (model_name === Object.keys(val)[0])
+          throw new Error("Model name already exist!");
+      });
+
       const res = await fetch("http://127.0.0.1:8000/api/build_model/", {
         method: "POST",
         headers: {
@@ -135,11 +147,51 @@ function BuildModel({ csvData }) {
         }),
       });
       const data = await res.json();
-      console.log(data)
+
+      tempModel.push({ [model_name]: data });
+      await updateDataInIndexedDB("models", tempModel);
+
+      toast.success("Model Built Successfully!", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
     } catch (error) {
-      console.log(error);
+      toast.error(JSON.stringify(error.message), {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
     }
   };
+
+  useEffect(() => {
+    if (whatKind === "Continuous") {
+      if (regressor === REGRESSOR[0]) setModelName("LR_Regression");
+      if (regressor === REGRESSOR[1]) setModelName("Ridge_Regression");
+      if (regressor === REGRESSOR[2]) setModelName("Lasso_Regression");
+      if (regressor === REGRESSOR[3]) setModelName("DT_Regression");
+      if (regressor === REGRESSOR[4]) setModelName("RF_Classification");
+      if (regressor === REGRESSOR[5]) setModelName("svr_Regression");
+    } else {
+      if (regressor === CLASSIFIER[0]) setModelName("KNN_Classification");
+      if (regressor === CLASSIFIER[1]) setModelName("SVM_Classification");
+      if (regressor === CLASSIFIER[2]) setModelName("LR_Classification");
+      if (regressor === CLASSIFIER[3]) setModelName("DT_Classification");
+      if (regressor === CLASSIFIER[4]) setModelName("RF_Classification");
+      if (regressor === CLASSIFIER[5]) setModelName("MLP_Classification");
+    }
+  }, [whatKind, regressor]);
 
   if (loading) return <div>Loading...</div>;
   if (allDatasetName.length === 0)
@@ -185,7 +237,13 @@ function BuildModel({ csvData }) {
               />
             </div>
             <div className="w-full">
-              <Input fullWidth label="Model Name" size="lg" />
+              <Input
+                fullWidth
+                label="Model Name"
+                size="lg"
+                value={model_name}
+                onChange={(e) => setModelName(e.target.value)}
+              />
             </div>
           </div>
 

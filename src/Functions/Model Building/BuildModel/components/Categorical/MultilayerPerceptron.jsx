@@ -1,9 +1,9 @@
 import { Input } from "@nextui-org/react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import MultipleDropDown from "../../../../../Components/MultipleDropDown/MultipleDropDown";
 import SingleDropDown from "../../../../../Components/SingleDropDown/SingleDropDown";
-import { setHyperparameterData } from "../../../../../Slices/ModelBuilding";
+import { setHyperparameterData, setModelSetting } from "../../../../../Slices/ModelBuilding";
 
 const DISPLAY_METRICES = ["Accuracy", "Precision", "Recall", "F1-Score"];
 
@@ -17,6 +17,19 @@ function MultilayerPerceptron({ train, test }) {
     (state) => state.modelBuilding.target_variable
   );
   const dispatch = useDispatch();
+  const [optimizedData, setOptimizedData] = useState({
+    "Multiclass Average": "micro",
+    activation: 'relu',
+    hidden_layer_sizes: 3,
+    max_iter: 1000,
+    alpha: 0.0001,
+    learning_rate_init: 0.001,
+    tol: 0.001
+  });
+
+  useEffect(() => {
+    dispatch(setModelSetting(optimizedData));
+  }, [dispatch, optimizedData]);
 
   const handleOptimization = async () => {
     try {
@@ -38,7 +51,7 @@ function MultilayerPerceptron({ train, test }) {
         }
       );
       const data = await res.json();
-      console.log(data);
+      setOptimizedData(data);
     } catch (error) {
       console.log(error);
     }
@@ -124,7 +137,13 @@ function MultilayerPerceptron({ train, test }) {
             bordered
             color="success"
             label="Hidden Layer Size"
-            value={3}
+            value={optimizedData.hidden_layer_sizes || 3}
+            onChange={(e) =>
+              setOptimizedData({
+                ...optimizedData,
+                hidden_layer_sizes: e.target.value,
+              })
+            }
             step={1}
           />
           <Input
@@ -133,7 +152,13 @@ function MultilayerPerceptron({ train, test }) {
             bordered
             color="success"
             label="Max Iteration"
-            value={1000}
+            value={optimizedData.max_iter || 1000}
+            onChange={(e) =>
+              setOptimizedData({
+                ...optimizedData,
+                max_iter: e.target.value,
+              })
+            }
             step={1}
           />
           <Input
@@ -142,7 +167,13 @@ function MultilayerPerceptron({ train, test }) {
             bordered
             color="success"
             label="Alpha"
-            value={0.0001}
+            value={optimizedData.alpha || 0.0001}
+            onChange={(e) =>
+              setOptimizedData({
+                ...optimizedData,
+                alpha: e.target.value,
+              })
+            }
             step={0.0001}
           />
           <Input
@@ -151,7 +182,13 @@ function MultilayerPerceptron({ train, test }) {
             bordered
             color="success"
             label="Learning Rate"
-            value={0.001}
+            value={optimizedData.learning_rate_init || 0.001}
+            onChange={(e) =>
+              setOptimizedData({
+                ...optimizedData,
+                learning_rate_init: e.target.value,
+              })
+            }
             step={0.001}
           />
           <Input
@@ -160,7 +197,13 @@ function MultilayerPerceptron({ train, test }) {
             bordered
             color="success"
             label="Tolerance"
-            value={0.001}
+            value={optimizedData.tol || 0.001}
+            onChange={(e) =>
+              setOptimizedData({
+                ...optimizedData,
+                tol: e.target.value,
+              })
+            }
             step={0.001}
           />
 
@@ -168,7 +211,13 @@ function MultilayerPerceptron({ train, test }) {
             <p>Activation Function</p>
             <SingleDropDown
               columnNames={["relu", "identity", "logistic", "tanh"]}
-              initValue={"relu"}
+              initValue={optimizedData.activation || "relu"}
+              onValueChange={(e) =>
+                setOptimizedData({
+                  ...optimizedData,
+                  activation: e,
+                })
+              }
             />
           </div>
 
@@ -177,6 +226,12 @@ function MultilayerPerceptron({ train, test }) {
             <SingleDropDown
               columnNames={["micro", "macro", "weighted"]}
               initValue={"micro"}
+              onValueChange={(e) =>
+                setOptimizedData({
+                  ...optimizedData,
+                  'Multiclass Average': e,
+                })
+              }
             />
           </div>
         </div>

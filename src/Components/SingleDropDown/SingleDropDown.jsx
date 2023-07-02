@@ -1,7 +1,7 @@
 import { Input } from "@nextui-org/react";
 import React, { useEffect, useRef, useState } from "react";
 
-function SingleDropDown({ columnNames, onValueChange, initValue }) {
+function SingleDropDown({ columnNames, onValueChange, initValue, disabled=false }) {
   const [filter1, setFilter1] = useState("");
   const [isOpen1, setIsOpen1] = useState(false);
   const dropdownRef1 = useRef(null);
@@ -47,6 +47,7 @@ function SingleDropDown({ columnNames, onValueChange, initValue }) {
         placeholder="Column Name"
         value={filter1}
         onChange={handleInputChange1}
+        disabled={disabled}
         onFocus={() => setIsOpen1(true)}
       />
 

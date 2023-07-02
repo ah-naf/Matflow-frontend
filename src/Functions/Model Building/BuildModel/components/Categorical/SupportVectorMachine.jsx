@@ -1,9 +1,12 @@
 import { Input } from "@nextui-org/react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import MultipleDropDown from "../../../../../Components/MultipleDropDown/MultipleDropDown";
 import SingleDropDown from "../../../../../Components/SingleDropDown/SingleDropDown";
-import { setHyperparameterData } from "../../../../../Slices/ModelBuilding";
+import {
+  setHyperparameterData,
+  setModelSetting,
+} from "../../../../../Slices/ModelBuilding";
 
 const DISPLAY_METRICES = ["Accuracy", "Precision", "Recall", "F1-Score"];
 
@@ -17,6 +20,18 @@ function SupportVectorMachine({ train, test }) {
     (state) => state.modelBuilding.target_variable
   );
   const dispatch = useDispatch();
+  const [optimizedData, setOptimizedData] = useState({
+    "Multiclass Average": "micro",
+    C: 1,
+    tol: 0.001,
+    degree: 3,
+    kernel: 'linear',
+    gamma: 'scale'
+  });
+
+  useEffect(() => {
+    dispatch(setModelSetting(optimizedData));
+  }, [optimizedData, dispatch]);
 
   const handleOptimization = async () => {
     try {
@@ -38,7 +53,7 @@ function SupportVectorMachine({ train, test }) {
         }
       );
       const data = await res.json();
-      console.log(data);
+      setOptimizedData(data);
     } catch (error) {
       console.log(error);
     }
@@ -78,8 +93,7 @@ function SupportVectorMachine({ train, test }) {
                 dispatch(
                   setHyperparameterData({
                     ...hyperparameterOption,
-                    "Number of cross-validation folds":
-                      e.target.value,
+                    "Number of cross-validation folds": e.target.value,
                   })
                 )
               }
@@ -96,8 +110,7 @@ function SupportVectorMachine({ train, test }) {
                 dispatch(
                   setHyperparameterData({
                     ...hyperparameterOption,
-                    "Random state for hyperparameter search":
-                      e.target.value,
+                    "Random state for hyperparameter search": e.target.value,
                   })
                 )
               }
@@ -126,7 +139,13 @@ function SupportVectorMachine({ train, test }) {
             bordered
             color="success"
             label="C"
-            value={1}
+            value={optimizedData.C || 1}
+            onChange={(e) =>
+              setOptimizedData({
+                ...optimizedData,
+                C: e.target.value,
+              })
+            }
             step={0.01}
           />
           <Input
@@ -135,7 +154,13 @@ function SupportVectorMachine({ train, test }) {
             bordered
             color="success"
             label="Tolerance"
-            value={0.001}
+            value={optimizedData.tol || 0.001}
+            onChange={(e) =>
+              setOptimizedData({
+                ...optimizedData,
+                tol: e.target.value,
+              })
+            }
             step={0.001}
           />
           <Input
@@ -144,7 +169,13 @@ function SupportVectorMachine({ train, test }) {
             bordered
             color="success"
             label="Polinomial Degree"
-            value={3}
+            value={optimizedData.degree || 3}
+            onChange={(e) =>
+              setOptimizedData({
+                ...optimizedData,
+                degree: e.target.value,
+              })
+            }
             step={1}
           />
 
@@ -152,14 +183,26 @@ function SupportVectorMachine({ train, test }) {
             <p>Kernel</p>
             <SingleDropDown
               columnNames={["linear", "poly", "rbf", "sigmoid"]}
-              initValue={"linear"}
+              initValue={optimizedData.kernel || "linear"}
+              onValueChange={(e) =>
+                setOptimizedData({
+                  ...optimizedData,
+                  kernel: e,
+                })
+              }
             />
           </div>
           <div>
             <p>Gamma</p>
             <SingleDropDown
               columnNames={["scale", "auto"]}
-              initValue={"scale"}
+              initValue={optimizedData.gamma || "scale"}
+              onValueChange={(e) =>
+                setOptimizedData({
+                  ...optimizedData,
+                  gamma: e,
+                })
+              }
             />
           </div>
           <div>
@@ -167,6 +210,12 @@ function SupportVectorMachine({ train, test }) {
             <SingleDropDown
               columnNames={["micro", "macro", "weighted"]}
               initValue={"micro"}
+              onValueChange={(e) =>
+                setOptimizedData({
+                  ...optimizedData,
+                  "Multiclass Average": e,
+                })
+              }
             />
           </div>
         </div>

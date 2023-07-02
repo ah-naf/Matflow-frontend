@@ -1,9 +1,9 @@
 import { Input } from "@nextui-org/react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import MultipleDropDown from "../../../../../Components/MultipleDropDown/MultipleDropDown";
 import SingleDropDown from "../../../../../Components/SingleDropDown/SingleDropDown";
-import { setHyperparameterData } from "../../../../../Slices/ModelBuilding";
+import { setHyperparameterData, setModelSetting } from "../../../../../Slices/ModelBuilding";
 
 const DISPLAY_METRICES = ["Accuracy", "Precision", "Recall", "F1-Score"];
 
@@ -17,6 +17,19 @@ function LogisticRegression({ train, test }) {
     (state) => state.modelBuilding.target_variable
   );
   const dispatch = useDispatch();
+  const [optimizedData, setOptimizedData] = useState({
+    "Multiclass Average": "micro",
+    C: 1,
+    tol: 0.0001,
+    max_iter: 100,
+    random_state: 42,
+    penalty: 'l2',
+    solver: 'lbfgs'
+  });
+
+  useEffect(() => {
+    dispatch(setModelSetting(optimizedData))
+  }, [dispatch, optimizedData])
 
   const handleOptimization = async () => {
     try {
@@ -38,7 +51,7 @@ function LogisticRegression({ train, test }) {
         }
       );
       const data = await res.json();
-      console.log(data);
+      setOptimizedData(data);
     } catch (error) {
       console.log(error);
     }
@@ -78,8 +91,7 @@ function LogisticRegression({ train, test }) {
                 dispatch(
                   setHyperparameterData({
                     ...hyperparameterOption,
-                    "Number of cross-validation folds":
-                      e.target.value,
+                    "Number of cross-validation folds": e.target.value,
                   })
                 )
               }
@@ -96,8 +108,7 @@ function LogisticRegression({ train, test }) {
                 dispatch(
                   setHyperparameterData({
                     ...hyperparameterOption,
-                    "Random state for hyperparameter search":
-                      e.target.value,
+                    "Random state for hyperparameter search": e.target.value,
                   })
                 )
               }
@@ -126,7 +137,13 @@ function LogisticRegression({ train, test }) {
             bordered
             color="success"
             label="C"
-            value={1}
+            value={optimizedData.C || 1}
+            onChange={(e) =>
+              setOptimizedData({
+                ...optimizedData,
+                C: e.target.value,
+              })
+            }
             step={0.01}
           />
           <Input
@@ -135,7 +152,13 @@ function LogisticRegression({ train, test }) {
             bordered
             color="success"
             label="Tolerance"
-            value={0.001}
+            value={optimizedData.tol || 0.0001}
+            onChange={(e) =>
+              setOptimizedData({
+                ...optimizedData,
+                tol: e.target.value,
+              })
+            }
             step={0.001}
           />
           <Input
@@ -144,7 +167,13 @@ function LogisticRegression({ train, test }) {
             bordered
             color="success"
             label="Max Iteration"
-            value={100}
+            value={optimizedData.max_iter || 100}
+            onChange={(e) =>
+              setOptimizedData({
+                ...optimizedData,
+                max_iter: e.target.value,
+              })
+            }
             step={1}
           />
           <Input
@@ -153,7 +182,13 @@ function LogisticRegression({ train, test }) {
             bordered
             color="success"
             label="Random State"
-            value={42}
+            value={optimizedData.random_state || 42}
+            onChange={(e) =>
+              setOptimizedData({
+                ...optimizedData,
+                random_state: e.target.value,
+              })
+            }
             step={1}
           />
 
@@ -161,14 +196,20 @@ function LogisticRegression({ train, test }) {
             <p>Penalty</p>
             <SingleDropDown
               columnNames={["None", "l1", "l2", "elasticnet"]}
-              initValue={"l2"}
+              initValue={optimizedData.penalty || "l2"}
+              onValueChange={(e) =>
+                setOptimizedData({ ...optimizedData, penalty: e })
+              }
             />
           </div>
           <div>
             <p>Solver</p>
             <SingleDropDown
               columnNames={["lbfgs", "newton-cg", "liblinear", "sag", "saga"]}
-              initValue={"lbfgs"}
+              initValue={optimizedData.solver || "lbfgs"}
+              onValueChange={(e) =>
+                setOptimizedData({ ...optimizedData, solver: e })
+              }
             />
           </div>
           <div>
@@ -176,6 +217,9 @@ function LogisticRegression({ train, test }) {
             <SingleDropDown
               columnNames={["micro", "macro", "weighted"]}
               initValue={"micro"}
+              onValueChange={(e) =>
+                setOptimizedData({ ...optimizedData, "Multiclass Average": e })
+              }
             />
           </div>
         </div>

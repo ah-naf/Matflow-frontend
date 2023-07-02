@@ -2,8 +2,8 @@ import styled from "@emotion/styled";
 import { Slider, Stack } from "@mui/material";
 import { Checkbox, Input } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
-import SingleDropDown from "../../../Components/SingleDropDown/SingleDropDown";
 import { toast } from "react-toastify";
+import SingleDropDown from "../../../Components/SingleDropDown/SingleDropDown";
 
 function SplitDataset({ csvData }) {
   const columnNames = Object.keys(csvData[0]);
@@ -29,7 +29,7 @@ function SplitDataset({ csvData }) {
 
   const handleSave = async () => {
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/feature_creation/", {
+      const res = await fetch("http://127.0.0.1:8000/api/split_dataset/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -37,11 +37,40 @@ function SplitDataset({ csvData }) {
         body: JSON.stringify({
           target_variable,
           stratify,
-          test_size, 
+          test_size,
           random_state,
           shuffle,
+          file: csvData
         }),
       });
+      const data = await res.json()
+      console.log(data)
+      if (!trainDataName || !testDataName)
+        throw new Error("Name cannot be empty");
+      const tempTrainName = "train_" + trainDataName;
+      const tempTestName = "test_" + testDataName;
+
+      const uploadedFiles = JSON.parse(localStorage.getItem("uploadedFiles"));
+      let fileExist = uploadedFiles.filter((val) => val.name === tempTrainName);
+
+      if (fileExist.length === 0) {
+        uploadedFiles.push({ name: tempTrainName, type: whatKind });
+      } else throw new Error('Name of this Dataset Already Exist')
+
+      fileExist = uploadedFiles.filter((val) => val.name === tempTestName);
+
+      if (fileExist.length === 0) {
+        uploadedFiles.push({ name: tempTestName, type: whatKind });
+      } else throw new Error('Name of this Dataset Already Exist')
+
+      // localStorage.setItem("uploadedFiles", JSON.stringify(uploadedFiles));
+
+      // await fetchDataFromIndexedDB(tempTrainName);
+      // await updateDataInIndexedDB(tempTrainName, data.train);
+
+      // await fetchDataFromIndexedDB(tempTestName);
+      // await updateDataInIndexedDB(tempTestName, data.test);
+
     } catch (error) {
       toast.error("Something went wrong. Please try again", {
         position: "bottom-right",

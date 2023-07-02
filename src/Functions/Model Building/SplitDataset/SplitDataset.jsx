@@ -2,8 +2,14 @@ import styled from "@emotion/styled";
 import { Slider, Stack } from "@mui/material";
 import { Checkbox, Input } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import SingleDropDown from "../../../Components/SingleDropDown/SingleDropDown";
+import { setReRender } from "../../../Slices/UploadedFileSlice";
+import {
+  fetchDataFromIndexedDB,
+  updateDataInIndexedDB,
+} from "../../../util/indexDB";
 
 function SplitDataset({ csvData }) {
   const columnNames = Object.keys(csvData[0]);
@@ -16,6 +22,10 @@ function SplitDataset({ csvData }) {
   const [test_size, setTestSize] = useState(0.5);
   const [shuffle, setShuffle] = useState(false);
   const [random_state, setRandomState] = useState(1);
+  const dispatch = useDispatch();
+  const render = useSelector((state) => state.uploadedFile.rerender);
+  const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
+  
 
   useEffect(() => {
     if (target_variable) {
@@ -24,11 +34,29 @@ function SplitDataset({ csvData }) {
           ? "Continuous"
           : "Categorical";
       setWhatKind(temp);
+      setTestDataName(
+        activeCsvFile.name +
+          "_" +
+          Object.keys(csvData[0]).filter((val) => val === target_variable)[0]
+      );
+      setTrainDataName(
+        activeCsvFile.name +
+          "_" +
+          Object.keys(csvData[0]).filter((val) => val === target_variable)[0]
+      );
+      setSplittedName(
+        activeCsvFile.name +
+          "_" +
+          Object.keys(csvData[0]).filter((val) => val === target_variable)[0]
+      );
     }
-  }, [target_variable, csvData]);
+  }, [target_variable, csvData, activeCsvFile]);
 
   const handleSave = async () => {
     try {
+      if (!trainDataName || !testDataName)
+        throw new Error("Dataset name field cannot be empty");
+
       const res = await fetch("http://127.0.0.1:8000/api/split_dataset/", {
         method: "POST",
         headers: {
@@ -40,13 +68,12 @@ function SplitDataset({ csvData }) {
           test_size,
           random_state,
           shuffle,
-          file: csvData
+          file: csvData,
         }),
       });
-      const data = await res.json()
-      console.log(data)
-      if (!trainDataName || !testDataName)
-        throw new Error("Name cannot be empty");
+      const data = await res.json();
+      
+
       const tempTrainName = "train_" + trainDataName;
       const tempTestName = "test_" + testDataName;
 
@@ -55,24 +82,37 @@ function SplitDataset({ csvData }) {
 
       if (fileExist.length === 0) {
         uploadedFiles.push({ name: tempTrainName, type: whatKind });
-      } else throw new Error('Name of this Dataset Already Exist')
+      } else throw new Error("Name of this Dataset Already Exist");
 
       fileExist = uploadedFiles.filter((val) => val.name === tempTestName);
 
       if (fileExist.length === 0) {
         uploadedFiles.push({ name: tempTestName, type: whatKind });
-      } else throw new Error('Name of this Dataset Already Exist')
+      } else throw new Error("Name of this Dataset Already Exist");
 
-      // localStorage.setItem("uploadedFiles", JSON.stringify(uploadedFiles));
+      localStorage.setItem("uploadedFiles", JSON.stringify(uploadedFiles));
 
-      // await fetchDataFromIndexedDB(tempTrainName);
-      // await updateDataInIndexedDB(tempTrainName, data.train);
+      await fetchDataFromIndexedDB(tempTrainName);
+      await updateDataInIndexedDB(tempTrainName, data.train);
 
-      // await fetchDataFromIndexedDB(tempTestName);
-      // await updateDataInIndexedDB(tempTestName, data.test);
+      await fetchDataFromIndexedDB(tempTestName);
+      await updateDataInIndexedDB(tempTestName, data.test);
 
+      const datasetName = await fetchDataFromIndexedDB("splitted_dataset");
+
+      datasetName.forEach((val) => {
+        if (Object.keys(val)[0] === splittedName)
+          throw new Error("Dataset Name already exist.");
+      });
+
+      await updateDataInIndexedDB("splitted_dataset", [
+        ...datasetName,
+        { [splittedName]: [whatKind, tempTrainName, tempTestName] },
+      ]);
+
+      dispatch(setReRender(!render));
     } catch (error) {
-      toast.error("Something went wrong. Please try again", {
+      toast.error(JSON.stringify(error.message), {
         position: "bottom-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -111,6 +151,7 @@ function SplitDataset({ csvData }) {
       <div className="flex items-center mt-12 gap-8">
         <div className="w-full">
           <Input
+            required
             label="Test Size"
             size="lg"
             fullWidth
@@ -151,6 +192,7 @@ function SplitDataset({ csvData }) {
       <div className="mt-12 flex  gap-4">
         <div className="w-full">
           <Input
+            required
             label="Train Data Name"
             fullWidth
             color="success"
@@ -162,6 +204,7 @@ function SplitDataset({ csvData }) {
         </div>
         <div className="w-full">
           <Input
+            required
             label="Test Data Name"
             fullWidth
             size="xl"
@@ -173,6 +216,7 @@ function SplitDataset({ csvData }) {
         </div>
         <div className="w-full">
           <Input
+            required
             label="Splitted Dataset Name"
             fullWidth
             size="xl"

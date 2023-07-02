@@ -12,6 +12,10 @@ function KNearestNeighbour({ train, test }) {
     (state) => state.modelBuilding.hyperparameter
   );
   const regressor = useSelector((state) => state.modelBuilding.regressor);
+  const type = useSelector((state) => state.modelBuilding.type);
+  const target_variable = useSelector(
+    (state) => state.modelBuilding.target_variable
+  );
   const dispatch = useDispatch();
 
   const handleOptimization = async () => {
@@ -27,12 +31,14 @@ function KNearestNeighbour({ train, test }) {
             train,
             test,
             regressor,
+            type,
+            target_variable,
             ...hyperparameterOption,
           }),
         }
       );
-      const data = await res.json()
-      console.log(data)
+      const data = await res.json();
+      console.log(data);
     } catch (error) {
       console.log(error);
     }

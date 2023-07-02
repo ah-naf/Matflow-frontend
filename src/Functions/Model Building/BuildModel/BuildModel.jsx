@@ -3,7 +3,11 @@ import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { ToastContainer, toast } from "react-toastify";
 import SingleDropDown from "../../../Components/SingleDropDown/SingleDropDown";
-import { setReg } from "../../../Slices/ModelBuilding";
+import {
+  setReg,
+  setTargetVariable,
+  setType,
+} from "../../../Slices/ModelBuilding";
 import { fetchDataFromIndexedDB } from "../../../util/indexDB";
 import DecisionTreeClassification from "./components/Categorical/DecisionTreeClassification";
 import KNearestNeighbour from "./components/Categorical/KNearestNeighbour";
@@ -70,11 +74,14 @@ function BuildModel({ csvData }) {
           setAllRegressor(REGRESSOR);
           setRegressor(REGRESSOR[0]);
           dispatch(setReg(REGRESSOR[0]));
+          dispatch(setType("regressor"));
         } else {
           setAllRegressor(CLASSIFIER);
           setRegressor(CLASSIFIER[0]);
           dispatch(setReg(CLASSIFIER[0]));
+          dispatch(setType("classifier"));
         }
+        dispatch(setTargetVariable(val[e][3]));
 
         const trainData = await fetchDataFromIndexedDB(val[e][1]);
         const testData = await fetchDataFromIndexedDB(val[e][2]);

@@ -4,6 +4,8 @@ const ModelBuildingSlice = createSlice({
   name: "model building",
   initialState: {
     regressor: "",
+    target_variable: '',
+    type: '',
     hyperparameter: {},
     model_setting: {},
   },
@@ -13,12 +15,18 @@ const ModelBuildingSlice = createSlice({
     },
     setHyperparameterData: (state, {payload}) => {
         state.hyperparameter = payload
+    },
+    setTargetVariable: (state, {payload}) => {
+        state.target_variable = payload
+    },
+    setType: (state, {payload}) => {
+        state.type = payload
     }
   },
 });
 
 // Action creators are generated for each case reducer function
 // export const {} = ModelBuildingSlice.actions;
-export const { setReg, setHyperparameterData } = ModelBuildingSlice.actions;
+export const { setReg, setHyperparameterData, setTargetVariable, setType } = ModelBuildingSlice.actions;
 
 export default ModelBuildingSlice.reducer;

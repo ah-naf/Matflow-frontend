@@ -115,6 +115,9 @@ const updateDataInIndexedDB = (name, data) => {
       const transaction = db.transaction(["data"], "readwrite");
       const objectStore = transaction.objectStore("data");
 
+      // Ulta palta korle remove kore daw
+      objectStore.clear()
+      
       transaction.onerror = (event) => {
         console.error("IndexedDB transaction error:", event.target.error);
         reject(event.target.error);

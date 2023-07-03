@@ -56,6 +56,7 @@ function BuildModel({ csvData }) {
   const [train, setTrain] = useState();
   const [test, setTest] = useState();
   const [model_name, setModelName] = useState("");
+  const [current_dataset, setCurrentDataset] = useState();
   const model_setting = useSelector(
     (state) => state.modelBuilding.model_setting
   );
@@ -81,6 +82,7 @@ function BuildModel({ csvData }) {
     let tempDatasets = await fetchDataFromIndexedDB("splitted_dataset");
     tempDatasets.forEach(async (val) => {
       if (e === Object.keys(val)[0]) {
+        setCurrentDataset(e);
         setWhatKind(val[e][0]);
 
         // Check What Kind
@@ -126,10 +128,12 @@ function BuildModel({ csvData }) {
 
   const handleSave = async () => {
     try {
+      // console.log('first')
       let tempModel = await fetchDataFromIndexedDB("models");
       tempModel.forEach((val) => {
-        if (model_name === Object.keys(val)[0])
-          throw new Error("Model name already exist!");
+        if (current_dataset === Object.keys(val)[0]) {
+          if (val[current_dataset]) throw new Error("Model name exist!");
+        }
       });
 
       const res = await fetch("http://127.0.0.1:8000/api/build_model/", {
@@ -138,8 +142,8 @@ function BuildModel({ csvData }) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          test,
-          train,
+          // test,
+          // train,
           target_var: target_variable,
           type,
           [type === "regressor" ? "regressor" : "classifier"]: reg,
@@ -148,8 +152,18 @@ function BuildModel({ csvData }) {
       });
       const data = await res.json();
 
-      tempModel.push({ [model_name]: data });
-      await updateDataInIndexedDB("models", tempModel);
+      let allModels = await fetchDataFromIndexedDB("models");
+      const ind = allModels.findIndex((obj) => current_dataset in obj);
+
+      if (ind !== -1) {
+        allModels[ind][current_dataset] = {
+          ...allModels[ind][current_dataset],
+          [model_name]: data,
+        };
+      } else {
+        allModels.push({ [current_dataset]: { [model_name]: data } });
+      }
+      await updateDataInIndexedDB("models", allModels);
 
       toast.success("Model Built Successfully!", {
         position: "bottom-right",

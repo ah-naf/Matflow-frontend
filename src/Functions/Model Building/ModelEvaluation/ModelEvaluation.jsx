@@ -14,6 +14,7 @@ function ModelEvaluation() {
   const [columnName, setColumnName] = useState();
   const [file, setFile] = useState();
   const [selectedColumn, setSelectedColumn] = useState();
+  const [columnDefs, setColumnDefs] = useState();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -40,35 +41,60 @@ function ModelEvaluation() {
     setFile(temp);
   };
 
-  useEffect(() => {
-    if (display_type === "Graph") {
-      const fetchData = async () => {
-        try {
-          const res = await fetch(
-            "http://127.0.0.1:8000/api/model_evaluation/",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                file,
-                'Display Type': display_type,
-                'Display Result': display_result,
-                'Select Orientation': orientation,
-                'Columns': selectedColumn
-              }),
-            }
-          );
-          const data = await res.json()
-          console.log(data)
-        } catch (error) {
-          console.log(error);
-        }
-      };
-      fetchData();
+  const handleSave = async () => {
+    try {
+      console.log({
+        file,
+        "Display Type": display_type,
+        "Display Result": display_result,
+        "Select Orientation": orientation,
+        Columns: selectedColumn,
+      });
+      const res = await fetch("http://127.0.0.1:8000/api/model_evaluation/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          file,
+          "Display Type": display_type,
+          "Display Result": display_result,
+          "Select Orientation": orientation,
+          Columns: selectedColumn,
+        }),
+      });
+      const data = await res.json();
+      console.log(data);
+    } catch (error) {
+      console.log(error);
     }
-  }, [display_type, display_result, file, orientation, selectedColumn]);
+  };
+
+  // useEffect(() => {
+  //   if (display_type === "Graph" && file) {
+
+  //   } else if (columnName) {
+  //     const temp =
+  //       columnName.length > 0
+  //         ? columnName.map((key) => ({
+  //             headerName: key,
+  //             field: key,
+  //             valueGetter: (params) => {
+  //               return params.data[key];
+  //             },
+  //           }))
+  //         : [];
+
+  //     console.log(temp);
+  //   }
+  // }, [
+  //   display_type,
+  //   display_result,
+  //   file,
+  //   orientation,
+  //   selectedColumn,
+  //   columnName,
+  // ]);
 
   if (!allDatasetName) return <div>Loading...</div>;
   return (
@@ -140,6 +166,14 @@ function ModelEvaluation() {
             setSelectedColumns={setSelectedColumn}
           />
         </div>
+      )}
+      {file && (
+        <button
+          className="self-start border-2 px-6 tracking-wider bg-primary-btn text-white font-medium rounded-md py-2 mt-8"
+          onClick={handleSave}
+        >
+          Submit
+        </button>
       )}
     </div>
   );

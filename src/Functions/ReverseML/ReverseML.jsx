@@ -1,5 +1,6 @@
 import { Input } from "@nextui-org/react";
 import React, { useState } from "react";
+import AgGridComponent from "../../Components/AgGridComponent/AgGridComponent";
 import MultipleDropDown from "../../Components/MultipleDropDown/MultipleDropDown";
 
 function ReverseML({ csvData }) {
@@ -10,6 +11,8 @@ function ReverseML({ csvData }) {
   const [selectFeature, setSelectFeature] = useState();
   const [targetVariable, setTargetVariable] = useState();
   const [enterValues, setEnterValues] = useState("");
+  const [mlData, setMlData] = useState();
+  const [columnDef, setColumnDef] = useState();
 
   const handleSelectFeature = (e) => {
     setSelectFeature(e);
@@ -30,14 +33,24 @@ function ReverseML({ csvData }) {
         },
         body: JSON.stringify({
           file: csvData,
-          'Select Feature': selectFeature,
-          'Select Target Variable': targetVariable,
-          'Enter Values': enterValues
+          "Select Feature": selectFeature,
+          "Select Target Variable": targetVariable,
+          "Enter Values": enterValues,
         }),
       });
       const data = await res.json();
+      setMlData(data);
+      const temp = Object.keys(data[0]).map((val) => ({
+        headerName: val,
+        key: val,
+        valueGetter: (params) => {
+          return params.data[val];
+        },
+      }));
+      console.log(temp);
+      setColumnDef(temp);
     } catch (error) {
-        console.log(error)
+      console.log(error);
     }
   };
 
@@ -79,6 +92,23 @@ function ReverseML({ csvData }) {
         >
           Predict
         </button>
+
+        {columnDef && (
+          <div className="mt-4">
+            <div
+              className="ag-theme-alpine"
+              style={{ height: "200px", width: "100%" }}
+            >
+              <AgGridComponent
+                rowData={mlData}
+                columnDefs={columnDef}
+                rowHeight={30}
+                headerHeight={30}
+                paginationPageSize={4}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -107,7 +107,7 @@ function SplitDataset({ csvData }) {
 
       await updateDataInIndexedDB("splitted_dataset", [
         ...datasetName,
-        { [splittedName]: [whatKind, tempTrainName, tempTestName, target_variable] },
+        { [splittedName]: [whatKind, tempTrainName, tempTestName, target_variable, activeCsvFile.name] },
       ]);
 
       dispatch(setReRender(!render));

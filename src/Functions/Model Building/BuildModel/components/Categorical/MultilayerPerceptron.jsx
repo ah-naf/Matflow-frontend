@@ -51,7 +51,7 @@ function MultilayerPerceptron({ train, test }) {
         }
       );
       const data = await res.json();
-      setOptimizedData(data);
+      setOptimizedData({...optimizedData, ...data});
     } catch (error) {
       console.log(error);
     }

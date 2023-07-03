@@ -103,6 +103,7 @@ function BuildModel({ csvData }) {
         dispatch(setTargetVariable(val[e][3]));
         dispatch(setHyperparameterData({}));
         dispatch(setModelSetting({}));
+        setNicherData('')
 
         const trainData = await fetchDataFromIndexedDB(val[e][1]);
         const testData = await fetchDataFromIndexedDB(val[e][2]);
@@ -138,7 +139,6 @@ function BuildModel({ csvData }) {
           }
         }
       });
-
       const res = await fetch("http://127.0.0.1:8000/api/build_model/", {
         method: "POST",
         headers: {
@@ -252,6 +252,7 @@ function BuildModel({ csvData }) {
                   dispatch(setReg(e));
                   dispatch(setHyperparameterData({}));
                   dispatch(setModelSetting({}));
+                  setNicherData('')
                 }}
                 initValue={allRegressor[0]}
               />

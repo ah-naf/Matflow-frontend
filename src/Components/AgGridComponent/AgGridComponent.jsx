@@ -1,7 +1,13 @@
 import { AgGridReact } from "ag-grid-react";
 import { useCallback, useMemo, useRef } from "react";
 
-function AgGridComponent({ rowData, columnDefs, rowHeight = 50 }) {
+function AgGridComponent({
+  rowData,
+  columnDefs,
+  rowHeight = 50,
+  paginationPageSize = 10,
+  headerHeight=50
+}) {
   const gridRef = useRef();
 
   const defaultColDef = useMemo(() => {
@@ -40,8 +46,9 @@ function AgGridComponent({ rowData, columnDefs, rowHeight = 50 }) {
         columnDefs={columnDefs}
         rowHeight={rowHeight}
         pagination
-        paginationPageSize={10}
+        paginationPageSize={paginationPageSize}
         defaultColDef={defaultColDef}
+        headerHeight={headerHeight}
       ></AgGridReact>
       <div className="flex items-center gap-2 mt-4 pb-8">
         <button

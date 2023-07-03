@@ -1,8 +1,10 @@
 import { Checkbox, Radio } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
+import AgGridComponent from "../../../Components/AgGridComponent/AgGridComponent";
 import MultipleDropDown from "../../../Components/MultipleDropDown/MultipleDropDown";
 import SingleDropDown from "../../../Components/SingleDropDown/SingleDropDown";
 import { fetchDataFromIndexedDB } from "../../../util/indexDB";
+import Plot from "react-plotly.js";
 
 function ModelEvaluation() {
   const [display_type, setDisplayType] = useState("Table");
@@ -15,6 +17,7 @@ function ModelEvaluation() {
   const [file, setFile] = useState();
   const [selectedColumn, setSelectedColumn] = useState();
   const [columnDefs, setColumnDefs] = useState();
+  const [graphData, setGraphData] = useState();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,58 +46,74 @@ function ModelEvaluation() {
 
   const handleSave = async () => {
     try {
-      console.log({
-        file,
-        "Display Type": display_type,
-        "Display Result": display_result,
-        "Select Orientation": orientation,
-        Columns: selectedColumn,
-      });
-      const res = await fetch("http://127.0.0.1:8000/api/model_evaluation/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          file,
-          "Display Type": display_type,
-          "Display Result": display_result,
-          "Select Orientation": orientation,
-          Columns: selectedColumn,
-        }),
-      });
-      const data = await res.json();
-      console.log(data);
+      if (display_type === "Graph") {
+        const res = await fetch("http://127.0.0.1:8000/api/model_evaluation/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            file,
+            "Display Type": display_type,
+            "Display Result": display_result,
+            "Select Orientation": orientation,
+            Columns: selectedColumn,
+          }),
+        });
+        const data = await res.json();
+        setGraphData(JSON.parse(data));
+      } else {
+        const columnSet = new Set(selectedColumn);
+        let tempDef = [];
+        let temp =
+          columnName.length > 0
+            ? columnName.map((key) => {
+                const tempCol = key.toLowerCase();
+                if (display_result === "Test" || display_result === "Train") {
+                  if (
+                    tempCol.includes(display_result.toLowerCase()) ||
+                    key === "name"
+                  )
+                    tempDef.push({
+                      headerName: key,
+                      field: key,
+                      valueGetter: (params) => {
+                        return params.data[key];
+                      },
+                    });
+                }
+                if (display_result === "All")
+                  tempDef.push({
+                    headerName: key,
+                    field: key,
+                    valueGetter: (params) => {
+                      return params.data[key];
+                    },
+                  });
+                if (display_result === "Custom") {
+                  if (columnSet.has(key) || key === "name") {
+                    tempDef.push({
+                      headerName: key,
+                      field: key,
+                      valueGetter: (params) => {
+                        return params.data[key];
+                      },
+                    });
+                  }
+                }
+              })
+            : [];
+
+        tempDef = [
+          tempDef[tempDef.length - 1],
+          ...tempDef.slice(0, tempDef.length - 1),
+        ];
+        setColumnDefs(tempDef);
+      }
     } catch (error) {
       console.log(error);
     }
   };
-
-  // useEffect(() => {
-  //   if (display_type === "Graph" && file) {
-
-  //   } else if (columnName) {
-  //     const temp =
-  //       columnName.length > 0
-  //         ? columnName.map((key) => ({
-  //             headerName: key,
-  //             field: key,
-  //             valueGetter: (params) => {
-  //               return params.data[key];
-  //             },
-  //           }))
-  //         : [];
-
-  //     console.log(temp);
-  //   }
-  // }, [
-  //   display_type,
-  //   display_result,
-  //   file,
-  //   orientation,
-  //   selectedColumn,
-  //   columnName,
-  // ]);
 
   if (!allDatasetName) return <div>Loading...</div>;
   return (
@@ -112,7 +131,11 @@ function ModelEvaluation() {
           <SingleDropDown
             columnNames={["Graph", "Table"]}
             initValue={"Table"}
-            onValueChange={setDisplayType}
+            onValueChange={(e) => {
+              setDisplayType(e);
+              setColumnDefs();
+              setGraphData();
+            }}
           />
         </div>
         <div className="w-full">
@@ -142,7 +165,11 @@ function ModelEvaluation() {
           orientation="horizontal"
           label="Display Result"
           defaultValue={display_result}
-          onChange={(e) => setDisplayResult(e)}
+          onChange={(e) => {
+            setDisplayResult(e);
+            setColumnDefs();
+            setGraphData();
+          }}
         >
           <Radio value="All" color="success">
             All
@@ -174,6 +201,33 @@ function ModelEvaluation() {
         >
           Submit
         </button>
+      )}
+
+      {columnDefs && columnDefs.length > 0 && (
+        <div className="mt-4">
+          <div
+            className="ag-theme-alpine"
+            style={{ height: "300px", width: "100%" }}
+          >
+            <AgGridComponent
+              rowData={file}
+              columnDefs={columnDefs}
+              rowHeight={30}
+              paginationPageSize={8}
+              headerHeight={30}
+            />
+          </div>
+        </div>
+      )}
+
+      {graphData && (
+        <div className="flex justify-center mt-4">
+          <Plot
+            data={graphData?.data}
+            layout={{ ...graphData.layout, showlegend: true }}
+            config={{ scrollZoom: true, editable: true, responsive: true }}
+          />
+        </div>
       )}
     </div>
   );

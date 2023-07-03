@@ -65,6 +65,7 @@ function BuildModel({ csvData }) {
     (state) => state.modelBuilding.target_variable
   );
   const reg = useSelector((state) => state.modelBuilding.regressor);
+  const [nicherData, setNicherData] = useState();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -132,7 +133,9 @@ function BuildModel({ csvData }) {
       let tempModel = await fetchDataFromIndexedDB("models");
       tempModel.forEach((val) => {
         if (current_dataset === Object.keys(val)[0]) {
-          if (val[current_dataset]) throw new Error("Model name exist!");
+          if (val[current_dataset] && val[current_dataset][model_name]) {
+            throw new Error("Model name exist!");
+          }
         }
       });
 
@@ -142,8 +145,8 @@ function BuildModel({ csvData }) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          // test,
-          // train,
+          test,
+          train,
           target_var: target_variable,
           type,
           [type === "regressor" ? "regressor" : "classifier"]: reg,
@@ -151,6 +154,7 @@ function BuildModel({ csvData }) {
         }),
       });
       const data = await res.json();
+      setNicherData(data.metrics);
 
       let allModels = await fetchDataFromIndexedDB("models");
       const ind = allModels.findIndex((obj) => current_dataset in obj);
@@ -158,10 +162,12 @@ function BuildModel({ csvData }) {
       if (ind !== -1) {
         allModels[ind][current_dataset] = {
           ...allModels[ind][current_dataset],
-          [model_name]: data,
+          [model_name]: data.metrics_table,
         };
       } else {
-        allModels.push({ [current_dataset]: { [model_name]: data } });
+        allModels.push({
+          [current_dataset]: { [model_name]: data.metrics_table },
+        });
       }
       await updateDataInIndexedDB("models", allModels);
 
@@ -313,6 +319,11 @@ function BuildModel({ csvData }) {
           >
             Submit
           </button>
+          {nicherData && (
+            <p className="mt-4 text-xl tracking-widest">
+              {JSON.stringify(nicherData)}
+            </p>
+          )}
         </>
       )}
     </div>

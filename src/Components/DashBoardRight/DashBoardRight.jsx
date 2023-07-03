@@ -34,6 +34,7 @@ import SplitDataset from "../../Functions/Model Building/SplitDataset/SplitDatas
 import TimeSeriesAnalysis from "../../Functions/TimeSeriesAnalysis/TimeSeriesAnalysis";
 import { setFile } from "../../Slices/FeatureEngineeringSlice";
 import { fetchDataFromIndexedDB } from "../../util/indexDB";
+import ReverseML from "../../Functions/ReverseML/ReverseML";
 
 function DashBoardRight() {
   const activeFunction = useSelector((state) => state.sideBar.activeFunction);
@@ -60,7 +61,8 @@ function DashBoardRight() {
         <>
           {/* Dataset Functions */}
 
-          {csvData && activeFunction &&
+          {csvData &&
+            activeFunction &&
             (activeFunction === "Display" || activeFunction === "Dataset") && (
               <DatasetDisplay csvData={csvData} />
             )}
@@ -76,25 +78,44 @@ function DashBoardRight() {
           {csvData && activeFunction && activeFunction === "Duplicate" && (
             <DatasetDuplicates csvData={csvData} />
           )}
-          {csvData && activeFunction && activeFunction === "Group" && <DatasetGroup csvData={csvData} />}
+          {csvData && activeFunction && activeFunction === "Group" && (
+            <DatasetGroup csvData={csvData} />
+          )}
 
           {/* EDA Functions */}
 
-          {csvData && activeFunction &&
+          {csvData &&
+            activeFunction &&
             (activeFunction === "Bar Plot" || activeFunction === "EDA") && (
               <BarPlot csvData={csvData} />
             )}
-          {csvData && activeFunction && activeFunction === "Pie Plot" && <PiePlot csvData={csvData} />}
-          {csvData && activeFunction && activeFunction === "Count Plot" && <CountPlot csvData={csvData} />}
-          {csvData && activeFunction && activeFunction === "Box Plot" && <BoxPlot csvData={csvData} />}
-          {csvData && activeFunction && activeFunction === "Histogram" && <Histogram csvData={csvData} />}
-          {csvData && activeFunction && activeFunction === "Violin Plot" && <ViolinPlot csvData={csvData} />}
+          {csvData && activeFunction && activeFunction === "Pie Plot" && (
+            <PiePlot csvData={csvData} />
+          )}
+          {csvData && activeFunction && activeFunction === "Count Plot" && (
+            <CountPlot csvData={csvData} />
+          )}
+          {csvData && activeFunction && activeFunction === "Box Plot" && (
+            <BoxPlot csvData={csvData} />
+          )}
+          {csvData && activeFunction && activeFunction === "Histogram" && (
+            <Histogram csvData={csvData} />
+          )}
+          {csvData && activeFunction && activeFunction === "Violin Plot" && (
+            <ViolinPlot csvData={csvData} />
+          )}
           {csvData && activeFunction && activeFunction === "Scatter Plot" && (
             <ScatterPlot csvData={csvData} />
           )}
-          {csvData && activeFunction && activeFunction === "Reg Plot" && <RegPlot csvData={csvData} />}
-          {csvData && activeFunction && activeFunction === "Line Plot" && <LinePlot csvData={csvData} />}
-          {csvData && activeFunction && activeFunction === "Custom Plot" && <CustomPlot csvData={csvData} />}
+          {csvData && activeFunction && activeFunction === "Reg Plot" && (
+            <RegPlot csvData={csvData} />
+          )}
+          {csvData && activeFunction && activeFunction === "Line Plot" && (
+            <LinePlot csvData={csvData} />
+          )}
+          {csvData && activeFunction && activeFunction === "Custom Plot" && (
+            <CustomPlot csvData={csvData} />
+          )}
 
           {/* Feature Engineering Functions */}
 
@@ -107,9 +128,11 @@ function DashBoardRight() {
           {csvData && activeFunction && activeFunction === "Change Dtype" && (
             <ChangeDType csvData={csvData} />
           )}
-          {csvData && activeFunction && activeFunction === "Alter Field Name" && (
-            <AlterFieldName csvData={csvData} />
-          )}
+          {csvData &&
+            activeFunction &&
+            activeFunction === "Alter Field Name" && (
+              <AlterFieldName csvData={csvData} />
+            )}
           {csvData && activeFunction && activeFunction === "Encoding" && (
             <Encoding csvData={csvData} />
           )}
@@ -165,6 +188,14 @@ function DashBoardRight() {
             activeFunction &&
             activeFunction === "Time Series Analysis" && (
               <TimeSeriesAnalysis csvData={csvData} />
+            )}
+
+          {/* ReverseML */}
+
+          {csvData &&
+            activeFunction &&
+            activeFunction === "ReverseML" && (
+              <ReverseML csvData={csvData} />
             )}
         </>
       ) : (

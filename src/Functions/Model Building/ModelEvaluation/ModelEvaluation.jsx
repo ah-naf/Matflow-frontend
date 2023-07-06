@@ -1,10 +1,10 @@
 import { Checkbox, Radio } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
+import Plot from "react-plotly.js";
 import AgGridComponent from "../../../Components/AgGridComponent/AgGridComponent";
 import MultipleDropDown from "../../../Components/MultipleDropDown/MultipleDropDown";
 import SingleDropDown from "../../../Components/SingleDropDown/SingleDropDown";
 import { fetchDataFromIndexedDB } from "../../../util/indexDB";
-import Plot from "react-plotly.js";
 
 function ModelEvaluation() {
   const [display_type, setDisplayType] = useState("Table");
@@ -18,12 +18,22 @@ function ModelEvaluation() {
   const [selectedColumn, setSelectedColumn] = useState();
   const [columnDefs, setColumnDefs] = useState();
   const [graphData, setGraphData] = useState();
+  const [notFound, setNotFound] = useState(false)
 
   useEffect(() => {
     const fetchData = async () => {
       let tempDatasetName = await fetchDataFromIndexedDB("splitted_dataset");
       tempDatasetName = tempDatasetName.map((val) => Object.keys(val)[0]);
       setAllDatasetName(tempDatasetName);
+
+      let tempModels = await fetchDataFromIndexedDB("models");
+      tempModels = tempModels.map((val) => {
+        if (Object.keys(val)[0] === tempDatasetName[0]) {
+          return val[tempDatasetName[0]];
+        }
+      })[0];
+      if(!tempModels) setNotFound(true)
+      else setNotFound(false)
     };
     fetchData();
   }, []);
@@ -36,6 +46,7 @@ function ModelEvaluation() {
         return val[e];
       }
     })[0];
+
     const keys = Object.keys(tempModels);
     const temp = keys.map((val) => {
       return { ...tempModels[val], name: val };
@@ -116,6 +127,12 @@ function ModelEvaluation() {
   };
 
   if (!allDatasetName) return <div>Loading...</div>;
+  if (!allDatasetName || allDatasetName.length === 0 || notFound)
+    return (
+      <h1 className="mt-8 text-3xl font-medium tracking-wide">
+        Build Model First...
+      </h1>
+    );
   return (
     <div className="mt-8">
       <div>

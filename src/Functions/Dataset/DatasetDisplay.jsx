@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import AgGridComponent from "../../Components/AgGridComponent/AgGridComponent";
-import { fetchDataFromIndexedDB } from "../../util/indexDB";
 
 let id = 1;
 
-const DatasetDisplay = ({csvData}) => {
+const DatasetDisplay = ({ csvData }) => {
   const [value] = useState("All");
   // const [csvData, setCsvData] = useState([]);
   const [filterText] = useState("");

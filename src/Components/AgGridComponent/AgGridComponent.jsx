@@ -6,7 +6,8 @@ function AgGridComponent({
   columnDefs,
   rowHeight = 50,
   paginationPageSize = 10,
-  headerHeight=50
+  headerHeight = 50,
+  download = false,
 }) {
   const gridRef = useRef();
 
@@ -63,6 +64,14 @@ function AgGridComponent({
         >
           Auto-Size All
         </button>
+        {download && (
+          <button
+            className="rounded px-4 py-2 border-2 border-[#097045]"
+            onClick={() => gridRef.current.api.exportDataAsCsv()}
+          >
+            Download
+          </button>
+        )}
       </div>
     </>
   );

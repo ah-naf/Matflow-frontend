@@ -3,7 +3,7 @@ import { AiFillCloseCircle } from "react-icons/ai";
 import { BsFillPlayFill } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
 import { setActiveFunction } from "../../Slices/SideBarSlice";
-import { setActiveFile } from "../../Slices/UploadedFileSlice";
+import { setActiveFile, setReRender } from "../../Slices/UploadedFileSlice";
 import {
   deleteIndexedDB,
   parseCsv,
@@ -99,6 +99,7 @@ function FileTab() {
       }
       await storeDataInIndexedDB(parsedData, uploadedFile.name);
       setUploadedFile("");
+      dispatch(setReRender(!render))
     }
   };
 

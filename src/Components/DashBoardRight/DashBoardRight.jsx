@@ -31,10 +31,11 @@ import BuildModel from "../../Functions/Model Building/BuildModel/BuildModel";
 import ModelEvaluation from "../../Functions/Model Building/ModelEvaluation/ModelEvaluation";
 import ModelPrediction from "../../Functions/Model Building/ModelPrediction/ModelPrediction";
 import SplitDataset from "../../Functions/Model Building/SplitDataset/SplitDataset";
+import ReverseML from "../../Functions/ReverseML/ReverseML";
 import TimeSeriesAnalysis from "../../Functions/TimeSeriesAnalysis/TimeSeriesAnalysis";
 import { setFile } from "../../Slices/FeatureEngineeringSlice";
 import { fetchDataFromIndexedDB } from "../../util/indexDB";
-import ReverseML from "../../Functions/ReverseML/ReverseML";
+import FinalDataset from "../../Functions/FinalDataset/FinalDataset";
 
 function DashBoardRight() {
   const activeFunction = useSelector((state) => state.sideBar.activeFunction);
@@ -192,11 +193,13 @@ function DashBoardRight() {
 
           {/* ReverseML */}
 
-          {csvData &&
-            activeFunction &&
-            activeFunction === "ReverseML" && (
-              <ReverseML csvData={csvData} />
-            )}
+          {csvData && activeFunction && activeFunction === "ReverseML" && (
+            <ReverseML csvData={csvData} />
+          )}
+
+          {/* Final Dataset */}
+
+          {activeFunction && activeFunction === "Final Dataset" && <FinalDataset />}
         </>
       ) : (
         <div className="w-full h-full grid place-content-center">

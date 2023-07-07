@@ -22,6 +22,14 @@ function Models({ csvData }) {
     fetchData();
   }, []);
 
+  if (
+    !allModels ||
+    allModels.length === 0 ||
+    !allTrainDataset ||
+    allTrainDataset.length === 0
+  )
+    return <div className="mt-8 text-3xl font-medium tracking-wide">Build a model first...</div>;
+
   return (
     <div className="my-8">
       <Collapse.Group accordion bordered>

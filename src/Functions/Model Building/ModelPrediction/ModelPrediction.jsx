@@ -63,6 +63,7 @@ function ModelPrediction({ csvData }) {
     setSelectModel(e);
     let res = await fetchDataFromIndexedDB("models");
     res = res.map((val) => val[selectDataset])[0][e];
+    console.log(res);
     setModelData(res);
   };
 
@@ -75,11 +76,13 @@ function ModelPrediction({ csvData }) {
         },
         body: JSON.stringify({
           "Target Variable": target_variable,
-          model: modelData,
+          model: modelData.metrics_table,
           file: csvData,
           Result: result,
+          y_pred: modelData.y_pred,
         }),
       });
+
       const data = await res.json();
       console.log(data);
     } catch (error) {

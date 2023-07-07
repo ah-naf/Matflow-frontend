@@ -18,7 +18,7 @@ function ModelEvaluation() {
   const [selectedColumn, setSelectedColumn] = useState();
   const [columnDefs, setColumnDefs] = useState();
   const [graphData, setGraphData] = useState();
-  const [notFound, setNotFound] = useState(false)
+  const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -32,8 +32,8 @@ function ModelEvaluation() {
           return val[tempDatasetName[0]];
         }
       })[0];
-      if(!tempModels) setNotFound(true)
-      else setNotFound(false)
+      if (!tempModels) setNotFound(true);
+      else setNotFound(false);
     };
     fetchData();
   }, []);
@@ -48,9 +48,11 @@ function ModelEvaluation() {
     })[0];
 
     const keys = Object.keys(tempModels);
-    const temp = keys.map((val) => {
-      return { ...tempModels[val], name: val };
+
+    let temp = keys.map((val) => {
+      return { ...tempModels[val].metrics_table, name: val };
     });
+
     setColumnName(Object.keys(temp[0]));
     setFile(temp);
   };

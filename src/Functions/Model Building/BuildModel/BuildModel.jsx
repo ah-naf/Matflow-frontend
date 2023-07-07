@@ -103,7 +103,7 @@ function BuildModel({ csvData }) {
         dispatch(setTargetVariable(val[e][3]));
         dispatch(setHyperparameterData({}));
         dispatch(setModelSetting({}));
-        setNicherData('')
+        setNicherData("");
 
         const trainData = await fetchDataFromIndexedDB(val[e][1]);
         const testData = await fetchDataFromIndexedDB(val[e][2]);
@@ -154,6 +154,7 @@ function BuildModel({ csvData }) {
         }),
       });
       const data = await res.json();
+
       setNicherData(data.metrics);
 
       let allModels = await fetchDataFromIndexedDB("models");
@@ -162,11 +163,21 @@ function BuildModel({ csvData }) {
       if (ind !== -1) {
         allModels[ind][current_dataset] = {
           ...allModels[ind][current_dataset],
-          [model_name]: data.metrics_table,
+          [model_name]: {
+            metrics: data.metrics,
+            metrics_table: data.metrics_table,
+            y_pred: JSON.parse(data.y_pred),
+          },
         };
       } else {
         allModels.push({
-          [current_dataset]: { [model_name]: data.metrics_table },
+          [current_dataset]: {
+            [model_name]: {
+              metrics: data.metrics,
+              metrics_table: data.metrics_table,
+              y_pred: JSON.parse(data.y_pred),
+            },
+          },
         });
       }
       await updateDataInIndexedDB("models", allModels);
@@ -252,7 +263,7 @@ function BuildModel({ csvData }) {
                   dispatch(setReg(e));
                   dispatch(setHyperparameterData({}));
                   dispatch(setModelSetting({}));
-                  setNicherData('')
+                  setNicherData("");
                 }}
                 initValue={allRegressor[0]}
               />

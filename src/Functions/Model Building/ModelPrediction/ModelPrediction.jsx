@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Plot from "react-plotly.js";
 import SingleDropDown from "../../../Components/SingleDropDown/SingleDropDown";
 import { fetchDataFromIndexedDB } from "../../../util/indexDB";
 
@@ -25,6 +26,7 @@ function ModelPrediction({ csvData }) {
   const [currentModels, setCurrentModels] = useState();
   const [modelData, setModelData] = useState();
   const [result, setResult] = useState(RESULT[0]);
+  const [data, setData] = useState();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -80,15 +82,25 @@ function ModelPrediction({ csvData }) {
           file: csvData,
           Result: result,
           y_pred: modelData.y_pred,
+          type: modelData.type,
+          regressor: modelData.regressor,
         }),
       });
 
-      const data = await res.json();
-      console.log(data);
+      const Data = await res.json();
+      console.log(Data);
+      setData({
+        table: Data.table,
+        graph: JSON.parse(Data.fig),
+      });
     } catch (error) {
       console.log(error);
     }
   };
+
+  // useEffect(() => {
+  //   console.log(data);
+  // }, [data]);
 
   if (!allDataset) return <div>Loading...</div>;
   if (!allModels || allModels.length === 0)
@@ -144,6 +156,16 @@ function ModelPrediction({ csvData }) {
       >
         Show Result
       </button>
+      {data && (
+        // <h1>{JSON.stringify(data.graph)}</h1>
+        <div className="flex justify-center mt-4">
+          <Plot
+            data={data.graph.data}
+            layout={{ ...data.graph.layout, showlegend: true }}
+            config={{ scrollZoom: true, editable: true, responsive: true }}
+          />
+        </div>
+      )}
     </div>
   );
 }

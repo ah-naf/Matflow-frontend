@@ -131,6 +131,7 @@ function BuildModel({ csvData }) {
   const handleSave = async () => {
     try {
       // console.log('first')
+
       let tempModel = await fetchDataFromIndexedDB("models");
       tempModel.forEach((val) => {
         if (current_dataset === Object.keys(val)[0]) {
@@ -151,7 +152,7 @@ function BuildModel({ csvData }) {
           type,
           [type === "regressor" ? "regressor" : "classifier"]: reg,
           ...model_setting,
-          file: csvData
+          file: csvData,
         }),
       });
       const data = await res.json();
@@ -177,6 +178,8 @@ function BuildModel({ csvData }) {
               metrics: data.metrics,
               metrics_table: data.metrics_table,
               y_pred: JSON.parse(data.y_pred),
+              type,
+              regressor,
             },
           },
         });

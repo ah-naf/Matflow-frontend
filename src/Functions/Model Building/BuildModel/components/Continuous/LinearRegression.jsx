@@ -1,8 +1,12 @@
 import { Checkbox, Input } from "@nextui-org/react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import MultipleDropDown from "../../../../../Components/MultipleDropDown/MultipleDropDown";
-import { setHyperparameterData } from "../../../../../Slices/ModelBuilding";
+import NextTable from "../../../../../Components/NextTable/NextTable";
+import {
+  setHyperparameterData,
+  setModelSetting,
+} from "../../../../../Slices/ModelBuilding";
 
 const DISPLAY_METRICES = [
   "R-Squared",
@@ -21,6 +25,16 @@ function LinearRegression({ train, test }) {
     (state) => state.modelBuilding.target_variable
   );
   const dispatch = useDispatch();
+  const [hData, setHData] = useState();
+  const [optimizedData, setOptimizedData] = useState({
+    "Number of jobs": -1,
+    fit_intercept: true,
+    "Display Metrices": DISPLAY_METRICES,
+  });
+
+  useEffect(() => {
+    dispatch(setModelSetting(optimizedData));
+  }, [dispatch, optimizedData]);
 
   const handleOptimization = async () => {
     try {
@@ -42,7 +56,8 @@ function LinearRegression({ train, test }) {
         }
       );
       const data = await res.json();
-      console.log(data);
+      setHData(data);
+      setOptimizedData({ ...optimizedData, ...data.param });
     } catch (error) {
       console.log(error);
     }
@@ -54,40 +69,50 @@ function LinearRegression({ train, test }) {
         <h1 className="text-2xl font-medium tracking-wide mb-2">
           Hyperparameter Optimization Settings
         </h1>
-        <div className="flex gap-4 items-center">
-          <div className="w-full">
-            <p className="mb-1">Number of cross-validation folds</p>
-            <Input
-              onChange={(e) =>
-                dispatch(
-                  setHyperparameterData({
-                    ...hyperparameterOption,
-                    "Number of cross-validation folds": e.target.value,
-                  })
-                )
-              }
-              fullWidth
-              bordered
-              color="success"
-              type="number"
-            />
+        <div className="flex gap-8">
+          <div className="flex flex-1 flex-col gap-4 justify-center">
+            <div className="w-full">
+              <p className="mb-1">Number of cross-validation folds</p>
+              <Input
+                onChange={(e) =>
+                  dispatch(
+                    setHyperparameterData({
+                      ...hyperparameterOption,
+                      "Number of cross-validation folds": e.target.value,
+                    })
+                  )
+                }
+                fullWidth
+                bordered
+                color="success"
+                type="number"
+              />
+            </div>
+            <div className="w-full">
+              <p className="mb-1">Random state for hyperparameter search</p>
+              <Input
+                onChange={(e) =>
+                  dispatch(
+                    setHyperparameterData({
+                      ...hyperparameterOption,
+                      "Random state for hyperparameter search": e.target.value,
+                    })
+                  )
+                }
+                fullWidth
+                bordered
+                color="success"
+                type="number"
+              />
+            </div>
           </div>
-          <div className="w-full">
-            <p className="mb-1">Random state for hyperparameter search</p>
-            <Input
-              onChange={(e) =>
-                dispatch(
-                  setHyperparameterData({
-                    ...hyperparameterOption,
-                    "Random state for hyperparameter search": e.target.value,
-                  })
-                )
-              }
-              fullWidth
-              bordered
-              color="success"
-              type="number"
-            />
+          <div className="flex-1">
+            {hData && hData.result && (
+              <>
+                <p className="mb-2 font-medium tracking-wide">Best Estimator</p>
+                <NextTable rowData={hData.result} />
+              </>
+            )}
           </div>
         </div>
         <button
@@ -106,11 +131,27 @@ function LinearRegression({ train, test }) {
             fullWidth
             label="Number of jobs"
             bordered
-            value={-1}
+            value={optimizedData["Number of jobs"]}
             type="number"
             color="success"
+            onChange={(e) =>
+              setOptimizedData({
+                ...optimizedData,
+                "Number of jobs": e.target.value,
+              })
+            }
           />
-          <Checkbox defaultSelected color="success" className="w-[30%]">
+          <Checkbox
+            isSelected={optimizedData.fit_intercept}
+            onChange={(e) =>
+              setOptimizedData({
+                ...optimizedData,
+                fit_intercept: e.valueOf(),
+              })
+            }
+            color="success"
+            className="w-[30%]"
+          >
             Fit Intercept
           </Checkbox>
         </div>
@@ -118,7 +159,10 @@ function LinearRegression({ train, test }) {
           <p className="mb-2">Display Metrices</p>
           <MultipleDropDown
             columnNames={DISPLAY_METRICES}
-            defaultValue={DISPLAY_METRICES}
+            defaultValue={optimizedData["Display Metrices"]}
+            setSelectedColumns={(e) =>
+              setOptimizedData({ ...optimizedData, "Display Metrices": e })
+            }
           />
         </div>
       </div>

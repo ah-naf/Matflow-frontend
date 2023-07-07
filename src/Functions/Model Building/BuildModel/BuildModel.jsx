@@ -107,7 +107,7 @@ function BuildModel({ csvData }) {
 
         const trainData = await fetchDataFromIndexedDB(val[e][1]);
         const testData = await fetchDataFromIndexedDB(val[e][2]);
-
+        console.log({ trainData, testData });
         if (!testData || !trainData || !testData.length || !trainData.length) {
           setAllRegressor();
           toast.warn("Properly Split Dataset First.", {

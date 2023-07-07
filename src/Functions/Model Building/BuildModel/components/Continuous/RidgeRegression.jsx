@@ -1,9 +1,10 @@
 import { Checkbox, Input } from "@nextui-org/react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import MultipleDropDown from "../../../../../Components/MultipleDropDown/MultipleDropDown";
+import NextTable from "../../../../../Components/NextTable/NextTable";
 import SingleDropDown from "../../../../../Components/SingleDropDown/SingleDropDown";
-import { setHyperparameterData } from "../../../../../Slices/ModelBuilding";
+import { setHyperparameterData, setModelSetting } from "../../../../../Slices/ModelBuilding";
 
 const DISPLAY_METRICES = [
   "R-Squared",
@@ -24,6 +25,19 @@ function RidgeRegression({ train, test }) {
     (state) => state.modelBuilding.target_variable
   );
   const dispatch = useDispatch();
+  const [hData, setHData] = useState();
+  const [optimizedData, setOptimizedData] = useState({
+    fit_intercept: true,
+    "Display Metrices": DISPLAY_METRICES,
+    max_iter: 1000,
+    solver: "auto",
+    alpha: 1,
+    tol: 0,
+  });
+
+  useEffect(() => {
+    dispatch(setModelSetting(optimizedData));
+  }, [dispatch, optimizedData]);
 
   const handleOptimization = async () => {
     try {
@@ -45,7 +59,8 @@ function RidgeRegression({ train, test }) {
         }
       );
       const data = await res.json();
-      console.log(data);
+      setHData(data);
+      setOptimizedData({ ...optimizedData, ...data.param });
     } catch (error) {
       console.log(error);
     }
@@ -57,62 +72,70 @@ function RidgeRegression({ train, test }) {
         <h1 className="text-2xl font-medium tracking-wide mb-2">
           Hyperparameter Optimization Settings
         </h1>
-        <div className="grid grid-cols-2 gap-4 items-center">
-          <div className="w-full">
-            <p className="mb-1">
-              Number of iterations for hyperparameter search
-            </p>
-            <Input
-              onChange={(e) =>
-                dispatch(
-                  setHyperparameterData({
-                    ...hyperparameterOption,
-                    "Number of iterations for hyperparameter search":
-                      e.target.value,
-                  })
-                )
-              }
-              fullWidth
-              bordered
-              color="success"
-              type="number"
-            />
+        <div className="grid grid-cols-2 gap-8">
+          <div className="w-full flex flex-col justify-start gap-4 mt-2">
+            <div className="w-full">
+              <p className="mb-1">
+                Number of iterations for hyperparameter search
+              </p>
+              <Input
+                onChange={(e) =>
+                  dispatch(
+                    setHyperparameterData({
+                      ...hyperparameterOption,
+                      "Number of iterations for hyperparameter search":
+                        e.target.value,
+                    })
+                  )
+                }
+                fullWidth
+                bordered
+                color="success"
+                type="number"
+              />
+            </div>
+            <div className="w-full">
+              <p className="mb-1">Number of cross-validation folds</p>
+              <Input
+                onChange={(e) =>
+                  dispatch(
+                    setHyperparameterData({
+                      ...hyperparameterOption,
+                      "Number of cross-validation folds": e.target.value,
+                    })
+                  )
+                }
+                fullWidth
+                bordered
+                color="success"
+                type="number"
+              />
+            </div>
+            <div className="w-full">
+              <p className="mb-1">Random state for hyperparameter search</p>
+              <Input
+                onChange={(e) =>
+                  dispatch(
+                    setHyperparameterData({
+                      ...hyperparameterOption,
+                      "Random state for hyperparameter search": e.target.value,
+                    })
+                  )
+                }
+                fullWidth
+                bordered
+                color="success"
+                type="number"
+              />
+            </div>
           </div>
           <div className="w-full">
-            <p className="mb-1">Number of cross-validation folds</p>
-            <Input
-              onChange={(e) =>
-                dispatch(
-                  setHyperparameterData({
-                    ...hyperparameterOption,
-                    "Number of cross-validation folds":
-                      e.target.value,
-                  })
-                )
-              }
-              fullWidth
-              bordered
-              color="success"
-              type="number"
-            />
-          </div>
-          <div className="w-full">
-            <p className="mb-1">Random state for hyperparameter search</p>
-            <Input
-              onChange={(e) =>
-                dispatch(
-                  setHyperparameterData({
-                    ...hyperparameterOption,
-                    "Random state for hyperparameter search":
-                      e.target.value,
-                  })
-                )
-              }
-              fullWidth
-              bordered
-              color="success"
-              type="number"
-            />
+            {hData && hData.result && (
+              <>
+                <p className="mb-2 font-medium tracking-wide">Best Estimator</p>
+                <NextTable rowData={hData.result} />
+              </>
+            )}
           </div>
         </div>
         <button
@@ -133,13 +156,19 @@ function RidgeRegression({ train, test }) {
             bordered
             color="success"
             label="Alpha"
-            value={1}
+            value={optimizedData.alpha}
+            onChange={(e) =>
+              setOptimizedData({ ...optimizedData, alpha: e.target.value })
+            }
             step={0.1}
           />
           <Input
             fullWidth
             type="number"
-            value={1000}
+            value={optimizedData.max_iter}
+            onChange={(e) =>
+              setOptimizedData({ ...optimizedData, max_iter: e.target.value })
+            }
             bordered
             color="success"
             label="Max Iterations"
@@ -149,15 +178,33 @@ function RidgeRegression({ train, test }) {
             bordered
             color="success"
             type="number"
-            value={0.0}
+            value={optimizedData.tol}
+            onChange={(e) =>
+              setOptimizedData({ ...optimizedData, tol: e.target.value })
+            }
             step={0.01}
             label="Tolerance"
           />
           <div>
             <p>Solver</p>
-            <SingleDropDown columnNames={SOLVER} initValue={SOLVER[0]} />
+            <SingleDropDown
+              columnNames={SOLVER}
+              initValue={optimizedData.solver}
+              onValueChange={(e) =>
+                setOptimizedData({ ...optimizedData, solver: e })
+              }
+            />
           </div>
-          <Checkbox defaultSelected color="success">
+          <Checkbox
+            isSelected={optimizedData.fit_intercept}
+            onChange={(e) =>
+              setOptimizedData({
+                ...optimizedData,
+                fit_intercept: e.valueOf(),
+              })
+            }
+            color="success"
+          >
             Fit Intercept
           </Checkbox>
         </div>
@@ -165,7 +212,10 @@ function RidgeRegression({ train, test }) {
           <p className="mb-2">Display Metrices</p>
           <MultipleDropDown
             columnNames={DISPLAY_METRICES}
-            defaultValue={DISPLAY_METRICES}
+            defaultValue={optimizedData["Display Metrices"]}
+            setSelectedColumns={(e) =>
+              setOptimizedData({ ...optimizedData, "Display Metrices": e })
+            }
           />
         </div>
       </div>

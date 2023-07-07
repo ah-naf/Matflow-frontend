@@ -151,6 +151,7 @@ function BuildModel({ csvData }) {
           type,
           [type === "regressor" ? "regressor" : "classifier"]: reg,
           ...model_setting,
+          file: csvData
         }),
       });
       const data = await res.json();

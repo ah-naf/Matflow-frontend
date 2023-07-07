@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import Plot from "react-plotly.js";
+import { toast } from "react-toastify";
 import SingleDropDown from "../../../Components/SingleDropDown/SingleDropDown";
 import { fetchDataFromIndexedDB } from "../../../util/indexDB";
+import ShowData from "./ShowData";
 
 const RESULT = [
   "Target Value",
@@ -27,6 +28,7 @@ function ModelPrediction({ csvData }) {
   const [modelData, setModelData] = useState();
   const [result, setResult] = useState(RESULT[0]);
   const [data, setData] = useState();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -65,12 +67,17 @@ function ModelPrediction({ csvData }) {
     setSelectModel(e);
     let res = await fetchDataFromIndexedDB("models");
     res = res.map((val) => val[selectDataset])[0][e];
-    console.log(res);
+
     setModelData(res);
   };
 
   const handleSave = async () => {
     try {
+      if (result in modelData.metrics) {
+        setData(modelData.metrics[result]);
+        return;
+      }
+      setLoading(true);
       const res = await fetch("http://127.0.0.1:8000/api/model_prediction/", {
         method: "POST",
         headers: {
@@ -88,12 +95,27 @@ function ModelPrediction({ csvData }) {
       });
 
       const Data = await res.json();
-      console.log(Data);
-      setData({
-        table: Data.table,
-        graph: JSON.parse(Data.fig),
-      });
+      // console.log(Data)
+      setData(Data);
+      // if (result === "Classification Report") {
+      //   setData(Data);
+      // } else setData({ ...Data });
+      if (Data.error) {
+        toast.error(JSON.stringify(Data.error), {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
+        setData();
+      }
+      setLoading(false);
     } catch (error) {
+      setLoading(false);
       console.log(error);
     }
   };
@@ -147,23 +169,23 @@ function ModelPrediction({ csvData }) {
         <SingleDropDown
           columnNames={RESULT}
           initValue={RESULT[0]}
-          onValueChange={setResult}
+          onValueChange={(e) => {
+            setResult(e);
+            setData();
+          }}
         />
       </div>
       <button
         className="self-start border-2 px-6 tracking-wider bg-primary-btn text-white font-medium rounded-md py-2 mt-8"
         onClick={handleSave}
+        disabled={loading}
       >
         Show Result
       </button>
       {data && (
         // <h1>{JSON.stringify(data.graph)}</h1>
-        <div className="flex justify-center mt-4">
-          <Plot
-            data={data.graph.data}
-            layout={{ ...data.graph.layout, showlegend: true }}
-            config={{ scrollZoom: true, editable: true, responsive: true }}
-          />
+        <div className="mt-4">
+          <ShowData data={data} result={result} />
         </div>
       )}
     </div>

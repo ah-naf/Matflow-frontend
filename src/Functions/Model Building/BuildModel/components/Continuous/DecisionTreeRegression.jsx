@@ -1,4 +1,4 @@
-import { Checkbox, Input } from "@nextui-org/react";
+import { Checkbox, Input, Loading } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import MultipleDropDown from "../../../../../Components/MultipleDropDown/MultipleDropDown";
@@ -36,6 +36,7 @@ function DecisionTreeRegression({ train, test }) {
     random_state: 0,
     criterion: "mse",
   });
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     dispatch(setModelSetting(optimizedData));
@@ -43,6 +44,7 @@ function DecisionTreeRegression({ train, test }) {
 
   const handleOptimization = async () => {
     try {
+      setLoading(true);
       const res = await fetch(
         "http://127.0.0.1:8000/api/hyperparameter_optimization/",
         {
@@ -66,6 +68,7 @@ function DecisionTreeRegression({ train, test }) {
     } catch (error) {
       console.log(error);
     }
+    setLoading(false);
   };
 
   return (
@@ -138,11 +141,19 @@ function DecisionTreeRegression({ train, test }) {
                 <NextTable rowData={hData.result} />
               </>
             )}
+            {loading && (
+              <div className="grid place-content-center h-full">
+                <Loading size="lg" color={"success"}>
+                  Fetching Data...
+                </Loading>
+              </div>
+            )}
           </div>
         </div>
         <button
           className="self-start border-2 px-4 tracking-wider border-primary-btn text-black font-medium text-sm rounded-md py-2 mt-6"
           onClick={handleOptimization}
+          disabled={loading}
         >
           Run Optimization
         </button>

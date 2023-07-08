@@ -46,27 +46,33 @@ function ModelPrediction({ csvData }) {
 
   const handleSelectDataset = async (e) => {
     setSelectDataset(e);
-    const temp = allModels.map((val) => {
+    let temp = allModels.map((val) => {
       if (Object.keys(val)[0] === e) {
         return val[e];
       }
-    })[0];
+    });
+    temp = temp.filter((val) => val !== undefined && val !== null)[0];
     setCurrentModels(Object.keys(temp));
     let tempDatasets = await fetchDataFromIndexedDB("splitted_dataset");
     tempDatasets = tempDatasets.map((val) => {
       if (Object.keys(val)[0] === e) {
         return val[e];
       }
-    })[0];
+    });
+    tempDatasets = tempDatasets.filter(
+      (val) => val !== undefined && val !== null
+    )[0];
     setSelectData(tempDatasets[4]);
-    // console.log(tempDatasets)
+    console.log(tempDatasets);
     setTargetVariable(tempDatasets[3]);
   };
 
   const handleModelChange = async (e) => {
     setSelectModel(e);
     let res = await fetchDataFromIndexedDB("models");
-    res = res.map((val) => val[selectDataset])[0][e];
+
+    res = res.map((val) => val[selectDataset]);
+    res = res.filter((val) => val !== undefined && val !== null)[0][e];
 
     setModelData(res);
   };
@@ -160,6 +166,7 @@ function ModelPrediction({ csvData }) {
           <p>Target Variable</p>
           <SingleDropDown
             columnNames={target_variable ? [target_variable] : []}
+            initValue={target_variable}
             onValueChange={setTargetVariable}
           />
         </div>

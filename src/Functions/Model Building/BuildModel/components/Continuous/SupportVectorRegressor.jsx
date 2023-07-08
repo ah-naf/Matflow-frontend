@@ -1,4 +1,4 @@
-import { Input } from "@nextui-org/react";
+import { Input, Loading } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import MultipleDropDown from "../../../../../Components/MultipleDropDown/MultipleDropDown";
@@ -35,6 +35,7 @@ function SupportVectorRegressor({ train, test }) {
     epsilon: 0.1,
     kernel: "linear",
   });
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     dispatch(setModelSetting(optimizedData));
@@ -42,6 +43,7 @@ function SupportVectorRegressor({ train, test }) {
 
   const handleOptimization = async () => {
     try {
+      setLoading(true)
       const res = await fetch(
         "http://127.0.0.1:8000/api/hyperparameter_optimization/",
         {
@@ -67,6 +69,7 @@ function SupportVectorRegressor({ train, test }) {
     } catch (error) {
       console.log(error);
     }
+    setLoading(false)
   };
 
   return (
@@ -102,11 +105,19 @@ function SupportVectorRegressor({ train, test }) {
                 <NextTable rowData={hData.result} />
               </>
             )}
+            {loading && (
+              <div className="grid place-content-center h-full">
+                <Loading size="lg" color={"success"}>
+                  Fetching Data...
+                </Loading>
+              </div>
+            )}
           </div>
         </div>
         <button
           className="self-start border-2 px-4 tracking-wider border-primary-btn text-black font-medium text-sm rounded-md py-2 mt-6"
           onClick={handleOptimization}
+          disabled={loading}
         >
           Run Optimization
         </button>

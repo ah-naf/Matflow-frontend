@@ -47,7 +47,7 @@ function DecisionTreeClassification({ train, test }) {
             test,
             [type === "regressor" ? "regressor" : "classifier"]: regressor,
             type,
-            target_variable,
+            target_var: target_variable,
             ...hyperparameterOption,
           }),
         }

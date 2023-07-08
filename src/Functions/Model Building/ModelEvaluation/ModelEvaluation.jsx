@@ -39,14 +39,20 @@ function ModelEvaluation() {
   }, []);
 
   const handleChangeDataset = async (e) => {
+    setColumnDefs()
     setTestDataset(e);
     let tempModels = await fetchDataFromIndexedDB("models");
+    // console.log(tempModels)
     tempModels = tempModels.map((val) => {
       if (Object.keys(val)[0] === e) {
         return val[e];
       }
-    })[0];
-
+    });
+    // console.log(tempModels)
+    tempModels = tempModels.filter(
+      (val) => val !== undefined && val !== null
+    )[0];
+    // console.log(tempModels)
     const keys = Object.keys(tempModels);
 
     let temp = keys.map((val) => {

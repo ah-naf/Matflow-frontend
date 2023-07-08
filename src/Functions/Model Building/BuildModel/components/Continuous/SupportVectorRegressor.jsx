@@ -1,9 +1,13 @@
 import { Input } from "@nextui-org/react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import MultipleDropDown from "../../../../../Components/MultipleDropDown/MultipleDropDown";
+import NextTable from "../../../../../Components/NextTable/NextTable";
 import SingleDropDown from "../../../../../Components/SingleDropDown/SingleDropDown";
-import { setHyperparameterData } from "../../../../../Slices/ModelBuilding";
+import {
+  setHyperparameterData,
+  setModelSetting,
+} from "../../../../../Slices/ModelBuilding";
 
 const DISPLAY_METRICES = [
   "R-Squared",
@@ -24,6 +28,17 @@ function SupportVectorRegressor({ train, test }) {
     (state) => state.modelBuilding.target_variable
   );
   const dispatch = useDispatch();
+  const [hData, setHData] = useState();
+  const [optimizedData, setOptimizedData] = useState({
+    "Display Metrices": DISPLAY_METRICES,
+    C: 1,
+    epsilon: 0.1,
+    kernel: "linear",
+  });
+
+  useEffect(() => {
+    dispatch(setModelSetting(optimizedData));
+  }, [dispatch, optimizedData]);
 
   const handleOptimization = async () => {
     try {
@@ -44,8 +59,11 @@ function SupportVectorRegressor({ train, test }) {
           }),
         }
       );
+
       const data = await res.json();
       console.log(data);
+      setHData(data);
+      setOptimizedData({ ...optimizedData, ...data.param });
     } catch (error) {
       console.log(error);
     }
@@ -57,23 +75,33 @@ function SupportVectorRegressor({ train, test }) {
         <h1 className="text-2xl font-medium tracking-wide mb-2">
           Hyperparameter Optimization Settings
         </h1>
-        <div className="grid grid-cols-2 gap-4 items-center">
+        <div className="grid grid-cols-2 gap-8">
+          <div className="w-full flex flex-col justify-start gap-4 mt-2">
+            <div className="w-full">
+              <p className="mb-1">Number of cross-validation folds</p>
+              <Input
+                onChange={(e) =>
+                  dispatch(
+                    setHyperparameterData({
+                      ...hyperparameterOption,
+                      "Number of cross-validation folds": e.target.value,
+                    })
+                  )
+                }
+                fullWidth
+                bordered
+                color="success"
+                type="number"
+              />
+            </div>
+          </div>
           <div className="w-full">
-            <p className="mb-1">Number of cross-validation folds</p>
-            <Input
-              onChange={(e) =>
-                dispatch(
-                  setHyperparameterData({
-                    ...hyperparameterOption,
-                    "Number of cross-validation folds": e.target.value,
-                  })
-                )
-              }
-              fullWidth
-              bordered
-              color="success"
-              type="number"
-            />
+            {hData && hData.result && (
+              <>
+                <p className="mb-2 font-medium tracking-wide">Best Estimator</p>
+                <NextTable rowData={hData.result} />
+              </>
+            )}
           </div>
         </div>
         <button
@@ -94,13 +122,19 @@ function SupportVectorRegressor({ train, test }) {
             bordered
             color="success"
             label="C"
-            value={1}
+            value={optimizedData.C}
+            onChange={(e) =>
+              setOptimizedData({ ...optimizedData, C: e.target.value })
+            }
             step={0.1}
           />
           <Input
             fullWidth
             type="number"
-            value={0.1}
+            value={optimizedData.epsilon}
+            onChange={(e) =>
+              setOptimizedData({ ...optimizedData, epsilon: e.target.value })
+            }
             step={0.01}
             bordered
             color="success"
@@ -109,14 +143,23 @@ function SupportVectorRegressor({ train, test }) {
 
           <div>
             <p>Kernel</p>
-            <SingleDropDown columnNames={KERNEL} initValue={KERNEL[0]} />
+            <SingleDropDown
+              columnNames={KERNEL}
+              initValue={optimizedData.kernel}
+              onValueChange={(e) =>
+                setOptimizedData({ ...optimizedData, kernel: e })
+              }
+            />
           </div>
         </div>
         <div className="mt-4">
           <p className="mb-2">Display Metrices</p>
           <MultipleDropDown
             columnNames={DISPLAY_METRICES}
-            defaultValue={DISPLAY_METRICES}
+            defaultValue={optimizedData["Display Metrices"]}
+            setSelectedColumns={(e) =>
+              setOptimizedData({ ...optimizedData, "Display Metrices": e })
+            }
           />
         </div>
       </div>

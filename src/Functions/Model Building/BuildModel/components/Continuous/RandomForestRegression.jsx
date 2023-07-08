@@ -1,11 +1,15 @@
 import styled from "@emotion/styled";
 import { Slider, Stack } from "@mui/material";
 import { Input } from "@nextui-org/react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import MultipleDropDown from "../../../../../Components/MultipleDropDown/MultipleDropDown";
+import NextTable from "../../../../../Components/NextTable/NextTable";
 import SingleDropDown from "../../../../../Components/SingleDropDown/SingleDropDown";
-import { setHyperparameterData } from "../../../../../Slices/ModelBuilding";
+import {
+  setHyperparameterData,
+  setModelSetting,
+} from "../../../../../Slices/ModelBuilding";
 
 const DISPLAY_METRICES = [
   "R-Squared",
@@ -33,6 +37,19 @@ function RandomForestRegression({ train, test }) {
     (state) => state.modelBuilding.target_variable
   );
   const dispatch = useDispatch();
+  const [hData, setHData] = useState();
+  const [optimizedData, setOptimizedData] = useState({
+    min_samples_leaf: 1,
+    min_samples_split: 2,
+    "Display Metrices": DISPLAY_METRICES,
+    max_features: "sqrt",
+    max_depth: 0,
+    criterion: "friedman_mse",
+  });
+
+  useEffect(() => {
+    dispatch(setModelSetting(optimizedData));
+  }, [dispatch, optimizedData]);
 
   const handleOptimization = async () => {
     try {
@@ -55,6 +72,8 @@ function RandomForestRegression({ train, test }) {
       );
       const data = await res.json();
       console.log(data);
+      setHData(data);
+      setOptimizedData({ ...optimizedData, ...data.param });
     } catch (error) {
       console.log(error);
     }
@@ -66,60 +85,70 @@ function RandomForestRegression({ train, test }) {
         <h1 className="text-2xl font-medium tracking-wide mb-2">
           Hyperparameter Optimization Settings
         </h1>
-        <div className="grid grid-cols-2 gap-4 items-center">
-          <div className="w-full">
-            <p className="mb-1">
-              Number of iterations for hyperparameter search
-            </p>
-            <Input
-              onChange={(e) =>
-                dispatch(
-                  setHyperparameterData({
-                    ...hyperparameterOption,
-                    "Number of iterations for hyperparameter search":
-                      e.target.value,
-                  })
-                )
-              }
-              fullWidth
-              bordered
-              color="success"
-              type="number"
-            />
+        <div className="grid grid-cols-2 gap-8">
+          <div className="w-full flex flex-col justify-start gap-4 mt-2">
+            <div className="w-full">
+              <p className="mb-1">
+                Number of iterations for hyperparameter search
+              </p>
+              <Input
+                onChange={(e) =>
+                  dispatch(
+                    setHyperparameterData({
+                      ...hyperparameterOption,
+                      "Number of iterations for hyperparameter search":
+                        e.target.value,
+                    })
+                  )
+                }
+                fullWidth
+                bordered
+                color="success"
+                type="number"
+              />
+            </div>
+            <div className="w-full">
+              <p className="mb-1">Number of cross-validation folds</p>
+              <Input
+                onChange={(e) =>
+                  dispatch(
+                    setHyperparameterData({
+                      ...hyperparameterOption,
+                      "Number of cross-validation folds": e.target.value,
+                    })
+                  )
+                }
+                fullWidth
+                bordered
+                color="success"
+                type="number"
+              />
+            </div>
+            <div className="w-full">
+              <p className="mb-1">Random state for hyperparameter search</p>
+              <Input
+                onChange={(e) =>
+                  dispatch(
+                    setHyperparameterData({
+                      ...hyperparameterOption,
+                      "Random state for hyperparameter search": e.target.value,
+                    })
+                  )
+                }
+                fullWidth
+                bordered
+                color="success"
+                type="number"
+              />
+            </div>
           </div>
           <div className="w-full">
-            <p className="mb-1">Number of cross-validation folds</p>
-            <Input
-              onChange={(e) =>
-                dispatch(
-                  setHyperparameterData({
-                    ...hyperparameterOption,
-                    "Number of cross-validation folds": e.target.value,
-                  })
-                )
-              }
-              fullWidth
-              bordered
-              color="success"
-              type="number"
-            />
-          </div>
-          <div className="w-full">
-            <p className="mb-1">Random state for hyperparameter search</p>
-            <Input
-              onChange={(e) =>
-                dispatch(
-                  setHyperparameterData({
-                    ...hyperparameterOption,
-                    "Random state for hyperparameter search": e.target.value,
-                  })
-                )
-              }
-              fullWidth
-              bordered
-              color="success"
-              type="number"
-            />
+            {hData && hData.result && (
+              <>
+                <p className="mb-2 font-medium tracking-wide">Best Estimator</p>
+                <NextTable rowData={hData.result} />
+              </>
+            )}
           </div>
         </div>
         <button
@@ -136,13 +165,22 @@ function RandomForestRegression({ train, test }) {
         <div className="grid grid-cols-3 gap-8">
           <div>
             <p>Criterion</p>
-            <SingleDropDown columnNames={CRITERION} initValue={CRITERION[0]} />
+            <SingleDropDown
+              columnNames={CRITERION}
+              initValue={optimizedData.criterion}
+              onValueChange={(e) =>
+                setOptimizedData({ ...optimizedData, criterion: e })
+              }
+            />
           </div>
           <div>
             <p>Max Features</p>
             <SingleDropDown
               columnNames={MAX_FEATURE}
-              initValue={MAX_FEATURE[0]}
+              initValue={optimizedData.max_features}
+              onValueChange={(e) =>
+                setOptimizedData({ ...optimizedData, max_features: e })
+              }
             />
           </div>
         </div>
@@ -161,7 +199,13 @@ function RandomForestRegression({ train, test }) {
                 min={2}
                 max={10}
                 step={1}
-                defaultValue={2}
+                value={optimizedData.min_samples_split}
+                onChange={(e, v) =>
+                  setOptimizedData({
+                    ...optimizedData,
+                    min_samples_split: v,
+                  })
+                }
                 valueLabelDisplay="on"
                 color="primary"
               />
@@ -182,7 +226,13 @@ function RandomForestRegression({ train, test }) {
                 min={1}
                 max={100}
                 step={1}
-                defaultValue={1}
+                value={optimizedData.max_depth}
+                onChange={(e, v) =>
+                  setOptimizedData({
+                    ...optimizedData,
+                    max_depth: v,
+                  })
+                }
                 valueLabelDisplay="on"
                 color="primary"
               />
@@ -203,7 +253,13 @@ function RandomForestRegression({ train, test }) {
                 min={1}
                 max={10}
                 step={1}
-                defaultValue={1}
+                value={optimizedData.min_samples_leaf}
+                onChange={(e, v) =>
+                  setOptimizedData({
+                    ...optimizedData,
+                    min_samples_leaf: v,
+                  })
+                }
                 valueLabelDisplay="on"
                 color="primary"
               />
@@ -215,7 +271,10 @@ function RandomForestRegression({ train, test }) {
           <p className="mb-2">Display Metrices</p>
           <MultipleDropDown
             columnNames={DISPLAY_METRICES}
-            defaultValue={DISPLAY_METRICES}
+            defaultValue={optimizedData["Display Metrices"]}
+            setSelectedColumns={(e) =>
+              setOptimizedData({ ...optimizedData, "Display Metrices": e })
+            }
           />
         </div>
       </div>

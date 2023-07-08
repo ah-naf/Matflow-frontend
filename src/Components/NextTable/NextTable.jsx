@@ -5,7 +5,7 @@ function NextTable({ rowData }) {
   
   const columnName = Object.keys(rowData[0]);
   return (
-    <Table shadow={false} lined striped>
+    <Table shadow={false} lined striped compact>
       <Table.Header>
         {columnName.map((val, ind) => (
           <Table.Column key={ind}>{val}</Table.Column>

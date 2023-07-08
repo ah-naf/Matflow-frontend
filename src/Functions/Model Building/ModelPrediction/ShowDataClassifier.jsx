@@ -2,7 +2,7 @@ import React from "react";
 import Plot from "react-plotly.js";
 import AgGridComponent from "../../../Components/AgGridComponent/AgGridComponent";
 
-function ShowData({ data, result }) {
+function ShowDataClassifier({ data, result }) {
   if (
     result === "Confusion Matrix" ||
     result === "Actual vs. Predicted" ||
@@ -69,4 +69,4 @@ function ShowData({ data, result }) {
   return <div></div>;
 }
 
-export default ShowData;
+export default ShowDataClassifier;

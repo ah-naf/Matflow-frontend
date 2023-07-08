@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import SingleDropDown from "../../../Components/SingleDropDown/SingleDropDown";
 import { fetchDataFromIndexedDB } from "../../../util/indexDB";
-import ShowData from "./ShowData";
+import ShowDataClassifier from "./ShowDataClassifier";
+import ShowDataRegressor from "./ShowDataRegressor";
 
-const RESULT = [
+const RESULT_CLASSIFIER = [
   "Target Value",
   "Accuracy",
   "Precision",
@@ -17,6 +18,20 @@ const RESULT = [
   "ROC Curve",
 ];
 
+const RESULT_REGRESSOR = [
+  "Target Value",
+  "R-Squared",
+  "Mean Absolute Error",
+  "Mean Squared Error",
+  "Root Mean Squared Error",
+  "Regression Line Plot",
+  "Actual vs. Predicted",
+  "Residuals vs. Predicted",
+  "Histogram of Residuals",
+  "QQ Plot",
+  "Box Plot of Residuals",
+];
+
 function ModelPrediction({ csvData }) {
   const [selectDataset, setSelectDataset] = useState();
   const [allDataset, setAllDataset] = useState();
@@ -26,9 +41,10 @@ function ModelPrediction({ csvData }) {
   const [select_model, setSelectModel] = useState();
   const [currentModels, setCurrentModels] = useState();
   const [modelData, setModelData] = useState();
-  const [result, setResult] = useState(RESULT[0]);
+  const [result, setResult] = useState();
   const [data, setData] = useState();
   const [loading, setLoading] = useState(false);
+  const [type, setType] = useState();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,6 +59,11 @@ function ModelPrediction({ csvData }) {
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (type === "Categorical") setResult(RESULT_CLASSIFIER[0]);
+    else setResult(RESULT_REGRESSOR[0]);
+  }, [type]);
 
   const handleSelectDataset = async (e) => {
     setSelectDataset(e);
@@ -62,8 +83,8 @@ function ModelPrediction({ csvData }) {
     tempDatasets = tempDatasets.filter(
       (val) => val !== undefined && val !== null
     )[0];
+    setType(tempDatasets[0]);
     setSelectData(tempDatasets[4]);
-    console.log(tempDatasets);
     setTargetVariable(tempDatasets[3]);
   };
 
@@ -84,6 +105,7 @@ function ModelPrediction({ csvData }) {
         return;
       }
       setLoading(true);
+      const tempCsv = await fetchDataFromIndexedDB(select_data);
       const res = await fetch("http://127.0.0.1:8000/api/model_prediction/", {
         method: "POST",
         headers: {
@@ -92,7 +114,7 @@ function ModelPrediction({ csvData }) {
         body: JSON.stringify({
           "Target Variable": target_variable,
           model: modelData.metrics_table,
-          file: csvData,
+          file: tempCsv,
           Result: result,
           y_pred: modelData.y_pred,
           type: modelData.type,
@@ -101,11 +123,9 @@ function ModelPrediction({ csvData }) {
       });
 
       const Data = await res.json();
-      // console.log(Data)
+      console.log(Data)
       setData(Data);
-      // if (result === "Classification Report") {
-      //   setData(Data);
-      // } else setData({ ...Data });
+      
       if (Data.error) {
         toast.error(JSON.stringify(Data.error), {
           position: "bottom-right",
@@ -174,8 +194,10 @@ function ModelPrediction({ csvData }) {
       <div className="mt-4">
         <p>Result</p>
         <SingleDropDown
-          columnNames={RESULT}
-          initValue={RESULT[0]}
+          columnNames={
+            type === "Categorical" ? RESULT_CLASSIFIER : RESULT_REGRESSOR
+          }
+          initValue={result}
           onValueChange={(e) => {
             setResult(e);
             setData();
@@ -189,12 +211,16 @@ function ModelPrediction({ csvData }) {
       >
         Show Result
       </button>
-      {data && (
-        // <h1>{JSON.stringify(data.graph)}</h1>
-        <div className="mt-4">
-          <ShowData data={data} result={result} />
-        </div>
-      )}
+      {data &&
+        (type === "Categorical" ? (
+          <div className="mt-4">
+            <ShowDataClassifier data={data} result={result} />
+          </div>
+        ) : (
+          <div className="mt-4">
+            <ShowDataRegressor data={data} result={result} />
+          </div>
+        ))}
     </div>
   );
 }

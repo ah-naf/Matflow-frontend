@@ -59,7 +59,7 @@ function LogisticRegression({ train, test }) {
       );
       const data = await res.json();
       console.log(data);
-      setHData(data);
+      setHData({ ...data, result: JSON.parse(data.result) });
       setOptimizedData({ ...optimizedData, ...data.param });
     } catch (error) {
       console.error(error);

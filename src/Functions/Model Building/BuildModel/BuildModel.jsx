@@ -169,6 +169,8 @@ function BuildModel({ csvData }) {
             metrics: data.metrics,
             metrics_table: data.metrics_table,
             y_pred: JSON.parse(data.y_pred),
+            type,
+            regressor,
           },
         };
       } else {

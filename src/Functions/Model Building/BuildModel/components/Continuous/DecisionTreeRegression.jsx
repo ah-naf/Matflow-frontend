@@ -16,7 +16,12 @@ const DISPLAY_METRICES = [
   "Root Mean Squared Error",
 ];
 
-const CRITERION = ["mse", "friedman_mse", "mae"];
+const CRITERION = [
+  "absolute_error",
+  "friedman_mse",
+  "poisson",
+  "squared_error",
+];
 
 function DecisionTreeRegression({ train, test }) {
   const hyperparameterOption = useSelector(
@@ -64,7 +69,7 @@ function DecisionTreeRegression({ train, test }) {
         }
       );
       const data = await res.json();
-      console.log(data)
+      console.log(data);
       setHData(data);
       setOptimizedData({ ...optimizedData, ...data.param });
     } catch (error) {

@@ -19,6 +19,7 @@ function ModelEvaluation() {
   const [columnDefs, setColumnDefs] = useState();
   const [graphData, setGraphData] = useState();
   const [notFound, setNotFound] = useState(false);
+  const [allModelName, setAllModelName] = useState();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -39,7 +40,7 @@ function ModelEvaluation() {
   }, []);
 
   const handleChangeDataset = async (e) => {
-    setColumnDefs()
+    setColumnDefs();
     setTestDataset(e);
     let tempModels = await fetchDataFromIndexedDB("models");
     // console.log(tempModels)
@@ -58,7 +59,7 @@ function ModelEvaluation() {
     let temp = keys.map((val) => {
       return { ...tempModels[val].metrics_table, name: val };
     });
-
+    setAllModelName(temp.map((val) => val.name));
     setColumnName(Object.keys(temp[0]));
     setFile(temp);
   };
@@ -230,6 +231,10 @@ function ModelEvaluation() {
 
       {columnDefs && columnDefs.length > 0 && (
         <div className="mt-4">
+          <div className="mb-4">
+            <p className="tracking-wide">Filter Model</p>
+            <MultipleDropDown columnNames={allModelName} />
+          </div>
           <div
             className="ag-theme-alpine"
             style={{ height: "300px", width: "100%" }}

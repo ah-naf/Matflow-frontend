@@ -167,6 +167,7 @@ function Cluster({ csvData }) {
                   <AgGridComponent
                     rowData={graphTableData.table}
                     columnDefs={columnDefs}
+                    download={true}
                   />
                 </div>
               )}

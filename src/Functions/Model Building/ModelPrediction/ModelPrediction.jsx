@@ -66,6 +66,7 @@ function ModelPrediction({ csvData }) {
   }, [type]);
 
   const handleSelectDataset = async (e) => {
+    setData();
     setSelectDataset(e);
     let temp = allModels.map((val) => {
       if (Object.keys(val)[0] === e) {
@@ -89,16 +90,26 @@ function ModelPrediction({ csvData }) {
   };
 
   const handleModelChange = async (e) => {
+    setData();
     setSelectModel(e);
     let res = await fetchDataFromIndexedDB("models");
 
     res = res.map((val) => val[selectDataset]);
     res = res.filter((val) => val !== undefined && val !== null)[0][e];
-
+    console.log(res)
     setModelData(res);
   };
 
   const handleSave = async () => {
+    console.log({
+      "Target Variable": target_variable,
+      model: modelData.metrics_table,
+      // file: tempCsv,
+      Result: result,
+      y_pred: modelData.y_pred,
+      type: modelData.type,
+      regressor: modelData.regressor,
+    });
     try {
       if (result in modelData.metrics) {
         setData(modelData.metrics[result]);
@@ -123,9 +134,9 @@ function ModelPrediction({ csvData }) {
       });
 
       const Data = await res.json();
-      console.log(Data)
+      console.log(Data);
       setData(Data);
-      
+
       if (Data.error) {
         toast.error(JSON.stringify(Data.error), {
           position: "bottom-right",

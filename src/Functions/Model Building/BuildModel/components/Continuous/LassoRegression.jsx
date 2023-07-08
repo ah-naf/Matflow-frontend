@@ -28,7 +28,6 @@ function LassoRegression({ train, test }) {
     (state) => state.modelBuilding.target_variable
   );
   const dispatch = useDispatch();
-  const [hData, setHData] = useState();
   const [optimizedData, setOptimizedData] = useState({
     warm_start: true,
     fit_intercept: true,
@@ -38,6 +37,7 @@ function LassoRegression({ train, test }) {
     tol: 0,
     selection: "cyclic",
   });
+  const [hData, setHData] = useState();
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {

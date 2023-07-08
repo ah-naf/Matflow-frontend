@@ -35,6 +35,7 @@ function DecisionTreeRegression({ train, test }) {
     "Display Metrices": DISPLAY_METRICES,
     random_state: 0,
     criterion: "mse",
+    none: true,
   });
   const [loading, setLoading] = useState(false);
 
@@ -63,6 +64,7 @@ function DecisionTreeRegression({ train, test }) {
         }
       );
       const data = await res.json();
+      console.log(data)
       setHData(data);
       setOptimizedData({ ...optimizedData, ...data.param });
     } catch (error) {
@@ -217,7 +219,16 @@ function DecisionTreeRegression({ train, test }) {
               }
             />
           </div>
-          <Checkbox defaultSelected color="success">
+          <Checkbox
+            isSelected={optimizedData.none}
+            onChange={(e) =>
+              setOptimizedData({
+                ...optimizedData,
+                none: e.valueOf(),
+              })
+            }
+            color="success"
+          >
             None
           </Checkbox>
         </div>

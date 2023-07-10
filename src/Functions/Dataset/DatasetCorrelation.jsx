@@ -8,7 +8,7 @@ import ApexChart from "../../Components/ApexChart/ApexChat";
 import FeaturePair from "../../Components/FeaturePair/FeaturePair";
 import { fetchDataFromIndexedDB } from "../../util/indexDB";
 
-function DatasetCorrelation({csvData}) {
+function DatasetCorrelation({ csvData }) {
   const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
   const [columnDefs, setColumnDefs] = useState([]);
   const [rowData, setRowData] = useState([]);
@@ -18,7 +18,6 @@ function DatasetCorrelation({csvData}) {
   const [relationMethod, setRelationMethod] = useState("pearson");
   const [displayType, setDisplayType] = useState("table");
   const [colWithInd, setColWithInd] = useState({});
-  const render = useSelector((state) => state.uploadedFile.rerender);
   const [searchValue, setSearchValue] = useState("");
   const [columnNames, setColumnNames] = useState([]);
   const [selectedColumns, setSelectedColumns] = useState([]);
@@ -216,6 +215,28 @@ function DatasetCorrelation({csvData}) {
     setRowData(tempData);
     setColumnDefs(tempColDef);
   }, [selectedColumns]);
+
+  useEffect(() => {
+    if (displayType === "heatmap") {
+      const fetchData = async () => {
+        const res = await fetch(
+          "http://127.0.0.1:8000/api/display_correlation_heatmap/",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              file: rowData,
+            }),
+          }
+        );
+        const data = await res.json();
+        console.log(data);
+      };
+      fetchData();
+    }
+  }, [rowData, displayType]);
 
   const handleColumnToggle = (column) => {
     if (selectedColumns.includes(column)) {

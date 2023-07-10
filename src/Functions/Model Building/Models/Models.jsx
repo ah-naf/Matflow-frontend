@@ -1,11 +1,15 @@
 import { Collapse } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
 import { AiOutlineDelete, AiOutlineDownload } from "react-icons/ai";
-import { fetchDataFromIndexedDB } from "../../../util/indexDB";
+import {
+  fetchDataFromIndexedDB,
+  updateDataInIndexedDB,
+} from "../../../util/indexDB";
 
 function Models({ csvData }) {
   const [allTrainDataset, setAllTrainDataset] = useState();
   const [allModels, setAllModels] = useState();
+  const [render, setRender] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -20,7 +24,33 @@ function Models({ csvData }) {
     };
 
     fetchData();
-  }, []);
+  }, [render]);
+
+  const handleDelete = async (datasetName, modelName) => {
+    let allModels = await fetchDataFromIndexedDB("models");
+    const ind = allModels.findIndex((obj) => datasetName in obj);
+    if (ind !== -1) {
+      if (
+        Object.keys(allModels[ind][datasetName]).length > 0 &&
+        allModels[ind][datasetName]
+      ) {
+        if (allModels[ind][datasetName][modelName])
+          delete allModels[ind][datasetName][modelName];
+        if (
+          !(
+            Object.keys(allModels[ind][datasetName]).length > 0 &&
+            allModels[ind][datasetName]
+          )
+        ) {
+          allModels = allModels.filter((val, i) => i !== ind);
+        }
+      } else {
+        allModels = allModels.filter((val, i) => i !== ind);
+      }
+    }
+    await updateDataInIndexedDB("models", allModels);
+    setRender(!render);
+  };
 
   if (
     !allModels ||
@@ -28,7 +58,11 @@ function Models({ csvData }) {
     !allTrainDataset ||
     allTrainDataset.length === 0
   )
-    return <div className="mt-8 text-3xl font-medium tracking-wide">Build a model first...</div>;
+    return (
+      <div className="mt-8 text-3xl font-medium tracking-wide">
+        Build a model first...
+      </div>
+    );
 
   return (
     <div className="my-8">
@@ -53,7 +87,10 @@ function Models({ csvData }) {
                         <AiOutlineDownload />
                       </span>{" "}
                     </button>
-                    <button className="border w-32 justify-self-center  flex items-center justify-center py-2 bg-red-500 rounded text-white font-medium tracking-wider text-sm">
+                    <button
+                      className="border w-32 justify-self-center  flex items-center justify-center py-2 bg-red-500 rounded text-white font-medium tracking-wider text-sm"
+                      onClick={() => handleDelete(val, d)}
+                    >
                       Delete{" "}
                       <span className="ml-2">
                         {" "}

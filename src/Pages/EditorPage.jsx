@@ -1,22 +1,29 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import ReactFlow, { Controls, Background, useNodesState, ReactFlowProvider, useEdgesState, addEdge } from 'reactflow';
-import 'reactflow/dist/style.css';
-import Sidebar from '../Components/Sidebar/Sidebar';
-import UploadFile from '../Components/UploadFile/UploadFile';
-import ChartNode from '../Components/ChartNode/ChartNode';
-import { useDispatch, useSelector } from 'react-redux';
-import { removeImage } from '../Slices/ChartSlices';
+import { useCallback, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import ReactFlow, {
+  Background,
+  Controls,
+  ReactFlowProvider,
+  addEdge,
+  useEdgesState,
+  useNodesState,
+} from "reactflow";
+import "reactflow/dist/style.css";
+import ChartNode from "../FunctionBased/Components/ChartNode/ChartNode";
+import Sidebar from "../FunctionBased/Components/Sidebar/Sidebar";
+import UploadFile from "../FunctionBased/Components/UploadFile/UploadFile";
+import { removeImage } from "../Slices/ChartSlices";
 
 const nodeTypes = {
   upload: UploadFile,
-  chart: ChartNode
-}
+  chart: ChartNode,
+};
 
 let id = 0;
 const getId = () => `dndnode_${id++}`;
 
 const initialNodes = [
-  {id: getId(), type: 'upload', position: {x : 0, y : 0}}
+  { id: getId(), type: "upload", position: { x: 0, y: 0 } },
 ];
 
 function EditorPage() {
@@ -24,31 +31,35 @@ function EditorPage() {
   const reactFlowWrapper = useRef(null);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
-  const charImages = useSelector(state => state.charts.charts)
-  const dispatch = useDispatch()
+  const charImages = useSelector((state) => state.charts.charts);
+  const dispatch = useDispatch();
 
   // useEffect(() => {
 
   // }, [])
 
-  const onConnect = useCallback((params) => setEdges((eds) => {
-    let image = charImages.filter(c => c.id === params.source)[0]
-    if(image) {
-      image = image.imageUrl
-      let tempNode = nodes.filter(n => n.id === params.target)[0];
-      tempNode = {...tempNode, data: {imageUrl : image}}
-      console.log(tempNode)
-      const changedNode = nodes.filter(n => n.id !== params.target);
-      changedNode.push(tempNode);
-      setNodes(changedNode);
-    }
-    
-    return addEdge(params, eds);
-  }), [charImages, nodes]);
+  const onConnect = useCallback(
+    (params) =>
+      setEdges((eds) => {
+        let image = charImages.filter((c) => c.id === params.source)[0];
+        if (image) {
+          image = image.imageUrl;
+          let tempNode = nodes.filter((n) => n.id === params.target)[0];
+          tempNode = { ...tempNode, data: { imageUrl: image } };
+          console.log(tempNode);
+          const changedNode = nodes.filter((n) => n.id !== params.target);
+          changedNode.push(tempNode);
+          setNodes(changedNode);
+        }
+
+        return addEdge(params, eds);
+      }),
+    [charImages, nodes]
+  );
 
   const onDragOver = useCallback((event) => {
     event.preventDefault();
-    event.dataTransfer.dropEffect = 'move';
+    event.dataTransfer.dropEffect = "move";
   }, []);
 
   const onDrop = useCallback(
@@ -56,10 +67,10 @@ function EditorPage() {
       event.preventDefault();
 
       const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
-      const type = event.dataTransfer.getData('application/reactflow');
+      const type = event.dataTransfer.getData("application/reactflow");
 
       // check if the dropped element is valid
-      if (typeof type === 'undefined' || !type) {
+      if (typeof type === "undefined" || !type) {
         return;
       }
 
@@ -70,7 +81,7 @@ function EditorPage() {
       const newNode = {
         id: getId(),
         type,
-        position
+        position,
       };
 
       setNodes((nds) => nds.concat(newNode));
@@ -80,14 +91,17 @@ function EditorPage() {
 
   const onNodesDelete = (e) => {
     // console.log(e[0].id)
-    dispatch(removeImage(e[0].id))
-  }
+    dispatch(removeImage(e[0].id));
+  };
 
   return (
     <div className=" flex flex-col md:flex-row flex-1 h-screen bg-slate-200">
       <ReactFlowProvider>
-      <Sidebar />
-        <div className="reactflow-wrapper h-full flex-grow" ref={reactFlowWrapper}>
+        <Sidebar />
+        <div
+          className="reactflow-wrapper h-full flex-grow"
+          ref={reactFlowWrapper}
+        >
           <ReactFlow
             nodes={nodes}
             edges={edges}
@@ -101,6 +115,12 @@ function EditorPage() {
             fitView
             onNodesDelete={onNodesDelete}
           >
+            <Background
+              color="grey"
+              variant={"dots"}
+              gap={15}
+              className="bg-slate-100"
+            />
             <Controls />
           </ReactFlow>
         </div>

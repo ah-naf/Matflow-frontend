@@ -47,9 +47,14 @@ function TreeNode({ node, setActiveLeaf }) {
 
   useEffect(() => {
     localStorage.setItem(`menu-${label}`, showChildren);
+    if (!showChildren) localStorage.removeItem(`menu-${label}`);
     if (isActive) {
       localStorage.setItem(`active-menu`, label);
-      if (isActive.leaf) localStorage.setItem(`activeFunction`, label);
+      if (!label) localStorage.removeItem(`active-menu`);
+      if (isActive.leaf) {
+        localStorage.setItem(`activeFunction`, label);
+        if (!label) localStorage.removeItem(`activeFunction`);
+      }
       dispatch(setActiveFunction(label));
     }
   }, [label, showChildren, isActive, dispatch]);
@@ -62,14 +67,15 @@ function TreeNode({ node, setActiveLeaf }) {
           isActive ? "font-bold" : ""
         }`}
       >
-        
-          <span className="mr-1">
-            <AiOutlineRight
-              size={13}
-              className={`${showChildren ? "rotate-90" : ""} ${(!children || children.length === 0) ? "opacity-0" : ""}`}
-            />
-          </span>
-        
+        <span className="mr-1">
+          <AiOutlineRight
+            size={13}
+            className={`${showChildren ? "rotate-90" : ""} ${
+              !children || children.length === 0 ? "opacity-0" : ""
+            }`}
+          />
+        </span>
+
         {icon && <span className="mr-2">{icon}</span>}
         <span className="tracking-wider capitalize">{label}</span>
       </div>

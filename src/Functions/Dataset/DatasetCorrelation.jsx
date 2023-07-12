@@ -1,10 +1,9 @@
 import { Checkbox, Input, Popover } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
-import { AiOutlineInfoCircle } from "react-icons/ai";
+import Plot from "react-plotly.js";
 import { useSelector } from "react-redux";
 import * as Stat from "statistics.js";
 import AgGridComponent from "../../Components/AgGridComponent/AgGridComponent";
-import ApexChart from "../../Components/ApexChart/ApexChat";
 import FeaturePair from "../../Components/FeaturePair/FeaturePair";
 import { fetchDataFromIndexedDB } from "../../util/indexDB";
 
@@ -21,6 +20,8 @@ function DatasetCorrelation({ csvData }) {
   const [searchValue, setSearchValue] = useState("");
   const [columnNames, setColumnNames] = useState([]);
   const [selectedColumns, setSelectedColumns] = useState([]);
+  const [showAnnotate, setShowAnnotate] = useState(false);
+  const [plotlyData, setPlotlyData] = useState();
 
   useEffect(() => {
     if (activeCsvFile) {
@@ -232,7 +233,7 @@ function DatasetCorrelation({ csvData }) {
           }
         );
         const data = await res.json();
-        console.log(data);
+        setPlotlyData(JSON.parse(data.graph));
       };
       fetchData();
     }
@@ -339,24 +340,36 @@ function DatasetCorrelation({ csvData }) {
                   <option value="feature_pair">Feature Pair</option>
                 </select>
               </div>
+              {/* {displayType === "heatmap" && (
+                <div className="flex flex-col gap-1 ">
+                  <Checkbox
+                    color="success"
+                    onChange={(e) => setShowAnnotate(e.valueOf())}
+                  >
+                    Annotate
+                  </Checkbox>
+                </div>
+              )} */}
             </div>
           </div>
+
           {displayType === "table" ? (
             <AgGridComponent columnDefs={columnDefs} rowData={rowData} />
           ) : displayType === "heatmap" ? (
-            <div className="mt-12">
-              <ApexChart data={rowData} />
-              <p className="flex items-center gap-2 mt-3 tracking-wide">
-                <span>
-                  <AiOutlineInfoCircle size={25} />{" "}
-                </span>{" "}
-                <span className="font-light">
-                  Hover on the color to see the value.
-                </span>{" "}
-                <span className="text-sm font-light">
-                  All colors are generated randomly.
-                </span>{" "}
-              </p>
+            <div>
+              {plotlyData && (
+                <div className=" mt-8">
+                  <Plot
+                    data={plotlyData?.data}
+                    layout={{ ...plotlyData.layout, showlegend: true }}
+                    config={{
+                      scrollZoom: true,
+                      editable: true,
+                      responsive: true,
+                    }}
+                  />
+                </div>
+              )}
             </div>
           ) : (
             <FeaturePair rowData={rowData} />

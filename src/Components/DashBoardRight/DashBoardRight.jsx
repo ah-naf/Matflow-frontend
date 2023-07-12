@@ -31,12 +31,13 @@ import FinalDataset from "../../Functions/FinalDataset/FinalDataset";
 import BuildModel from "../../Functions/Model Building/BuildModel/BuildModel";
 import ModelEvaluation from "../../Functions/Model Building/ModelEvaluation/ModelEvaluation";
 import ModelPrediction from "../../Functions/Model Building/ModelPrediction/ModelPrediction";
+import Models from "../../Functions/Model Building/Models/Models";
 import SplitDataset from "../../Functions/Model Building/SplitDataset/SplitDataset";
+import ModelDeployment from "../../Functions/ModelDeployment/ModelDeployment";
 import ReverseML from "../../Functions/ReverseML/ReverseML";
 import TimeSeriesAnalysis from "../../Functions/TimeSeriesAnalysis/TimeSeriesAnalysis";
 import { setFile } from "../../Slices/FeatureEngineeringSlice";
 import { fetchDataFromIndexedDB } from "../../util/indexDB";
-import Models from "../../Functions/Model Building/Models/Models";
 
 function DashBoardRight() {
   const activeFunction = useSelector((state) => state.sideBar.activeFunction);
@@ -184,11 +185,9 @@ function DashBoardRight() {
               <ModelPrediction csvData={csvData} />
             )}
 
-          {csvData &&
-            activeFunction &&
-            activeFunction === "Models" && (
-              <Models csvData={csvData} />
-            )}
+          {csvData && activeFunction && activeFunction === "Models" && (
+            <Models csvData={csvData} />
+          )}
 
           {/* Time Series Analysis */}
 
@@ -208,6 +207,12 @@ function DashBoardRight() {
 
           {activeFunction && activeFunction === "Final Dataset" && (
             <FinalDataset />
+          )}
+
+          {/* Model Deployment */}
+
+          {csvData && activeFunction && activeFunction === "Model Deployment" && (
+            <ModelDeployment csvData={csvData} />
           )}
         </>
       ) : (

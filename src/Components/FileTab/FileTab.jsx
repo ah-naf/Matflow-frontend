@@ -69,7 +69,7 @@ function FileTab() {
       dispatch(setActiveFunction(""));
       localStorage.removeItem("activeFunction");
     }
-    window.location.reload();
+    // window.location.reload();
     await deleteIndexedDB(name);
   };
 
@@ -78,9 +78,11 @@ function FileTab() {
     const active = files.filter((item) => item.name === name)[0];
     dispatch(setActiveFile(active));
     localStorage.setItem("activeFile", JSON.stringify(active));
-    localStorage.setItem("menu-Dataset", true);
-    localStorage.setItem("activeFunction", "Display");
-    window.location.reload();
+    // localStorage.setItem("menu-Dataset", true);
+    // localStorage.setItem("activeFunction", "Display");
+    dispatch(setActiveFunction(localStorage.getItem("activeFunction")));
+    // window.location.reload();
+    dispatch(setReRender(!render));
   };
 
   const handleFileUpload = async () => {
@@ -99,7 +101,7 @@ function FileTab() {
       }
       await storeDataInIndexedDB(parsedData, uploadedFile.name);
       setUploadedFile("");
-      dispatch(setReRender(!render))
+      dispatch(setReRender(!render));
     }
   };
 

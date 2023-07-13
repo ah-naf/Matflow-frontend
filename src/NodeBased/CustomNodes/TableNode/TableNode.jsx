@@ -31,14 +31,13 @@ function TableNode({ id, data }) {
 
   const closeHandler = () => {
     setVisible(false);
-    console.log("closed");
   };
 
   return (
     <>
       <div
         className="flex bg-white border-2 border-black shadow-[6px_6px_0_1px_rgba(0,0,0,0.7)]"
-        onClick={handler}
+        onDoubleClick={handler}
       >
         {/* <Handle type="source" position={Position.Right}></Handle> */}
         <Handle type="target" position={Position.Left}></Handle>

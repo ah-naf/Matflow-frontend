@@ -1,11 +1,11 @@
-import { data } from "autoprefixer";
-import { useCallback, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
+import uuid from "react-uuid";
 import ReactFlow, {
   Background,
   Controls,
   MarkerType,
+  Panel,
   addEdge,
   useEdges,
   useEdgesState,
@@ -14,24 +14,22 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 import ChartNode from "../NodeBased/CustomNodes/ChartNode/ChartNode";
+import EDANode from "../NodeBased/CustomNodes/EDANode/EDANode";
 import TableNode from "../NodeBased/CustomNodes/TableNode/TableNode";
 import UploadFile from "../NodeBased/CustomNodes/UploadFile/UploadFile";
 import Sidebar from "../NodeBased/components/Sidebar/Sidebar";
-import { removeImage } from "../Slices/ChartSlices";
-import { parseCsv } from "../util/indexDB";
+import { handleOutputTable, handlePlotOptions } from "../util/NodeFunctions";
 
 const nodeTypes = {
   upload: UploadFile,
   output_graph: ChartNode,
   output_table: TableNode,
+  EDA: EDANode,
 };
-
-let id = 0;
-const getId = () => `dndnode_${id++}`;
 
 const initialNodes = [
   {
-    id: getId(),
+    id: uuid(),
     type: "upload",
     position: {
       x: 100,
@@ -45,7 +43,6 @@ function EditorPage() {
   const reactFlowWrapper = useRef(null);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
-  const dispatch = useDispatch();
   const rflow = useReactFlow();
   const edgeList = useEdges();
 
@@ -71,7 +68,7 @@ function EditorPage() {
         y: event.clientY - reactFlowBounds.top,
       });
       const newNode = {
-        id: getId(),
+        id: uuid(),
         type,
         position,
       };
@@ -83,7 +80,6 @@ function EditorPage() {
 
   const onNodesDelete = (e) => {
     // console.log(e[0].id)
-    dispatch(removeImage(e[0].id));
   };
 
   const onEdgesDelete = (e) => {
@@ -96,14 +92,44 @@ function EditorPage() {
     rflow.setNodes(tempNodes);
   };
 
+  const onRestore = useCallback(() => {
+    const restoreFlow = async () => {
+      const flow = JSON.parse(localStorage.getItem("flow"));
+
+      if (flow) {
+        const { x = 0, y = 0, zoom = 1 } = flow.viewport;
+        setNodes(flow.nodes || []);
+        setEdges(flow.edges || []);
+        rflow.setViewport({ x, y, zoom });
+      }
+    };
+
+    restoreFlow();
+  }, [setNodes, rflow.setViewport]);
+
+  useEffect(() => {
+    onRestore();
+  }, []);
+
+  const onSave = useCallback(() => {
+    if (reactFlowInstance) {
+      const flow = reactFlowInstance.toObject();
+      localStorage.setItem("flow", JSON.stringify(flow));
+    }
+  }, [reactFlowInstance]);
+
   const onConnect = useCallback(
     async (params) => {
       const typeSource = rflow.getNode(params.source).type;
       const typeTarget = rflow.getNode(params.target).type;
-      if (typeTarget === "output_table") {
+      if (
+        typeTarget === "output_table" ||
+        typeTarget === "EDA" ||
+        typeTarget === "output_graph"
+      ) {
         const temp = edgeList.filter((val) => val.target === params.target);
         if (temp && temp.length > 0) {
-          toast.error("Connection limit of output node is 1", {
+          toast.error(`Connection limit of ${typeTarget} node is 1`, {
             position: "top-center",
             autoClose: 5000,
             hideProgressBar: false,
@@ -119,6 +145,17 @@ function EditorPage() {
 
       if (typeSource === "upload" && typeTarget === "output_table") {
         const ok = await handleOutputTable(rflow, params);
+        if (!ok) return;
+      }
+
+      if (typeSource === "upload" && typeTarget === "EDA") {
+        const ok = await handleOutputTable(rflow, params);
+        if (!ok) return;
+      }
+
+      if (typeSource === "EDA" && typeTarget === "output_graph") {
+        console.log(rflow);
+        const ok = await handlePlotOptions(rflow, params);
         if (!ok) return;
       }
 
@@ -167,6 +204,14 @@ function EditorPage() {
             gap={15}
             className="bg-slate-100"
           />
+          <Panel position="top-right">
+            <button
+              className="bg-white p-3 px-6 tracking-wider font-medium shadow-lg rounded border-2 border-black"
+              onClick={onSave}
+            >
+              Save
+            </button>
+          </Panel>
           <Controls />
         </ReactFlow>
       </div>
@@ -175,30 +220,3 @@ function EditorPage() {
 }
 
 export default EditorPage;
-
-const handleOutputTable = async (rflow, params) => {
-  try {
-    const csvFile = rflow.getNode(params.source).data;
-    const csvData = await parseCsv(csvFile);
-
-    const tempNodes = rflow.getNodes().map((val) => {
-      if (val.id === params.target)
-        return { ...val, data: { ...data, table: csvData } };
-      return val;
-    });
-    rflow.setNodes(tempNodes);
-    return true;
-  } catch (error) {
-    toast.error("Check your file in upload node", {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
-    });
-    return false;
-  }
-};

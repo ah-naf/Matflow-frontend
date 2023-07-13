@@ -3,8 +3,9 @@ import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutl
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Handle, Position, useReactFlow } from "reactflow";
+import { parseCsv } from "../../../util/indexDB";
 
-function UploadFile({ id }) {
+function UploadFile({ id, data }) {
   const [file, setFile] = useState(null);
   const rflow = useReactFlow();
   const inputRef = useRef(null);
@@ -19,12 +20,23 @@ function UploadFile({ id }) {
 
   useEffect(() => {
     if (file) {
-      const tempNode = rflow.getNodes().map((val) => {
-        if (val.id === id) return { ...val, data: file };
-        return val;
-      });
-      // console.log(tempNode);
-      rflow.setNodes(tempNode)
+      let tempData;
+      (async function () {
+        tempData = await parseCsv(file);
+        const tempNode = rflow.getNodes().map((val) => {
+          if (val.id === id)
+            return {
+              ...val,
+              data: {
+                ...val.data,
+                file_name: file.name,
+                table: tempData,
+              },
+            };
+          return val;
+        });
+        rflow.setNodes(tempNode);
+      })();
     }
   }, [file, rflow]);
 
@@ -62,7 +74,7 @@ function UploadFile({ id }) {
       onDrop={handleDrop}
     >
       <Handle type="source" position={Position.Right}></Handle>
-      {file === undefined || file === null ? (
+      {!data || !data.file_name ? (
         <div className="grid place-items-center p-2">
           <label htmlFor="upload-file" className="text-center">
             <CloudUploadOutlinedIcon color="black" />
@@ -79,7 +91,9 @@ function UploadFile({ id }) {
       ) : (
         <div className="grid place-items-center p-2 py-3 min-w-[100px]">
           <InsertDriveFileOutlinedIcon />
-          <p className="text-light tracking-wide text-sm mt-1">{file.name}</p>
+          <p className="text-light tracking-wide text-sm mt-1">
+            {data.file_name}
+          </p>
         </div>
       )}
     </div>

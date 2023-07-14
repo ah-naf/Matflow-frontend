@@ -1,0 +1,111 @@
+"filename", "language", "JavaScript", "JavaScript JSX", "CSS", "XML", "comment", "blank", "total"
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/App.css", "CSS", 0, 0, 37, 0, 0, 6, 43
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/App.jsx", "JavaScript JSX", 0, 31, 0, 0, 1, 3, 35
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Components/AgGridComponent/AgGridComponent.jsx", "JavaScript JSX", 0, 73, 0, 0, 1, 7, 81
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Components/DashBoardLeft/DashBoardLeft.jsx", "JavaScript JSX", 0, 58, 0, 0, 0, 6, 64
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Components/DashBoardRight/DashBoardRight.jsx", "JavaScript JSX", 0, 202, 0, 0, 8, 22, 232
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Components/DashBoardTop/DashBoardTop.jsx", "JavaScript JSX", 0, 55, 0, 0, 0, 6, 61
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Components/DateTime/DateTime.jsx", "JavaScript JSX", 0, 26, 0, 0, 0, 5, 31
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Components/FeaturePair/FeaturePair.jsx", "JavaScript JSX", 0, 125, 0, 0, 0, 15, 140
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Components/FileTab/FileTab.jsx", "JavaScript JSX", 0, 192, 0, 0, 5, 13, 210
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Components/FunctionTab/FunctionTab.jsx", "JavaScript JSX", 0, 224, 0, 0, 0, 6, 230
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Components/MultipleDropDown/MultipleDropDown.jsx", "JavaScript JSX", 0, 107, 0, 0, 2, 14, 123
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Components/Navbar/Navbar.jsx", "JavaScript JSX", 0, 30, 0, 0, 0, 3, 33
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Components/NextTable/NextTable.jsx", "JavaScript JSX", 0, 32, 0, 0, 0, 4, 36
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Components/SingleDropDown/SingleDropDown.jsx", "JavaScript JSX", 0, 65, 0, 0, 0, 11, 76
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Components/TreeView/TreeView.jsx", "JavaScript JSX", 0, 80, 0, 0, 1, 11, 92
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Dataset/DatasetCorrelation.jsx", "JavaScript JSX", 0, 330, 0, 0, 16, 39, 385
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Dataset/DatasetDisplay.jsx", "JavaScript JSX", 0, 52, 0, 0, 14, 10, 76
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Dataset/DatasetDuplicates.jsx", "JavaScript JSX", 0, 153, 0, 0, 6, 18, 177
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Dataset/DatasetGroup.jsx", "JavaScript JSX", 0, 153, 0, 0, 1, 15, 169
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Dataset/DatasetInformation.jsx", "JavaScript JSX", 0, 115, 0, 0, 11, 17, 143
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Dataset/DatasetStatistics.jsx", "JavaScript JSX", 0, 77, 0, 0, 1, 12, 90
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/EDA/BarPlot.jsx", "JavaScript JSX", 0, 160, 0, 0, 1, 11, 172
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/EDA/BoxPlot.jsx", "JavaScript JSX", 0, 161, 0, 0, 1, 11, 173
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/EDA/CountPlot.jsx", "JavaScript JSX", 0, 145, 0, 0, 1, 12, 158
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/EDA/CustomPlot.jsx", "JavaScript JSX", 0, 102, 0, 0, 1, 11, 114
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/EDA/Histogram.jsx", "JavaScript JSX", 0, 244, 0, 0, 1, 12, 257
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/EDA/LinePlot.jsx", "JavaScript JSX", 0, 136, 0, 0, 1, 11, 148
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/EDA/PiePlot.jsx", "JavaScript JSX", 0, 149, 0, 0, 1, 13, 163
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/EDA/RegPlot.jsx", "JavaScript JSX", 0, 119, 0, 0, 0, 12, 131
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/EDA/ScatterPlot.jsx", "JavaScript JSX", 0, 121, 0, 0, 0, 11, 132
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/EDA/ViolinPlot.jsx", "JavaScript JSX", 0, 167, 0, 0, 0, 11, 178
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Feature Engineering/AddModify/AddModify.jsx", "JavaScript JSX", 0, 245, 0, 0, 1, 15, 261
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Feature Engineering/AddModify/Component/Add_ExtractText.jsx", "JavaScript JSX", 0, 41, 0, 0, 0, 5, 46
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Feature Engineering/AddModify/Component/Add_GroupCategorical.jsx", "JavaScript JSX", 0, 156, 0, 0, 2, 10, 168
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Feature Engineering/AddModify/Component/Add_GroupNumerical.jsx", "JavaScript JSX", 0, 177, 0, 0, 0, 6, 183
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Feature Engineering/AddModify/Component/Add_MathOperation.jsx", "JavaScript JSX", 0, 25, 0, 0, 0, 4, 29
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Feature Engineering/AddModify/Component/Add_NewColumn.jsx", "JavaScript JSX", 0, 63, 0, 0, 0, 5, 68
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Feature Engineering/AddModify/Component/Modify_ProgressApply.jsx", "JavaScript JSX", 0, 28, 0, 0, 0, 5, 33
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Feature Engineering/AddModify/Component/Modify_ReplaceValue.jsx", "JavaScript JSX", 0, 183, 0, 0, 0, 8, 191
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Feature Engineering/AlterFieldName/AlterFieldName.jsx", "JavaScript JSX", 0, 179, 0, 0, 1, 16, 196
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Feature Engineering/AppendDataset/AppendDataset.jsx", "JavaScript JSX", 0, 118, 0, 0, 0, 11, 129
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Feature Engineering/ChangeDType/ChangeDType.jsx", "JavaScript JSX", 0, 183, 0, 0, 1, 15, 199
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Feature Engineering/Cluster/Cluster.jsx", "JavaScript JSX", 0, 213, 0, 0, 0, 8, 221
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Feature Engineering/DropColumn/DropColumn.jsx", "JavaScript JSX", 0, 161, 0, 0, 1, 13, 175
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Feature Engineering/DropRow/DropRow.jsx", "JavaScript JSX", 0, 140, 0, 0, 1, 12, 153
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Feature Engineering/Encoding/Encoding.jsx", "JavaScript JSX", 0, 176, 0, 0, 1, 16, 193
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Feature Engineering/FeatureSelection/FeatureSelection.jsx", "JavaScript JSX", 0, 63, 0, 0, 0, 5, 68
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Feature Engineering/FeatureSelection/components/BestOverallFeature.jsx", "JavaScript JSX", 0, 38, 0, 0, 0, 4, 42
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Feature Engineering/FeatureSelection/components/MutualInformation.jsx", "JavaScript JSX", 0, 7, 0, 0, 0, 2, 9
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Feature Engineering/FeatureSelection/components/ProgressiveFeature.jsx", "JavaScript JSX", 0, 68, 0, 0, 0, 4, 72
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Feature Engineering/FeatureSelection/components/SelectKBest.jsx", "JavaScript JSX", 0, 110, 0, 0, 0, 5, 115
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Feature Engineering/MergeDataset/MergeDataset.jsx", "JavaScript JSX", 0, 149, 0, 0, 1, 14, 164
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Feature Engineering/Scaling/Scaling.jsx", "JavaScript JSX", 0, 157, 0, 0, 1, 11, 169
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/FinalDataset/FinalDataset.jsx", "JavaScript JSX", 0, 64, 0, 0, 0, 6, 70
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Model Building/BuildModel/BuildModel.jsx", "JavaScript JSX", 0, 326, 0, 0, 4, 22, 352
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Model Building/BuildModel/components/Categorical/DecisionTreeClassification.jsx", "JavaScript JSX", 0, 249, 0, 0, 0, 9, 258
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Model Building/BuildModel/components/Categorical/KNearestNeighbour.jsx", "JavaScript JSX", 0, 214, 0, 0, 0, 8, 222
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Model Building/BuildModel/components/Categorical/LogisticRegression.jsx", "JavaScript JSX", 0, 259, 0, 0, 0, 8, 267
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Model Building/BuildModel/components/Categorical/MultilayerPerceptron.jsx", "JavaScript JSX", 0, 270, 0, 0, 0, 9, 279
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Model Building/BuildModel/components/Categorical/RandomForestClassification.jsx", "JavaScript JSX", 0, 276, 0, 0, 0, 10, 286
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Model Building/BuildModel/components/Categorical/SupportVectorMachine.jsx", "JavaScript JSX", 0, 252, 0, 0, 0, 8, 260
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Model Building/BuildModel/components/Continuous/DecisionTreeRegression.jsx", "JavaScript JSX", 0, 248, 0, 0, 0, 8, 256
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Model Building/BuildModel/components/Continuous/LassoRegression.jsx", "JavaScript JSX", 0, 247, 0, 0, 0, 8, 255
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Model Building/BuildModel/components/Continuous/LinearRegression.jsx", "JavaScript JSX", 0, 178, 0, 0, 0, 7, 185
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Model Building/BuildModel/components/Continuous/RandomForestRegression.jsx", "JavaScript JSX", 0, 326, 0, 0, 0, 10, 336
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Model Building/BuildModel/components/Continuous/RidgeRegression.jsx", "JavaScript JSX", 0, 233, 0, 0, 0, 8, 241
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Model Building/BuildModel/components/Continuous/SupportVectorRegressor.jsx", "JavaScript JSX", 0, 172, 0, 0, 0, 10, 182
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Model Building/ModelEvaluation/ModelEvaluation.jsx", "JavaScript JSX", 0, 252, 0, 0, 3, 12, 267
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Model Building/ModelPrediction/ModelPrediction.jsx", "JavaScript JSX", 0, 218, 0, 0, 4, 18, 240
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Model Building/ModelPrediction/ShowDataClassifier.jsx", "JavaScript JSX", 0, 66, 0, 0, 0, 7, 73
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Model Building/ModelPrediction/ShowDataRegressor.jsx", "JavaScript JSX", 0, 63, 0, 0, 0, 6, 69
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Model Building/Models/Models.jsx", "JavaScript JSX", 0, 103, 0, 0, 0, 8, 111
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/Model Building/SplitDataset/SplitDataset.jsx", "JavaScript JSX", 0, 275, 0, 0, 0, 20, 295
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/ModelDeployment/ModelDeployment.jsx", "JavaScript JSX", 0, 102, 0, 0, 0, 8, 110
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/ReverseML/ReverseML.jsx", "JavaScript JSX", 0, 110, 0, 0, 0, 8, 118
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/FunctionBased/Functions/TimeSeriesAnalysis/TimeSeriesAnalysis.jsx", "JavaScript JSX", 0, 226, 0, 0, 1, 12, 239
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/Layout.jsx", "JavaScript JSX", 0, 12, 0, 0, 0, 3, 15
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/NodeBased/CustomNodes/ChartNode/ChartNode.jsx", "JavaScript JSX", 0, 67, 0, 0, 1, 5, 73
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/NodeBased/CustomNodes/EDANode/EDANode.jsx", "JavaScript JSX", 0, 57, 0, 0, 0, 6, 63
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/NodeBased/CustomNodes/TableNode/TableNode.jsx", "JavaScript JSX", 0, 83, 0, 0, 1, 7, 91
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/NodeBased/CustomNodes/UploadFile/UploadFile.jsx", "JavaScript JSX", 0, 91, 0, 0, 0, 13, 104
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/NodeBased/UpdateNodes/UpdateEDANode/UpdateEDANode.jsx", "JavaScript JSX", 0, 142, 0, 0, 0, 8, 150
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/NodeBased/UpdateNodes/UpdateEDANode/plots/BarPlot.jsx", "JavaScript JSX", 0, 119, 0, 0, 0, 6, 125
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/NodeBased/UpdateNodes/UpdateEDANode/plots/BoxPlot.jsx", "JavaScript JSX", 0, 62, 0, 0, 3, 4, 69
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/NodeBased/UpdateNodes/UpdateEDANode/plots/CountPlot.jsx", "JavaScript JSX", 0, 56, 0, 0, 2, 5, 63
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/NodeBased/UpdateNodes/UpdateEDANode/plots/CustomPlot.jsx", "JavaScript JSX", 0, 27, 0, 0, 3, 3, 33
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/NodeBased/UpdateNodes/UpdateEDANode/plots/Histogram.jsx", "JavaScript JSX", 0, 136, 0, 0, 3, 7, 146
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/NodeBased/UpdateNodes/UpdateEDANode/plots/LinePlot.jsx", "JavaScript JSX", 0, 68, 0, 0, 4, 4, 76
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/NodeBased/UpdateNodes/UpdateEDANode/plots/PiePlot.jsx", "JavaScript JSX", 0, 81, 0, 0, 1, 5, 87
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/NodeBased/UpdateNodes/UpdateEDANode/plots/RegPlot.jsx", "JavaScript JSX", 0, 56, 0, 0, 2, 5, 63
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/NodeBased/UpdateNodes/UpdateEDANode/plots/ScatterPlot.jsx", "JavaScript JSX", 0, 55, 0, 0, 3, 5, 63
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/NodeBased/UpdateNodes/UpdateEDANode/plots/ViolinPlot.jsx", "JavaScript JSX", 0, 66, 0, 0, 3, 5, 74
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/NodeBased/components/Sidebar/Sidebar.jsx", "JavaScript JSX", 0, 252, 0, 0, 33, 5, 290
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/Pages/Dashboard.jsx", "JavaScript JSX", 0, 21, 0, 0, 0, 5, 26
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/Pages/EditorPage.jsx", "JavaScript JSX", 0, 194, 0, 0, 4, 25, 223
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/Pages/Feature_collage.svg", "XML", 0, 0, 0, 263, 0, 1, 264
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/Pages/HomePage.jsx", "JavaScript JSX", 0, 206, 0, 0, 20, 10, 236
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/Pages/Login.jsx", "JavaScript JSX", 0, 64, 0, 0, 0, 3, 67
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/Slices/FeatureEngineeringSlice.js", "JavaScript", 64, 0, 0, 0, 1, 4, 69
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/Slices/ModelBuilding.js", "JavaScript", 30, 0, 0, 0, 2, 4, 36
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/Slices/NodeBasedSlices/EDASlice.js", "JavaScript", 33, 0, 0, 0, 1, 4, 38
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/Slices/SideBarSlice.js", "JavaScript", 18, 0, 0, 0, 1, 4, 23
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/Slices/UploadedFileSlice.js", "JavaScript", 18, 0, 0, 0, 1, 4, 23
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/TempPage.jsx", "JavaScript JSX", 0, 21, 0, 0, 0, 4, 25
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/index.css", "CSS", 0, 0, 28, 0, 1, 8, 37
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/main.jsx", "JavaScript JSX", 0, 41, 0, 0, 2, 2, 45
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/store.js", "JavaScript", 15, 0, 0, 0, 0, 2, 17
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/util/NodeFunctions.js", "JavaScript", 67, 0, 0, 0, 1, 6, 74
+"/home/ahnaf/Documents/Web Development/Mf-frontend/src/util/indexDB.js", "JavaScript", 214, 0, 0, 0, 5, 46, 265
+"Total", "-", 459, 13070, 65, 263, 194, 1010, 15061

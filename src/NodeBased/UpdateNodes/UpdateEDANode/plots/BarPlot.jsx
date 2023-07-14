@@ -1,18 +1,16 @@
 import { Checkbox, Input } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useReactFlow } from "reactflow";
 import SingleDropDown from "../../../../FunctionBased/Components/SingleDropDown/SingleDropDown";
 
 function BarPlot({ csvData, setPlotOption }) {
+  // console.log(csvData)
   const stringColumn = Object.keys(csvData[0]).filter(
     (val) => typeof csvData[0][val] === "string"
   );
   const numberColumn = Object.keys(csvData[0]).filter(
     (val) => typeof csvData[0][val] === "number"
   );
-  const nodeId = useSelector((state) => state.EDA.nodeId);
-  const rflow = useReactFlow();
   const [activeStringColumn, setActiveStringColumn] = useState("");
   const [activeNumberColumn, setActiveNumberColumn] = useState("");
   const [activeHueColumn, setActiveHueColumn] = useState("");
@@ -21,19 +19,25 @@ function BarPlot({ csvData, setPlotOption }) {
   const [titleValue, setTitleValue] = useState("");
   const [title, setTitle] = useState();
   const [annotate, setAnnotate] = useState(false);
+  const plotOption = useSelector((state) => state.EDA.plotOption);
 
   useEffect(() => {
-    const nodeDetails = rflow.getNode(nodeId);
-    if (nodeDetails.data && nodeDetails.data.plotOption) {
-      const temp = nodeDetails.data.plotOption;
-      setActiveHueColumn(temp.hue);
-      setActiveNumberColumn(temp.num);
-      setActiveStringColumn(temp.cat);
-      setOrientation(temp.orient);
-      setTitle(temp.title);
-      setAnnotate(temp.annote);
+    if (plotOption && Object.keys(plotOption).length > 0) {
+      setActiveHueColumn(plotOption.hue);
+      setActiveNumberColumn(plotOption.num);
+      setActiveStringColumn(plotOption.cat);
+      setOrientation(plotOption.orient);
+      setTitle(plotOption.title);
+      setAnnotate(plotOption.annote);
+    } else {
+      setActiveHueColumn('');
+      setActiveNumberColumn('');
+      setActiveStringColumn('');
+      setOrientation('Vertical');
+      setTitle('');
+      setAnnotate(false);
     }
-  }, []);
+  }, [plotOption]);
 
   useEffect(() => {
     setPlotOption({

@@ -4,7 +4,8 @@ import { useDispatch } from "react-redux";
 import { Handle, Position, useReactFlow } from "reactflow";
 import {
   setNodeIdRedux,
-  setPlotOptionInitRedux,
+  setPlotOptionRedux,
+  setPlotRedux,
 } from "../../../Slices/NodeBasedSlices/EDASlice";
 import { handlePlotOptions } from "../../../util/NodeFunctions";
 import UpdateEDANode from "../../UpdateNodes/UpdateEDANode/UpdateEDANode";
@@ -27,18 +28,23 @@ function EDANode({ id, data }) {
         await handlePlotOptions(rflow, val);
       });
     })();
-  }, [data]);
+    if (data) {
+      dispatch(setPlotOptionRedux(data.plotOption));
+      dispatch(setPlotRedux(data.plot));
+    }
+  }, [data, dispatch]);
 
   useEffect(() => {
     dispatch(setNodeIdRedux(id));
-    dispatch(setPlotOptionInitRedux(id));
   }, [dispatch, visible]);
 
   return (
     <>
       <div
         className="flex bg-white border-2 border-black shadow-[6px_6px_0_1px_rgba(0,0,0,0.7)]"
-        onDoubleClick={() => setVisible(!visible)}
+        onDoubleClick={() => {
+          setVisible(!visible);
+        }}
       >
         <Handle type="source" position={Position.Right}></Handle>
         <Handle type="target" position={Position.Left}></Handle>

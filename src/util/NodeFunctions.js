@@ -2,12 +2,15 @@ import { toast } from "react-toastify";
 
 const EDA_LINK = {
   "Bar Plot": "eda_barplot",
+  "Box Plot": "eda_boxplot",
+  "Count Plot": "eda_countplot",
+  "Custom Plot": "eda_customplot",
 };
 
 export const handleOutputTable = async (rflow, params) => {
   try {
     const csvFile = rflow.getNode(params.source).data;
-    
+
     const tempNodes = rflow.getNodes().map((val) => {
       if (val.id === params.target)
         return { ...val, data: { table: csvFile.table } };
@@ -37,7 +40,10 @@ export const handlePlotOptions = async (rflow, params) => {
     if (!file || !file.table) {
       throw new Error("File not found.");
     }
-    const url = `http://127.0.0.1:8000/api/${EDA_LINK[file.plot]}/`;
+    console.log(file)
+    if (Object.keys(file.plotOption).length === 0) return true;
+
+    const url = `http://127.0.0.1:8000/api/${EDA_LINK[file.plot || 'Bar Plot']}/`;
     const res = await fetch(url, {
       method: "POST",
       headers: {

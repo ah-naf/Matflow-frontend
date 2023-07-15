@@ -16,7 +16,6 @@ function BarPlot({ csvData, setPlotOption }) {
   const [activeHueColumn, setActiveHueColumn] = useState("");
   const [orientation, setOrientation] = useState("Vertical");
   const [showTitle, setShowTitle] = useState(false);
-  const [titleValue, setTitleValue] = useState("");
   const [title, setTitle] = useState();
   const [annotate, setAnnotate] = useState(false);
   const plotOption = useSelector((state) => state.EDA.plotOption);
@@ -30,11 +29,11 @@ function BarPlot({ csvData, setPlotOption }) {
       setTitle(plotOption.title);
       setAnnotate(plotOption.annote);
     } else {
-      setActiveHueColumn('');
-      setActiveNumberColumn('');
-      setActiveStringColumn('');
-      setOrientation('Vertical');
-      setTitle('');
+      setActiveHueColumn("");
+      setActiveNumberColumn("");
+      setActiveStringColumn("");
+      setOrientation("Vertical");
+      setTitle("");
       setAnnotate(false);
     }
   }, [plotOption]);
@@ -113,11 +112,7 @@ function BarPlot({ csvData, setPlotOption }) {
             placeholder="Enter your desired title"
             fullWidth
             value={title}
-            onChange={(e) => setTitleValue(e.target.value)}
-            helperText="Press Enter to apply"
-            onKeyDown={(e) => {
-              if (e.key === "Enter") setTitle(titleValue);
-            }}
+            onChange={(e) => setTitle(e.target.value)}
           />
         </div>
       )}

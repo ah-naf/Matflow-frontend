@@ -6,6 +6,11 @@ const EDA_LINK = {
   "Count Plot": "eda_countplot",
   "Custom Plot": "eda_customplot",
   Histogram: "eda_histogram",
+  "Line Plot": "eda_lineplot",
+  "Pie Plot": "eda_pieplot",
+  "Reg Plot": "eda_regplot",
+  "Scatter Plot": "eda_scatterplot",
+  "Violin Plot": "eda_violinplot",
 };
 
 export const handleOutputTable = async (rflow, params) => {

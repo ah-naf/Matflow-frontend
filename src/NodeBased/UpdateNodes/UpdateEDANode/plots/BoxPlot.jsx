@@ -15,7 +15,6 @@ function BoxPlot({ csvData, setPlotOption }) {
   const [activeHueColumn, setActiveHueColumn] = useState("");
   const [orientation, setOrientation] = useState("Vertical");
   const [showTitle, setShowTitle] = useState(false);
-  const [titleValue, setTitleValue] = useState("");
   const [title, setTitle] = useState();
   const [dodge, setDodge] = useState(false);
   const plotOption = useSelector((state) => state.EDA.plotOption);
@@ -111,12 +110,8 @@ function BoxPlot({ csvData, setPlotOption }) {
             label="Input Title"
             placeholder="Enter your desired title"
             fullWidth
-            value={titleValue}
-            onChange={(e) => setTitleValue(e.target.value)}
-            helperText="Press Enter to apply"
-            onKeyDown={(e) => {
-              if (e.key === "Enter") setTitle(titleValue);
-            }}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
           />
         </div>
       )}

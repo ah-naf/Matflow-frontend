@@ -18,7 +18,6 @@ function Histogram({ csvData, setPlotOption }) {
   const [activeHueColumn, setActiveHueColumn] = useState("");
   const [orientation, setOrientation] = useState("Vertical");
   const [showTitle, setShowTitle] = useState(false);
-  const [titleValue, setTitleValue] = useState("");
   const [title, setTitle] = useState();
   const [aggregate, setAggregate] = useState("count");
   const [KDE, setKDE] = useState(false);
@@ -163,12 +162,8 @@ function Histogram({ csvData, setPlotOption }) {
             label="Input Title"
             placeholder="Enter your desired title"
             fullWidth
-            value={titleValue}
-            onChange={(e) => setTitleValue(e.target.value)}
-            helperText="Press Enter to apply"
-            onKeyDown={(e) => {
-              if (e.key === "Enter") setTitle(titleValue);
-            }}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
           />
         </div>
       )}

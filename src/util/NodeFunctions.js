@@ -5,6 +5,7 @@ const EDA_LINK = {
   "Box Plot": "eda_boxplot",
   "Count Plot": "eda_countplot",
   "Custom Plot": "eda_customplot",
+  Histogram: "eda_histogram",
 };
 
 export const handleOutputTable = async (rflow, params) => {
@@ -40,10 +41,12 @@ export const handlePlotOptions = async (rflow, params) => {
     if (!file || !file.table) {
       throw new Error("File not found.");
     }
-    console.log(file)
+    console.log(file);
     if (Object.keys(file.plotOption).length === 0) return true;
 
-    const url = `http://127.0.0.1:8000/api/${EDA_LINK[file.plot || 'Bar Plot']}/`;
+    const url = `http://127.0.0.1:8000/api/${
+      EDA_LINK[file.plot || "Bar Plot"]
+    }/`;
     const res = await fetch(url, {
       method: "POST",
       headers: {

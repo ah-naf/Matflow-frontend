@@ -3,7 +3,7 @@ import { Dialog } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useReactFlow } from "reactflow";
 import SingleDropDown from "../../../FunctionBased/Components/SingleDropDown/SingleDropDown";
 import BarPlot from "./plots/BarPlot";
@@ -32,9 +32,7 @@ const PLOT = [
 function UpdateEDANode({ visible, setVisible, csvData }) {
   // console.log(csvData)
   const rflow = useReactFlow();
-  const [isFullScreen, setIsFullScreen] = useState(false);
   const [plotType, setPlotType] = useState(PLOT[0]);
-  const dispatch = useDispatch();
   const nodeId = useSelector((state) => state.EDA.nodeId);
   const nodeDetails = rflow.getNode(nodeId);
   const [plotOption, setPlotOption] = useState();
@@ -69,7 +67,10 @@ function UpdateEDANode({ visible, setVisible, csvData }) {
         fullScreen={fullScreen}
         scroll="paper"
       >
-        <span className="ml-auto p-2 cursor-pointer">
+        <span
+          className="ml-auto p-2 cursor-pointer"
+          onClick={() => setVisible(false)}
+        >
           <CloseIcon color="action" />
         </span>
         <h1 className="text-center font-medium tracking-wider text-3xl">

@@ -156,7 +156,24 @@ function BuildModel({ csvData }) {
         }),
       });
       const data = await res.json();
+      console.log(data);
 
+      const res1 = await fetch("http://127.0.0.1:8000/api/deploy_data/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          train,
+          target_var: target_variable,
+          model: data.model_deploy 
+        }),
+      });
+
+      const dd = await res.json()
+      console.log(dd)
+
+      return;
       setNicherData(data.metrics);
 
       let allModels = await fetchDataFromIndexedDB("models");

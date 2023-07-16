@@ -15,6 +15,7 @@ import ReactFlow, {
 import "reactflow/dist/style.css";
 import ChartNode from "../NodeBased/CustomNodes/ChartNode/ChartNode";
 import EDANode from "../NodeBased/CustomNodes/EDANode/EDANode";
+import ReverseMLNode from "../NodeBased/CustomNodes/ReverseMLNode/ReverseMLNode";
 import TableNode from "../NodeBased/CustomNodes/TableNode/TableNode";
 import UploadFile from "../NodeBased/CustomNodes/UploadFile/UploadFile";
 import Sidebar from "../NodeBased/components/Sidebar/Sidebar";
@@ -25,6 +26,7 @@ const nodeTypes = {
   output_graph: ChartNode,
   output_table: TableNode,
   EDA: EDANode,
+  ReverseML: ReverseMLNode,
 };
 
 const initialNodes = [
@@ -143,18 +145,21 @@ function EditorPage() {
         }
       }
 
-      if (typeSource === "upload" && typeTarget === "output_table") {
+      if (
+        typeSource === "upload" &&
+        (typeTarget === "output_table" ||
+          typeTarget === "EDA" ||
+          typeTarget === "ReverseML")
+      ) {
         const ok = await handleOutputTable(rflow, params);
         if (!ok) return;
       }
 
-      if (typeSource === "upload" && typeTarget === "EDA") {
-        const ok = await handleOutputTable(rflow, params);
-        if (!ok) return;
-      }
-
-      if (typeSource === "EDA" && typeTarget === "output_graph") {
-        console.log(rflow);
+      if (
+        (typeSource === "EDA" || typeSource === "upload") &&
+        typeTarget === "output_graph"
+      ) {
+        // console.log(rflow);
         const ok = await handlePlotOptions(rflow, params);
         if (!ok) return;
       }

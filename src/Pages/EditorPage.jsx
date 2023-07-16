@@ -19,7 +19,11 @@ import ReverseMLNode from "../NodeBased/CustomNodes/ReverseMLNode/ReverseMLNode"
 import TableNode from "../NodeBased/CustomNodes/TableNode/TableNode";
 import UploadFile from "../NodeBased/CustomNodes/UploadFile/UploadFile";
 import Sidebar from "../NodeBased/components/Sidebar/Sidebar";
-import { handleOutputTable, handlePlotOptions } from "../util/NodeFunctions";
+import {
+  handleOutputTable,
+  handlePlotOptions,
+  handleReverseML,
+} from "../util/NodeFunctions";
 
 const nodeTypes = {
   upload: UploadFile,
@@ -124,6 +128,7 @@ function EditorPage() {
     async (params) => {
       const typeSource = rflow.getNode(params.source).type;
       const typeTarget = rflow.getNode(params.target).type;
+      let ok = false;
       if (
         typeTarget === "output_table" ||
         typeTarget === "EDA" ||
@@ -151,8 +156,7 @@ function EditorPage() {
           typeTarget === "EDA" ||
           typeTarget === "ReverseML")
       ) {
-        const ok = await handleOutputTable(rflow, params);
-        if (!ok) return;
+        ok = await handleOutputTable(rflow, params);
       }
 
       if (
@@ -160,10 +164,13 @@ function EditorPage() {
         typeTarget === "output_graph"
       ) {
         // console.log(rflow);
-        const ok = await handlePlotOptions(rflow, params);
-        if (!ok) return;
+        ok = await handlePlotOptions(rflow, params);
       }
 
+      if (typeSource === "ReverseML" && typeTarget === "output_table") {
+        ok = await handleReverseML(rflow, params);
+      }
+      if(!ok) return
       setEdges((eds) => {
         const temp = {
           ...params,

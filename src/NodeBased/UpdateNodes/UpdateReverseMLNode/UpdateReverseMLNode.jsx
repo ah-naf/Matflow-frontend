@@ -3,10 +3,11 @@ import { Dialog } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { Input } from "@nextui-org/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useReactFlow } from "reactflow";
 import MultipleDropDown from "../../../FunctionBased/Components/MultipleDropDown/MultipleDropDown";
 
-function UpdateReverseMLNode({ visible, setVisible, csvData }) {
+function UpdateReverseMLNode({ visible, setVisible, csvData, nodeId }) {
   const allColumnName = Object.keys(csvData[0]);
   const [allTargetColumn, setAllTargetColumn] = useState(
     Object.keys(csvData[0])
@@ -16,8 +17,17 @@ function UpdateReverseMLNode({ visible, setVisible, csvData }) {
   const [selectFeature, setSelectFeature] = useState();
   const [targetVariable, setTargetVariable] = useState();
   const [enterValues, setEnterValues] = useState("");
-  const [mlData, setMlData] = useState();
-  const [columnDef, setColumnDef] = useState();
+  const rflow = useReactFlow();
+  const nodeDetails = rflow.getNode(nodeId);
+
+  useEffect(() => {
+    const data = nodeDetails.data;
+    if (data && data.reverseml) {
+      setSelectFeature(data.reverseml["Select Feature"]);
+      setTargetVariable(data.reverseml["Select Target Variable"]);
+      setEnterValues(data.reverseml["Enter Values"]);
+    }
+  }, [nodeDetails]);
 
   const handleSelectFeature = (e) => {
     setSelectFeature(e);
@@ -27,6 +37,26 @@ function UpdateReverseMLNode({ visible, setVisible, csvData }) {
       if (!ache.has(val)) temp.push(val);
     });
     setAllTargetColumn(temp);
+  };
+
+  const handleSave = () => {
+    const tempNode = {
+      ...nodeDetails,
+      data: {
+        ...nodeDetails.data,
+        reverseml: {
+          "Select Feature": selectFeature,
+          "Select Target Variable": targetVariable,
+          "Enter Values": enterValues,
+        },
+      },
+    };
+
+    const tempNodes = rflow.getNodes().map((node) => {
+      if (node.id === nodeId) return tempNode;
+      return node;
+    });
+    rflow.setNodes(tempNodes);
   };
 
   return (
@@ -80,6 +110,25 @@ function UpdateReverseMLNode({ visible, setVisible, csvData }) {
               onChange={(e) => setEnterValues(e.target.value)}
             />
           </div>
+        </div>
+        <div className="sticky bottom-0 bg-white border-t-2 shadow-md border-gray-200 flex items-center gap-4 w-full justify-end px-6 py-3 pt-6 mt-4">
+          <button
+            className="font-medium border-2 p-2 px-4 text-lg tracking-wider border-gray-500 rounded"
+            onClick={() => {
+              setVisible(false);
+            }}
+          >
+            Close
+          </button>
+          <button
+            className="font-medium border-2 p-2 px-4 text-lg tracking-wider bg-black text-white rounded"
+            onClick={() => {
+              handleSave();
+              setVisible(false);
+            }}
+          >
+            Save
+          </button>
         </div>
       </Dialog>
     </div>

@@ -13,6 +13,26 @@ const EDA_LINK = {
   "Violin Plot": "eda_violinplot",
 };
 
+const raiseErrorToast = (rflow, params, error) => {
+  // Error paile connected node er data delete kore dibe
+  const tempNodes = rflow.getNodes().map((val) => {
+    if (val.id === params.target) return { ...val, data: {} };
+    return val;
+  });
+  rflow.setNodes(tempNodes);
+
+  toast.error(error, {
+    position: "top-center",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: "colored",
+  });
+};
+
 export const handleOutputTable = async (rflow, params) => {
   try {
     const csvFile = rflow.getNode(params.source).data;
@@ -25,23 +45,7 @@ export const handleOutputTable = async (rflow, params) => {
     rflow.setNodes(tempNodes);
     return true;
   } catch (error) {
-    // Error paile connected node er data delete kore dibe
-    const tempNodes = rflow.getNodes().map((val) => {
-      if (val.id === params.target) return { ...val, data: {} };
-      return val;
-    });
-    rflow.setNodes(tempNodes);
-    
-    toast.error("Check your file in upload node", {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
-    });
+    raiseErrorToast(rflow, params, error.message);
     return false;
   }
 };
@@ -78,22 +82,7 @@ export const handlePlotOptions = async (rflow, params) => {
     rflow.setNodes(tempNodes);
     return true;
   } catch (error) {
-    // Error paile connected node er data delete kore dibe
-    const tempNodes = rflow.getNodes().map((val) => {
-      if (val.id === params.target) return { ...val, data: {} };
-      return val;
-    });
-    rflow.setNodes(tempNodes);
-    toast.error(error.message, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
-    });
+    raiseErrorToast(rflow, params, error.message);
     return false;
   }
 };
@@ -124,23 +113,80 @@ export const handleReverseML = async (rflow, params) => {
     rflow.setNodes(tempNodes);
     return true;
   } catch (error) {
-    // Error paile connected node er data delete kore dibe
+    raiseErrorToast(rflow, params, error.message);
+    return false;
+  }
+};
+
+export const isItTimeSeriesFile = async (rflow, params) => {
+  try {
+    const { table, timeSeries } = rflow.getNode(params.source).data;
+
+    let option = { file: table };
+    if (timeSeries && timeSeries.target_variable)
+      option = { ...option, select_column: timeSeries.target_variable };
+    else option = { ...option, select_column: "" };
+
+    const res = await fetch("http://127.0.0.1:8000/api/time_series/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(option),
+    });
+    const data = await res.json();
+    if ("error" in data && data.error) {
+      toast.warn("No date-time column found in the dataset.", {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+      return false;
+    }
     const tempNodes = rflow.getNodes().map((val) => {
-      if (val.id === params.target) return { ...val, data: {} };
+      if (val.id === params.target) return { ...val, data: { table } };
       return val;
     });
     rflow.setNodes(tempNodes);
+    return true;
+  } catch (error) {
+    raiseErrorToast(rflow, params, error.message);
+    return false;
+  }
+};
 
-    toast.error(error.message, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
+export const handleTimeSeriesAnalysis = async (rflow, params) => {
+  try {
+    const { table, timeSeries } = rflow.getNode(params.source).data;
+    if (!timeSeries) return;
+    console.log(timeSeries);
+    const res = await fetch("http://127.0.0.1:8000/api/time_series_analysis/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        file: table,
+        date: timeSeries.date,
+        select_column: timeSeries.target_variable,
+      }),
     });
+    const data = await res.json();
+    
+    const tempNodes = rflow.getNodes().map((val) => {
+      if (val.id === params.target)
+        return { ...val, data: { graph: JSON.parse(data.graph) } };
+      return val;
+    });
+    rflow.setNodes(tempNodes);
+    return true;
+  } catch (error) {
+    raiseErrorToast(rflow, params, error.message);
     return false;
   }
 };

@@ -188,6 +188,7 @@ function BuildModel({ csvData }) {
         body: JSON.stringify({
           model_deploy: data.model_deploy,
           result,
+          train,
         }),
       });
 

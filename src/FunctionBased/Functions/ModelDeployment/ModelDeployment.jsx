@@ -18,6 +18,7 @@ function ModelDeployment({ csvData }) {
   const [target_val, setTargetVal] = useState();
   const [current_model, setCurrentModel] = useState();
   const [model_deploy, setModelDeploy] = useState();
+  const [pred_result, setPredResult] = useState();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -101,11 +102,12 @@ function ModelDeployment({ csvData }) {
         model_deploy,
         result,
         train: train_data,
+        target_var: target_val,
       }),
     });
 
     const dat = await res2.json();
-    console.log(dat);
+    setPredResult(dat.pred);
   };
 
   if (!datasetsName || datasetsName.length === 0)
@@ -199,6 +201,13 @@ function ModelDeployment({ csvData }) {
                 >
                   Submit
                 </button>
+              </div>
+              <div className="mt-4">
+                <h1 className="font-medium text-4xl ">Prediction</h1>
+                <p className="mt-4 text-2xl">
+                  {target_val}:{" "}
+                  <span className="font-semibold ml-2">{pred_result}</span>
+                </p>
               </div>
             </div>
           )}

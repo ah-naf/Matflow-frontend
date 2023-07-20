@@ -172,6 +172,28 @@ function BuildModel({ csvData }) {
       const da = await res1.json();
       console.log(da);
 
+      let result = {};
+      da.result.forEach((val) => {
+        result = { ...result, [val.col]: val.value };
+      });
+      console.log({
+        model_deploy: data.model_deploy,
+        result,
+      });
+      const res2 = await fetch("http://127.0.0.1:8000/api/deploy_result/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model_deploy: data.model_deploy,
+          result,
+        }),
+      });
+
+      const dat = await res2.json();
+      console.log(dat);
+
       return;
       setNicherData(data.metrics);
 

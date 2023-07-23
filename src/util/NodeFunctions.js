@@ -177,10 +177,38 @@ export const handleTimeSeriesAnalysis = async (rflow, params) => {
       }),
     });
     const data = await res.json();
-    
+
     const tempNodes = rflow.getNodes().map((val) => {
       if (val.id === params.target)
         return { ...val, data: { graph: JSON.parse(data.graph) } };
+      return val;
+    });
+    rflow.setNodes(tempNodes);
+    return true;
+  } catch (error) {
+    raiseErrorToast(rflow, params, error.message);
+    return false;
+  }
+};
+
+export const handleFileForMergeDataset = async (rflow, params) => {
+  try {
+    const fileNode = rflow.getNode(params.source).data;
+    const targetNodeFile = rflow.getNode(params.target).data;
+
+    if (
+      typeof targetNodeFile === "object" &&
+      Object.keys(targetNodeFile).length === 2
+    ) {
+      throw new Error("Can't accept more than two dataset to merge");
+    }
+
+    const tempNodes = rflow.getNodes().map((val) => {
+      if (val.id === params.target)
+        return {
+          ...val,
+          data: { ...val.data, [fileNode["file_name"]]: fileNode.table },
+        };
       return val;
     });
     rflow.setNodes(tempNodes);

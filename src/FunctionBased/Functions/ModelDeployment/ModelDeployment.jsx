@@ -44,6 +44,7 @@ function ModelDeployment({ csvData }) {
   }, [current_model]);
 
   const handleDatasetChange = async (name) => {
+    setPredResult("");
     setCurrentDataset(name);
     const sp_ind = splitted_datasets.findIndex((obj) => name in obj);
     const res = allModels.map((val) => val[name]);
@@ -132,7 +133,10 @@ function ModelDeployment({ csvData }) {
             <p>Select Model</p>
             <SingleDropDown
               columnNames={modelNames}
-              onValueChange={setCurrentModel}
+              onValueChange={(e) => {
+                setCurrentModel(e);
+                setPredResult("");
+              }}
               initValue={current_model}
             />
           </div>
@@ -171,9 +175,9 @@ function ModelDeployment({ csvData }) {
             </div>
           )}
           {filtered_column && filtered_column.length > 0 && (
-            <div className="grid grid-cols-2 gap-8 mt-4">
+            <div className="grid grid-cols-2 gap-8 mt-4 relative">
               <div className="mt-4">
-                <h3 className="font-medium text-2xl tracking-wide mb-4">
+                <h3 className="font-medium text-3xl tracking-wide mb-4">
                   Input Values
                 </h3>
                 <div className="flex flex-col gap-4">
@@ -202,12 +206,14 @@ function ModelDeployment({ csvData }) {
                   Submit
                 </button>
               </div>
-              <div className="mt-4">
-                <h1 className="font-medium text-4xl ">Prediction</h1>
-                <p className="mt-4 text-2xl">
-                  {target_val}:{" "}
-                  <span className="font-semibold ml-2">{pred_result}</span>
-                </p>
+              <div className=" relative">
+                <div className="sticky top-4 mt-4">
+                  <h1 className="font-medium text-3xl tracking-wide">Prediction</h1>
+                  <p className="mt-4 text-2xl">
+                    {target_val}:{" "}
+                    <span className="font-semibold ml-2">{pred_result}</span>
+                  </p>
+                </div>
               </div>
             </div>
           )}

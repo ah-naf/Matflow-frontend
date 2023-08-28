@@ -1,10 +1,10 @@
 import { Textarea } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import SingleDropDown from "../../../../Components/SingleDropDown/SingleDropDown";
 import { setData } from "../../../../../Slices/FeatureEngineeringSlice";
+import SingleDropDown from "../../../../Components/SingleDropDown/SingleDropDown";
 
-function Add_ExtractText({ csvData }) {
+function Add_ExtractText({ csvData, type = "function" }) {
   const data = useSelector((state) => state.featureEngineering.data);
   const stringColumns = Object.keys(csvData[0]).filter(
     (val) => typeof csvData[0][val] === "string"
@@ -14,12 +14,12 @@ function Add_ExtractText({ csvData }) {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(setData({...data, regex, extract_from}))
-  }, [regex, extract_from, dispatch])
+    dispatch(setData({ ...data, regex, extract_from }));
+  }, [regex, extract_from, dispatch]);
 
   return (
-    <div className="flex gap-8 mb-10">
-      <div className="w-[70%]">
+    <div className={`flex gap-8 mb-10 ${type === "node" && "flex-col"}`}>
+      <div className="basis-3/4">
         <Textarea
           label="Regex Pattern"
           helperText="Example: ([A-Za-z]+)\."
@@ -31,7 +31,7 @@ function Add_ExtractText({ csvData }) {
           minRows={6}
         />
       </div>
-      <div className="w-[30%]">
+      <div className="basis-1/4">
         <p>Extract From</p>
         <SingleDropDown
           columnNames={stringColumns}

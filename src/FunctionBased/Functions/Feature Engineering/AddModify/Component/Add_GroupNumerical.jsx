@@ -1,10 +1,10 @@
 import { Checkbox, Input } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import SingleDropDown from "../../../../Components/SingleDropDown/SingleDropDown";
 import { setData } from "../../../../../Slices/FeatureEngineeringSlice";
+import SingleDropDown from "../../../../Components/SingleDropDown/SingleDropDown";
 
-function Add_GroupNumerical({ csvData }) {
+function Add_GroupNumerical({ csvData, type = "function" }) {
   const [nGroups, setNGroups] = useState(2);
   const columnNames = Object.keys(csvData[0]).filter(
     (val) => typeof csvData[0][val] === "number"
@@ -52,38 +52,40 @@ function Add_GroupNumerical({ csvData }) {
 
   return (
     <div>
-      <div className="flex gap-8 mb-4">
-        <Input
-          label="N Groups"
-          value={nGroups}
-          onChange={(e) => {
-            const val = e.target.value;
-            setNGroups(val);
-            if (val < nGroupData.length)
-              setNGroupData(nGroupData.slice(0, val));
-            else {
-              const temp = JSON.parse(JSON.stringify(nGroupData));
-              while (val - temp.length > 0) {
-                temp.push({
-                  min_value: 0,
-                  max_value: 0,
-                  operator: "==",
-                  value: 0,
-                  bin_value: 0,
-                  use_operator: false,
-                });
+      <div className={`flex gap-8 mb-4 ${type === "node" && "flex-col"}`}>
+        <div className={`flex items-center gap-8 w-full max-w-3xl `}>
+          <Input
+            label="N Groups"
+            value={nGroups}
+            onChange={(e) => {
+              const val = e.target.value;
+              setNGroups(val);
+              if (val < nGroupData.length)
+                setNGroupData(nGroupData.slice(0, val));
+              else {
+                const temp = JSON.parse(JSON.stringify(nGroupData));
+                while (val - temp.length > 0) {
+                  temp.push({
+                    min_value: 0,
+                    max_value: 0,
+                    operator: "==",
+                    value: 0,
+                    bin_value: 0,
+                    use_operator: false,
+                  });
+                }
+                setNGroupData(temp);
               }
-              setNGroupData(temp);
-            }
-          }}
-          type="number"
-        />
-        <div className="flex-grow">
-          <p>Bin Column</p>
-          <SingleDropDown
-            columnNames={columnNames}
-            onValueChange={setBin_column}
+            }}
+            type="number"
           />
+          <div className="flex-grow">
+            <p>Bin Column</p>
+            <SingleDropDown
+              columnNames={columnNames}
+              onValueChange={setBin_column}
+            />
+          </div>
         </div>
         <Checkbox
           color="success"
@@ -95,8 +97,13 @@ function Add_GroupNumerical({ csvData }) {
       <div className="mt-8">
         {nGroupData.map((val, index) => {
           return (
-            <div key={index} className="flex gap-8 mt-4">
-              <div className="flex w-full gap-8">
+            <div
+              key={index}
+              className={`flex ${type === "node" ? "gap-4" : "gap-8"} mt-4`}
+            >
+              <div
+                className={`flex w-full ${type === "node" ? "gap-4" : "gap-8"}`}
+              >
                 {val.use_operator ? (
                   <>
                     <div className="w-full flex flex-col">
@@ -163,8 +170,9 @@ function Add_GroupNumerical({ csvData }) {
                 />
               </div>
               <Checkbox
+                size={type === "node" ? "sm" : "md"}
                 color="success"
-                className="w-60"
+                className="w-44"
                 onChange={(e) =>
                   handleValueChange(e.valueOf(), index, "use_operator")
                 }

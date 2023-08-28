@@ -40,7 +40,7 @@ const nodeTypes = {
   ReverseML: ReverseMLNode,
   "Time Series Analysis": TimeSeriesNode,
   "Merge Dataset": MergeDatasetNode,
-  "add/modify": AddModify,
+  "Add/Modify": AddModify,
 };
 
 const initialNodes = [
@@ -161,7 +161,8 @@ function EditorPage() {
         typeTarget === "EDA" ||
         typeTarget === "output_graph" ||
         typeTarget === "Time Series Analysis" ||
-        typeTarget === "ReverseML"
+        typeTarget === "ReverseML" ||
+        typeTarget === "Add/Modify"
       ) {
         const temp = edgeList.filter((val) => val.target === params.target);
         if (temp && temp.length > 0) {
@@ -183,7 +184,8 @@ function EditorPage() {
         typeSource === "upload" &&
         (typeTarget === "output_table" ||
           typeTarget === "EDA" ||
-          typeTarget === "ReverseML")
+          typeTarget === "ReverseML" ||
+          typeTarget === "Add/Modify")
       ) {
         ok = await handleOutputTable(rflow, params);
       }

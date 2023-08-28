@@ -1,11 +1,11 @@
 import { Checkbox, Input } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
+import { setData } from "../../../../../Slices/FeatureEngineeringSlice";
 import MultipleDropDown from "../../../../Components/MultipleDropDown/MultipleDropDown";
 import SingleDropDown from "../../../../Components/SingleDropDown/SingleDropDown";
-import { setData } from "../../../../../Slices/FeatureEngineeringSlice";
 
-function Add_GroupCategorical({ csvData }) {
+function Add_GroupCategorical({ csvData, type='function' }) {
   const [nGroups, setNGroups] = useState(2);
   const columnNames = Object.keys(csvData[0]).filter(
     (val) => typeof csvData[0][val] === "number"
@@ -84,36 +84,39 @@ function Add_GroupCategorical({ csvData }) {
 
   return (
     <div className="mt-12">
-      <div className="flex gap-8 mb-4">
-        <Input
-          label="N Groups"
-          value={nGroups}
-          onChange={(e) => {
-            const val = e.target.value;
-            setNGroups(val);
-            if (val < nGroupData.length) setNGroupData(nGroupData.slice(0, val));
-            else {
-              const temp = JSON.parse(JSON.stringify(nGroupData));
-              while (val - temp.length > 0) {
-                temp.push({
-                  group_name: "",
-                  group_members: [],
-                  others: false,
-                });
+      <div className={`flex gap-8 mb-4 ${type === 'node' && 'flex-col'}`}>
+        <div className={`flex items-center w-full max-w-3xl gap-8`}>
+          <Input
+            label="N Groups"
+            value={nGroups}
+            onChange={(e) => {
+              const val = e.target.value;
+              setNGroups(val);
+              if (val < nGroupData.length)
+                setNGroupData(nGroupData.slice(0, val));
+              else {
+                const temp = JSON.parse(JSON.stringify(nGroupData));
+                while (val - temp.length > 0) {
+                  temp.push({
+                    group_name: "",
+                    group_members: [],
+                    others: false,
+                  });
+                }
+                setNGroupData(temp);
               }
-              setNGroupData(temp);
-            }
-          }}
-          type="number"
-        />
-        <div className="flex-grow">
-          <p>Group Column</p>
-          <SingleDropDown
-            columnNames={columnNames}
-            onValueChange={setGroupColumn}
+            }}
+            type="number"
           />
+          <div className="flex-grow">
+            <p>Group Column</p>
+            <SingleDropDown
+              columnNames={columnNames}
+              onValueChange={setGroupColumn}
+            />
+          </div>
         </div>
-        <div className="flex flex-col gap-2">
+        <div className={`flex ${type === 'node' ? '' : 'flex-col'} gap-2`}>
           <Checkbox
             defaultSelected={true}
             color="success"
@@ -151,6 +154,7 @@ function Add_GroupCategorical({ csvData }) {
               </div>
               {index === nGroups - 1 && (
                 <Checkbox
+                  size={type === 'node' ? 'sm' : 'md'}
                   onChange={(e) => handleOtherChange(e.valueOf(), index)}
                 >
                   Others

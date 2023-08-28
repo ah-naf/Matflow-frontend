@@ -1,8 +1,10 @@
 import React, { useState } from "react";
-import { AiOutlineMergeCells } from "react-icons/ai";
+import { RiFileEditLine } from "react-icons/ri";
 import { Handle, Position } from "reactflow";
+import UpdateAddModifyNode from "../../UpdateNodes/UpdateAddModifyNode/UpdateAddModifyNode";
 
-function AddModify({id, data}) {
+function AddModify({ id, data }) {
+  console.log(data);
   const [visible, setVisible] = useState(false);
   return (
     <>
@@ -16,11 +18,18 @@ function AddModify({id, data}) {
         <Handle type="target" position={Position.Left}></Handle>
 
         <div className="grid place-items-center gap-1 p-2 py-3 min-w-[80px]">
-          <AiOutlineMergeCells className="text-[rgba(0,0,0,1)]" size={"25"} />
+          <RiFileEditLine className="text-[rgba(0,0,0,0.54)]" size={"25"} />
           <span>Add/Modify</span>
         </div>
       </div>
-      
+      {data && data.table && (
+        <UpdateAddModifyNode
+          visible={visible}
+          setVisible={setVisible}
+          nodeId={id}
+          csvData={data.table}
+        />
+      )}
     </>
   );
 }

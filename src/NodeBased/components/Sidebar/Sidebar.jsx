@@ -1,8 +1,10 @@
+import AutoFixHighOutlinedIcon from "@mui/icons-material/AutoFixHighOutlined";
 import AutoGraphOutlinedIcon from "@mui/icons-material/AutoGraphOutlined";
 import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import InsertChartOutlinedIcon from "@mui/icons-material/InsertChartOutlined";
-import SettingsSuggestOutlinedIcon from "@mui/icons-material/SettingsSuggestOutlined";
+import RemoveCircleOutlineOutlinedIcon from "@mui/icons-material/RemoveCircleOutlineOutlined";
+import TextFieldsOutlinedIcon from "@mui/icons-material/TextFieldsOutlined";
 import { Collapse } from "@nextui-org/react";
 import {
   AiOutlineGroup,
@@ -16,9 +18,59 @@ import {
   HiOutlineDocumentReport,
   HiOutlinePuzzle,
 } from "react-icons/hi";
-import { RiFlowChart } from "react-icons/ri";
+import { RiFileEditLine, RiFlowChart } from "react-icons/ri";
 import { RxRocket } from "react-icons/rx";
 import { TbCirclesRelation } from "react-icons/tb";
+import {GrTableAdd} from 'react-icons/gr'
+
+const FEATURE_ENGINEERING = [
+  {
+    key: "2-0",
+    label: "Add/Modify",
+    icon: <RiFileEditLine className="text-[rgba(0,0,0,0.54)]" size={"25"} />,
+  },
+  {
+    key: "2-1",
+    label: "Change Dtype",
+    icon: <AutoFixHighOutlinedIcon color="action" />,
+  },
+  {
+    key: "2-2",
+    label: "Alter Field Name",
+    icon: <TextFieldsOutlinedIcon color="action" />,
+  },
+  {
+    key: "2-3",
+    label: "Imputation",
+  },
+  {
+    key: "2-4",
+    label: "Encoding",
+  },
+  {
+    key: "2-5",
+    label: "Scaling",
+  },
+  {
+    key: "2-6",
+    label: "Drop Column/Rows",
+    icon: <RemoveCircleOutlineOutlinedIcon color="action" />,
+  },
+  {
+    key: "2-9",
+    label: "Append Dataset",
+    icon: <GrTableAdd className="opacity-70" size={"20"} />,
+  },
+  {
+    key: "2-10",
+    label: "Feature Selection",
+  },
+  {
+    key: "2-11",
+    label: "Cluster",
+  },
+];
+
 const FUNCTION_NODES = [
   {
     key: "0",
@@ -58,62 +110,7 @@ const FUNCTION_NODES = [
     icon: <InsertChartOutlinedIcon color="action" />,
     children: [],
   },
-  {
-    key: "2",
-    label: "Feature Engineering",
-    // icon: <RxGear size={"20"} />,
-    children: [
-      {
-        key: "2-0",
-        label: "Add/Modify",
-        icon: <SettingsSuggestOutlinedIcon color="action" />,
-      },
-      {
-        key: "2-1",
-        label: "Change Dtype",
-      },
-      {
-        key: "2-2",
-        label: "Alter Field Name",
-      },
-      {
-        key: "2-3",
-        label: "Imputation",
-      },
-      {
-        key: "2-4",
-        label: "Encoding",
-      },
-      {
-        key: "2-5",
-        label: "Scaling",
-      },
-      {
-        key: "2-6",
-        label: "Drop Column",
-      },
-      {
-        key: "2-7",
-        label: "Drop Rows",
-      },
-      {
-        key: "2-8",
-        label: "Merge Dataset",
-      },
-      {
-        key: "2-9",
-        label: "Append Dataset",
-      },
-      {
-        key: "2-10",
-        label: "Feature Selection",
-      },
-      {
-        key: "2-11",
-        label: "Cluster",
-      },
-    ],
-  },
+
   {
     key: "3",
     label: "Final Dataset",
@@ -215,7 +212,7 @@ const Sidebar = () => {
                   draggable
                 >
                   <CloudUploadOutlinedIcon color="action" />
-                  <span>Upload File</span>
+                  <span className="text-xs">Upload File</span>
                 </button>
                 <button
                   className="grid gap-1 place-items-center border-2 px-2 py-3 rounded-md shadow text-sm "
@@ -223,7 +220,7 @@ const Sidebar = () => {
                   draggable
                 >
                   <AutoGraphOutlinedIcon color="action" />
-                  <span>Graph</span>
+                  <span className="text-xs">Graph</span>
                 </button>
                 <button
                   className="grid gap-1 place-items-center border-2 px-2 py-3 rounded-md shadow text-sm "
@@ -231,7 +228,7 @@ const Sidebar = () => {
                   draggable
                 >
                   <BsTable className="text-[rgba(0,0,0,0.54)]" size={20} />
-                  <span>Table</span>
+                  <span className="text-xs">Table</span>
                 </button>
               </div>
             </Collapse>
@@ -253,11 +250,34 @@ const Sidebar = () => {
                         draggable
                       >
                         {node.icon && <span>{node.icon}</span>}
-                        <span>{node.label}</span>
+                        <span className="text-xs">{node.label}</span>
                       </button>
                     );
                   }
                 })}
+              </div>
+            </Collapse>
+          </Collapse.Group>
+          <Collapse.Group bordered>
+            <Collapse
+              title={
+                <h1 className="font-medium tracking-wider">
+                  Feature Engineering
+                </h1>
+              }
+            >
+              <div className="grid grid-cols-3 gap-4">
+                {FEATURE_ENGINEERING.map((node) => (
+                  <button
+                    className="grid gap-1 place-items-center border-2 px-2 py-3 rounded-md shadow text-sm "
+                    onDragStart={(event) => onDragStart(event, node.label)}
+                    draggable
+                    key={node.key}
+                  >
+                    {node.icon && <span>{node.icon}</span>}
+                    <span className="text-xs">{node.label}</span>
+                  </button>
+                ))}
               </div>
             </Collapse>
           </Collapse.Group>

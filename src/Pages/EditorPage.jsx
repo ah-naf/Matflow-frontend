@@ -23,6 +23,7 @@ import TimeSeriesNode from "../NodeBased/CustomNodes/TimeSeiresNode/TimeSeriesNo
 import UploadFile from "../NodeBased/CustomNodes/UploadFile/UploadFile";
 import Sidebar from "../NodeBased/components/Sidebar/Sidebar";
 import {
+  handleAddModify,
   handleFileForMergeDataset,
   handleMergeDataset,
   handleOutputTable,
@@ -219,6 +220,11 @@ function EditorPage() {
 
       if (typeSource === "Merge Dataset" && typeTarget === "output_table") {
         ok = await handleMergeDataset(rflow, params);
+      }
+
+      if(typeSource === 'Add/Modify' && typeTarget === 'upload') {
+        ok = await handleAddModify(rflow, params)
+        
       }
 
       if (!ok) return;

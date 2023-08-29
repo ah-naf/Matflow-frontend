@@ -4,7 +4,12 @@ import { useDispatch } from "react-redux";
 import { setData } from "../../../../../Slices/FeatureEngineeringSlice";
 import SingleDropDown from "../../../../Components/SingleDropDown/SingleDropDown";
 
-function Add_GroupNumerical({ csvData, type = "function" }) {
+function Add_GroupNumerical({
+  csvData,
+  type = "function",
+  nodeId,
+  rflow = undefined,
+}) {
   const [nGroups, setNGroups] = useState(2);
   const columnNames = Object.keys(csvData[0]).filter(
     (val) => typeof csvData[0][val] === "number"
@@ -30,6 +35,27 @@ function Add_GroupNumerical({ csvData, type = "function" }) {
   const [bin_column, setBin_column] = useState("");
   const [show_bin_dict, setShow_bin_dict] = useState(false);
   const dispatch = useDispatch();
+  let nodeDetails = {};
+  if (rflow) {
+    nodeDetails = rflow.getNode(nodeId);
+  }
+
+  useEffect(() => {
+    if (nodeDetails && type === "node") {
+      let data = nodeDetails.data;
+      if (
+        data &&
+        data.addModify &&
+        data.addModify.method === "Group Numerical"
+      ) {
+        data = data.addModify.data;
+        if (data.n_group_data.length > 0) setNGroupData(data.n_group_data);
+        setBin_column(data.bin_column || "");
+        setShow_bin_dict(!!data.show_bin_dict);
+        setNGroups(data.n_groups || 2);
+      }
+    }
+  }, [nodeDetails]);
 
   useEffect(() => {
     dispatch(
@@ -84,10 +110,12 @@ function Add_GroupNumerical({ csvData, type = "function" }) {
             <SingleDropDown
               columnNames={columnNames}
               onValueChange={setBin_column}
+              initValue={bin_column}
             />
           </div>
         </div>
         <Checkbox
+          isSelected={show_bin_dict}
           color="success"
           onChange={(e) => setShow_bin_dict(e.valueOf())}
         >
@@ -173,6 +201,7 @@ function Add_GroupNumerical({ csvData, type = "function" }) {
                 size={type === "node" ? "sm" : "md"}
                 color="success"
                 className="w-44"
+                isSelected={val.use_operator}
                 onChange={(e) =>
                   handleValueChange(e.valueOf(), index, "use_operator")
                 }

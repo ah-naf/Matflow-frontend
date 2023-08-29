@@ -36,7 +36,7 @@ function TimeSeriesNode({ id, data }) {
         <Handle type="source" position={Position.Right}></Handle>
         <Handle type="target" position={Position.Left}></Handle>
         <div className="grid place-items-center p-3 px-4 min-w-[80px]">
-          <AiOutlineLineChart className="text-[rgba(0,0,0,0.54)]" size={"30"} />
+          <AiOutlineLineChart size={"30"} />
           <span className="mt-1 text-center text-sm">
             Time Series <br /> Analysis
           </span>

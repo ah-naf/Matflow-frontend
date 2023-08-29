@@ -3,7 +3,9 @@ import { Dialog } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { Input } from "@nextui-org/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useReactFlow } from "reactflow";
 import SingleDropDown from "../../../FunctionBased/Components/SingleDropDown/SingleDropDown";
 import Add_ExtractText from "../../../FunctionBased/Functions/Feature Engineering/AddModify/Component/Add_ExtractText";
 import Add_GroupCategorical from "../../../FunctionBased/Functions/Feature Engineering/AddModify/Component/Add_GroupCategorical";
@@ -12,16 +14,74 @@ import Add_MathOperation from "../../../FunctionBased/Functions/Feature Engineer
 import Add_NewColumn from "../../../FunctionBased/Functions/Feature Engineering/AddModify/Component/Add_NewColumn";
 import Modify_ProgressApply from "../../../FunctionBased/Functions/Feature Engineering/AddModify/Component/Modify_ProgressApply";
 import Modify_ReplaceValue from "../../../FunctionBased/Functions/Feature Engineering/AddModify/Component/Modify_ReplaceValue";
-import { setMethod } from "../../../Slices/FeatureEngineeringSlice";
-import { useDispatch } from "react-redux";
+import {
+  setColumnName,
+  setMethod,
+  setOption,
+  setSelectColumn,
+} from "../../../Slices/FeatureEngineeringSlice";
 
 function UpdateAddModifyNode({ visible, setVisible, csvData, nodeId }) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
-  const [option, setOption] = useState("Add");
-  const [column_name, setColumnName] = useState("");
+  const [current_option, setCurrentOption] = useState("Add");
   const [currentMethod, setCurrentMethod] = useState("New Column");
-  const dispatch = useDispatch()
+  const [selectedColumn, setSelectedColumn] = useState("");
+  const featureData = useSelector((state) => state.featureEngineering);
+  const [col_name, setColName] = useState("");
+  const dispatch = useDispatch();
+  const rflow = useReactFlow();
+  const nodeDetails = rflow.getNode(nodeId);
+  const [dataset_name, setDatasetName] = useState("");
+
+  useEffect(() => {
+    let data = nodeDetails.data;
+    if (data && data.addModify) {
+      data = data.addModify;
+      setCurrentOption(data.option || "Add");
+      setCurrentMethod(data.method || "");
+      setColName(data.column_name || "");
+      setSelectedColumn(data.select_column || "");
+      setDatasetName(data.dataset_name || "");
+    }
+  }, [nodeDetails]);
+
+  const handleOptionClicked = (e) => {
+    setCurrentOption(e);
+
+    let meth;
+    if (e === "Add") {
+      setCurrentMethod("New Column");
+      meth = "New Column";
+    } else {
+      setCurrentMethod("Math Operation");
+      meth = "Math Operation";
+    }
+    dispatch(setOption(e));
+    dispatch(setMethod(meth));
+  };
+
+  const handleSave = () => {
+    const newFeatureData = {
+      ...featureData,
+      file: csvData,
+      option: featureData.option.trim(),
+    };
+    // console.log(newFeatureData);
+    const tempNode = {
+      ...nodeDetails,
+      data: {
+        ...nodeDetails.data,
+        addModify: { ...newFeatureData, dataset_name },
+      },
+    };
+
+    const tempNodes = rflow.getNodes().map((node) => {
+      if (node.id === nodeId) return tempNode;
+      return node;
+    });
+    rflow.setNodes(tempNodes);
+  };
 
   return (
     <div>
@@ -45,19 +105,38 @@ function UpdateAddModifyNode({ visible, setVisible, csvData, nodeId }) {
             <p>Option</p>
             <SingleDropDown
               columnNames={["Add", "Modify"]}
-              initValue={option}
-              onValueChange={e => {
-                setOption(e)
-                
+              initValue={current_option}
+              onValueChange={(e) => {
+                handleOptionClicked(e);
               }}
             />
           </div>
-          <Input
-            fullWidth
-            label="New Column Name"
-            value={column_name}
-            onChange={(e) => setColumnName(e.target.value)}
-          />
+          <div className="w-full flex flex-col">
+            <label className=" text-lg tracking-wide font-medium" htmlFor="">
+              {current_option === "Add" ? "New column name" : "Select Column"}
+            </label>
+            {current_option === "Add" ? (
+              <Input
+                bordered
+                color="success"
+                className="mt-1"
+                value={col_name}
+                onChange={(e) => {
+                  dispatch(setColumnName(e.target.value));
+                  setColName(e.target.value);
+                }}
+              />
+            ) : (
+              <SingleDropDown
+                columnNames={Object.keys(csvData[0])}
+                onValueChange={(e) => {
+                  setSelectedColumn(e);
+                  dispatch(setSelectColumn(e));
+                }}
+                initValue={selectedColumn}
+              />
+            )}
+          </div>
           <div>
             <p>Method</p>
             <select
@@ -70,14 +149,14 @@ function UpdateAddModifyNode({ visible, setVisible, csvData, nodeId }) {
                 dispatch(setMethod(e.target.value));
               }}
             >
-              {option === "Add" && (
+              {current_option === "Add" && (
                 <option value="New Column">New Column</option>
               )}
               <option value="Math Operation">Math Operation</option>
               <option value="Extract Text">Extract Text</option>
               <option value="Group Categorical">Group Categorical</option>
               <option value="Group Numerical">Group Numerical</option>
-              {option === "Modify" && (
+              {current_option === "Modify" && (
                 <>
                   <option value="Replace Values">Replace Values</option>
                   <option value="Progress Apply">Progress Apply</option>
@@ -87,28 +166,73 @@ function UpdateAddModifyNode({ visible, setVisible, csvData, nodeId }) {
           </div>
           <div className="mt-12">
             {csvData && currentMethod === "New Column" && (
-              <Add_NewColumn csvData={csvData} type="node" />
+              <Add_NewColumn
+                csvData={csvData}
+                type="node"
+                nodeId={nodeId}
+                rflow={rflow}
+              />
             )}
             {csvData && currentMethod === "Math Operation" && (
-              <Add_MathOperation csvData={csvData} type="node" />
+              <Add_MathOperation
+                csvData={csvData}
+                type="node"
+                nodeId={nodeId}
+                rflow={rflow}
+              />
             )}
             {csvData && currentMethod === "Extract Text" && (
-              <Add_ExtractText csvData={csvData} type="node" />
+              <Add_ExtractText
+                csvData={csvData}
+                type="node"
+                nodeId={nodeId}
+                rflow={rflow}
+              />
             )}
             {csvData && currentMethod === "Group Categorical" && (
-              <Add_GroupCategorical csvData={csvData} type="node" />
+              <Add_GroupCategorical
+                csvData={csvData}
+                type="node"
+                nodeId={nodeId}
+                rflow={rflow}
+              />
             )}
             {csvData && currentMethod === "Group Numerical" && (
-              <Add_GroupNumerical csvData={csvData} type="node" />
+              <Add_GroupNumerical
+                csvData={csvData}
+                type="node"
+                nodeId={nodeId}
+                rflow={rflow}
+              />
             )}
             {csvData && currentMethod === "Replace Values" && (
-              <Modify_ReplaceValue csvData={csvData} type="node" />
+              <Modify_ReplaceValue
+                csvData={csvData}
+                type="node"
+                nodeId={nodeId}
+                rflow={rflow}
+              />
             )}
             {csvData && currentMethod === "Progress Apply" && (
-              <Modify_ProgressApply csvData={csvData} type="node" />
+              <Modify_ProgressApply
+                csvData={csvData}
+                type="node"
+                nodeId={nodeId}
+                rflow={rflow}
+              />
             )}
           </div>
+          <div>
+            <Input
+              label="New Dataset Name"
+              fullWidth
+              clearable
+              value={dataset_name}
+              onChange={(e) => setDatasetName(e.target.value)}
+            />
+          </div>
         </div>
+
         <div className="sticky bottom-0 bg-white border-t-2 shadow-md border-gray-200 flex items-center gap-4 w-full justify-end px-6 py-3 pt-6 mt-4 z-[100]">
           <button
             className="font-medium border-2 p-2 px-4 text-lg tracking-wider border-gray-500 rounded"
@@ -121,7 +245,7 @@ function UpdateAddModifyNode({ visible, setVisible, csvData, nodeId }) {
           <button
             className="font-medium border-2 p-2 px-4 text-lg tracking-wider bg-black text-white rounded"
             onClick={() => {
-              //   handleSave();
+              handleSave();
               setVisible(false);
             }}
           >

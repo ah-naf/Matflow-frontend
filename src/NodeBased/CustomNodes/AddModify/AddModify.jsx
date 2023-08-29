@@ -1,11 +1,28 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { RiFileEditLine } from "react-icons/ri";
-import { Handle, Position } from "reactflow";
+import { Handle, Position, useReactFlow } from "reactflow";
+import { handleAddModify } from "../../../util/NodeFunctions";
 import UpdateAddModifyNode from "../../UpdateNodes/UpdateAddModifyNode/UpdateAddModifyNode";
 
 function AddModify({ id, data }) {
-  console.log(data);
+  // console.log(data);
   const [visible, setVisible] = useState(false);
+  const rflow = useReactFlow();
+
+  useEffect(() => {
+    (async function () {
+      const temp = rflow
+        .getEdges()
+        .filter(
+          (edge) =>
+            edge.source === id && rflow.getNode(edge.target).type === "upload"
+        );
+      temp.forEach(async (val) => {
+        await handleAddModify(rflow, val);
+      });
+    })();
+  }, [data]);
+
   return (
     <>
       <div
@@ -18,7 +35,7 @@ function AddModify({ id, data }) {
         <Handle type="target" position={Position.Left}></Handle>
 
         <div className="grid place-items-center gap-1 p-2 py-3 min-w-[80px]">
-          <RiFileEditLine className="text-[rgba(0,0,0,0.54)]" size={"25"} />
+          <RiFileEditLine size={"25"} />
           <span>Add/Modify</span>
         </div>
       </div>

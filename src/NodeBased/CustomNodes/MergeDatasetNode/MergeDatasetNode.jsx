@@ -47,7 +47,7 @@ function MergeDatasetNode({ id, data }) {
           position={Position.Left}
         ></Handle>
         <div className="grid place-items-center gap-1 p-2 py-3 min-w-[80px]">
-          <AiOutlineMergeCells className="text-[rgba(0,0,0,1)]" size={"25"} />
+          <AiOutlineMergeCells  size={"25"} />
           <span>Merge Dataset</span>
         </div>
       </div>

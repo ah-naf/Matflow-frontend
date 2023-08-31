@@ -14,6 +14,7 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 import AddModify from "../NodeBased/CustomNodes/AddModify/AddModify";
+import ChangeDtypeNode from "../NodeBased/CustomNodes/ChangeDTypeNode/ChangeDtypeNode";
 import ChartNode from "../NodeBased/CustomNodes/ChartNode/ChartNode";
 import EDANode from "../NodeBased/CustomNodes/EDANode/EDANode";
 import MergeDatasetNode from "../NodeBased/CustomNodes/MergeDatasetNode/MergeDatasetNode";
@@ -24,6 +25,7 @@ import UploadFile from "../NodeBased/CustomNodes/UploadFile/UploadFile";
 import Sidebar from "../NodeBased/components/Sidebar/Sidebar";
 import {
   handleAddModify,
+  handleChangeDtype,
   handleFileForMergeDataset,
   handleMergeDataset,
   handleOutputTable,
@@ -42,6 +44,7 @@ const nodeTypes = {
   "Time Series Analysis": TimeSeriesNode,
   "Merge Dataset": MergeDatasetNode,
   "Add/Modify": AddModify,
+  "Change Dtype": ChangeDtypeNode,
 };
 
 const initialNodes = [
@@ -163,7 +166,8 @@ function EditorPage() {
         typeTarget === "output_graph" ||
         typeTarget === "Time Series Analysis" ||
         typeTarget === "ReverseML" ||
-        typeTarget === "Add/Modify"
+        typeTarget === "Add/Modify" ||
+        typeTarget === "Change Dtype"
       ) {
         const temp = edgeList.filter((val) => val.target === params.target);
         if (temp && temp.length > 0) {
@@ -186,7 +190,8 @@ function EditorPage() {
         (typeTarget === "output_table" ||
           typeTarget === "EDA" ||
           typeTarget === "ReverseML" ||
-          typeTarget === "Add/Modify")
+          typeTarget === "Add/Modify" ||
+          typeTarget === "Change Dtype")
       ) {
         ok = await handleOutputTable(rflow, params);
       }
@@ -222,9 +227,12 @@ function EditorPage() {
         ok = await handleMergeDataset(rflow, params);
       }
 
-      if(typeSource === 'Add/Modify' && typeTarget === 'upload') {
-        ok = await handleAddModify(rflow, params)
-        
+      if (typeSource === "Add/Modify" && typeTarget === "upload") {
+        ok = await handleAddModify(rflow, params);
+      }
+
+      if (typeSource === "Change Dtype" && typeTarget === "upload") {
+        ok = await handleChangeDtype(rflow, params);
       }
 
       if (!ok) return;

@@ -288,3 +288,36 @@ export const handleAddModify = async (rflow, params) => {
     return false;
   }
 };
+
+export const handleChangeDtype = async (rflow, params) => {
+  try {
+    let { changeDtype } = rflow.getNode(params.source).data;
+    console.log(changeDtype);
+    if (!changeDtype) throw new Error("Check Change Dtype Node.");
+    
+    const res = await fetch("http://127.0.0.1:8000/api/change_dtype/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(changeDtype),
+    });
+
+    let data = await res.json();
+    console.log(data)
+    const tempNodes = rflow.getNodes().map((val) => {
+      if (val.id === params.target)
+        return {
+          ...val,
+          data: { table: data, file_name: changeDtype.dataset_name },
+        };
+      return val;
+    });
+    rflow.setNodes(tempNodes);
+
+    return true;
+  } catch (error) {
+    raiseErrorToast(rflow, params, error.message);
+    return false;
+  }
+};

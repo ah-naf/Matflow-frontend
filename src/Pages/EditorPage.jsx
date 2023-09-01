@@ -17,6 +17,7 @@ import AddModify from "../NodeBased/CustomNodes/AddModify/AddModify";
 import AlterFieldNameNode from "../NodeBased/CustomNodes/AlterFieldNameNode/AlterFieldNameNode";
 import ChangeDtypeNode from "../NodeBased/CustomNodes/ChangeDTypeNode/ChangeDtypeNode";
 import ChartNode from "../NodeBased/CustomNodes/ChartNode/ChartNode";
+import DropRowsColumnNode from "../NodeBased/CustomNodes/DropRowsColumnNode/DropRowsColumnNode";
 import EDANode from "../NodeBased/CustomNodes/EDANode/EDANode";
 import MergeDatasetNode from "../NodeBased/CustomNodes/MergeDatasetNode/MergeDatasetNode";
 import ReverseMLNode from "../NodeBased/CustomNodes/ReverseMLNode/ReverseMLNode";
@@ -28,6 +29,7 @@ import {
   handleAddModify,
   handleAlterFieldName,
   handleChangeDtype,
+  handleDropRowColumn,
   handleFileForMergeDataset,
   handleMergeDataset,
   handleOutputTable,
@@ -48,6 +50,7 @@ const nodeTypes = {
   "Add/Modify": AddModify,
   "Change Dtype": ChangeDtypeNode,
   "Alter Field Name": AlterFieldNameNode,
+  "Drop Column/Rows": DropRowsColumnNode,
 };
 
 const initialNodes = [
@@ -187,7 +190,8 @@ function EditorPage() {
           typeTarget === "ReverseML" ||
           typeTarget === "Add/Modify" ||
           typeTarget === "Change Dtype" ||
-          typeTarget === "Alter Field Name")
+          typeTarget === "Alter Field Name" ||
+          typeTarget === "Drop Column/Rows")
       ) {
         ok = await handleOutputTable(rflow, params);
       }
@@ -233,6 +237,10 @@ function EditorPage() {
 
       if (typeSource === "Alter Field Name" && typeTarget === "upload") {
         ok = await handleAlterFieldName(rflow, params);
+      }
+
+      if (typeSource === "Drop Column/Rows" && typeTarget === "upload") {
+        ok = await handleDropRowColumn(rflow, params);
       }
 
       if (!ok) return;

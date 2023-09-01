@@ -257,7 +257,7 @@ export const handleMergeDataset = async (rflow, params) => {
 export const handleAddModify = async (rflow, params) => {
   try {
     let { addModify } = rflow.getNode(params.source).data;
-    console.log(addModify);
+    // console.log(addModify);
     if (!addModify) throw new Error("Check Add/Modify Node.");
     if (addModify.option === "Add") {
       addModify.select_column = addModify.column_name;
@@ -271,7 +271,7 @@ export const handleAddModify = async (rflow, params) => {
     });
 
     let data = await res.json();
-    console.log(data)
+    // console.log(data);
     const tempNodes = rflow.getNodes().map((val) => {
       if (val.id === params.target)
         return {
@@ -292,9 +292,9 @@ export const handleAddModify = async (rflow, params) => {
 export const handleChangeDtype = async (rflow, params) => {
   try {
     let { changeDtype } = rflow.getNode(params.source).data;
-    console.log(changeDtype);
+    // console.log(changeDtype);
     if (!changeDtype) throw new Error("Check Change Dtype Node.");
-    
+
     const res = await fetch("http://127.0.0.1:8000/api/change_dtype/", {
       method: "POST",
       headers: {
@@ -304,7 +304,7 @@ export const handleChangeDtype = async (rflow, params) => {
     });
 
     let data = await res.json();
-    console.log(data)
+    // console.log(data);
     const tempNodes = rflow.getNodes().map((val) => {
       if (val.id === params.target)
         return {
@@ -325,9 +325,9 @@ export const handleChangeDtype = async (rflow, params) => {
 export const handleAlterFieldName = async (rflow, params) => {
   try {
     let { alterFieldName } = rflow.getNode(params.source).data;
-    console.log(alterFieldName);
-    if (!alterFieldName) throw new Error("Check Alter Field Name Node.");
     
+    if (!alterFieldName) throw new Error("Check Alter Field Name Node.");
+
     const res = await fetch("http://127.0.0.1:8000/api/alter_field_name/", {
       method: "POST",
       headers: {
@@ -337,12 +337,51 @@ export const handleAlterFieldName = async (rflow, params) => {
     });
 
     let data = await res.json();
-    console.log(data)
+    // console.log(data);
     const tempNodes = rflow.getNodes().map((val) => {
       if (val.id === params.target)
         return {
           ...val,
           data: { table: data, file_name: alterFieldName.dataset_name },
+        };
+      return val;
+    });
+    rflow.setNodes(tempNodes);
+
+    return true;
+  } catch (error) {
+    raiseErrorToast(rflow, params, error.message);
+    return false;
+  }
+};
+
+export const handleDropRowColumn = async (rflow, params) => {
+  try {
+    let { dropColumnRow } = rflow.getNode(params.source).data;
+
+    if (!dropColumnRow) throw new Error("Check Alter Field Name Node.");
+    let url = "http://127.0.0.1:8000/api/drop_column/";
+    if (dropColumnRow.dropOption === "Row")
+      url = "http://127.0.0.1:8000/api/drop_rows/";
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        default_value: dropColumnRow.default_value,
+        select_columns: dropColumnRow.select_columns,
+        file: dropColumnRow.file,
+      }),
+    });
+
+    let data = await res.json();
+    console.log(data)
+    const tempNodes = rflow.getNodes().map((val) => {
+      if (val.id === params.target)
+        return {
+          ...val,
+          data: { table: data, file_name: dropColumnRow.dataset_name },
         };
       return val;
     });

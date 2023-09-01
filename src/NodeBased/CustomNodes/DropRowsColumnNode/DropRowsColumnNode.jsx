@@ -1,11 +1,11 @@
-import TextFieldsOutlinedIcon from "@mui/icons-material/TextFieldsOutlined";
+import RemoveCircleOutlineOutlinedIcon from "@mui/icons-material/RemoveCircleOutlineOutlined";
 import React, { useEffect, useState } from "react";
 import { Handle, Position, useReactFlow } from "reactflow";
-import { handleAlterFieldName } from "../../../util/NodeFunctions";
-import UpdateAlterFieldNameNode from "../../UpdateNodes/UpdateAlterFieldNameNode/UpdateAlterFieldNameNode";
+import UpdateDropRowsColumnNode from "../../UpdateNodes/UpdateDropRowsColumnNode/UpdateDropRowsColumnNode";
+import { handleDropRowColumn } from "../../../util/NodeFunctions";
 
-function AlterFieldNameNode({ id, data }) {
-  // console.log(data);
+function DropRowsColumnNode({ id, data }) {
+  console.log(data);
   const [visible, setVisible] = useState(false);
   const rflow = useReactFlow();
 
@@ -18,7 +18,7 @@ function AlterFieldNameNode({ id, data }) {
             edge.source === id && rflow.getNode(edge.target).type === "upload"
         );
       temp.forEach(async (val) => {
-        await handleAlterFieldName(rflow, val);
+        await handleDropRowColumn(rflow, val);
       });
     })();
   }, [data]);
@@ -35,12 +35,12 @@ function AlterFieldNameNode({ id, data }) {
         <Handle type="target" position={Position.Left}></Handle>
 
         <div className="grid place-items-center gap-1 p-2 py-3 min-w-[80px]">
-          <TextFieldsOutlinedIcon />
-          <span>Alter Field Name</span>
+          <RemoveCircleOutlineOutlinedIcon />
+          <span>Drop Column/Row</span>
         </div>
       </div>
       {data && data.table && (
-        <UpdateAlterFieldNameNode
+        <UpdateDropRowsColumnNode
           visible={visible}
           setVisible={setVisible}
           nodeId={id}
@@ -51,4 +51,4 @@ function AlterFieldNameNode({ id, data }) {
   );
 }
 
-export default AlterFieldNameNode;
+export default DropRowsColumnNode;

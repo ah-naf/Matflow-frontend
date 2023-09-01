@@ -321,3 +321,36 @@ export const handleChangeDtype = async (rflow, params) => {
     return false;
   }
 };
+
+export const handleAlterFieldName = async (rflow, params) => {
+  try {
+    let { alterFieldName } = rflow.getNode(params.source).data;
+    console.log(alterFieldName);
+    if (!alterFieldName) throw new Error("Check Alter Field Name Node.");
+    
+    const res = await fetch("http://127.0.0.1:8000/api/alter_field_name/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(alterFieldName),
+    });
+
+    let data = await res.json();
+    console.log(data)
+    const tempNodes = rflow.getNodes().map((val) => {
+      if (val.id === params.target)
+        return {
+          ...val,
+          data: { table: data, file_name: alterFieldName.dataset_name },
+        };
+      return val;
+    });
+    rflow.setNodes(tempNodes);
+
+    return true;
+  } catch (error) {
+    raiseErrorToast(rflow, params, error.message);
+    return false;
+  }
+};

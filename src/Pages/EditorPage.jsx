@@ -14,6 +14,7 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 import AddModify from "../NodeBased/CustomNodes/AddModify/AddModify";
+import AlterFieldNameNode from "../NodeBased/CustomNodes/AlterFieldNameNode/AlterFieldNameNode";
 import ChangeDtypeNode from "../NodeBased/CustomNodes/ChangeDTypeNode/ChangeDtypeNode";
 import ChartNode from "../NodeBased/CustomNodes/ChartNode/ChartNode";
 import EDANode from "../NodeBased/CustomNodes/EDANode/EDANode";
@@ -25,6 +26,7 @@ import UploadFile from "../NodeBased/CustomNodes/UploadFile/UploadFile";
 import Sidebar from "../NodeBased/components/Sidebar/Sidebar";
 import {
   handleAddModify,
+  handleAlterFieldName,
   handleChangeDtype,
   handleFileForMergeDataset,
   handleMergeDataset,
@@ -45,6 +47,7 @@ const nodeTypes = {
   "Merge Dataset": MergeDatasetNode,
   "Add/Modify": AddModify,
   "Change Dtype": ChangeDtypeNode,
+  "Alter Field Name": AlterFieldNameNode,
 };
 
 const initialNodes = [
@@ -160,15 +163,7 @@ function EditorPage() {
       const typeSource = rflow.getNode(params.source).type;
       const typeTarget = rflow.getNode(params.target).type;
       let ok = false;
-      if (
-        typeTarget === "output_table" ||
-        typeTarget === "EDA" ||
-        typeTarget === "output_graph" ||
-        typeTarget === "Time Series Analysis" ||
-        typeTarget === "ReverseML" ||
-        typeTarget === "Add/Modify" ||
-        typeTarget === "Change Dtype"
-      ) {
+      if (typeTarget !== "Merge Dataset") {
         const temp = edgeList.filter((val) => val.target === params.target);
         if (temp && temp.length > 0) {
           toast.error(`Connection limit of ${typeTarget} node is 1`, {
@@ -191,7 +186,8 @@ function EditorPage() {
           typeTarget === "EDA" ||
           typeTarget === "ReverseML" ||
           typeTarget === "Add/Modify" ||
-          typeTarget === "Change Dtype")
+          typeTarget === "Change Dtype" ||
+          typeTarget === "Alter Field Name")
       ) {
         ok = await handleOutputTable(rflow, params);
       }
@@ -233,6 +229,10 @@ function EditorPage() {
 
       if (typeSource === "Change Dtype" && typeTarget === "upload") {
         ok = await handleChangeDtype(rflow, params);
+      }
+
+      if (typeSource === "Alter Field Name" && typeTarget === "upload") {
+        ok = await handleAlterFieldName(rflow, params);
       }
 
       if (!ok) return;

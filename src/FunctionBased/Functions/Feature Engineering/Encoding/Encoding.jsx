@@ -12,7 +12,12 @@ import SingleDropDown from "../../../Components/SingleDropDown/SingleDropDown";
 
 const Method = ["Ordinal Encoding", "One-Hot Encoding", "Target Encoding"];
 
-function Encoding({ csvData }) {
+function Encoding({
+  csvData,
+  type = "function",
+  onValueChange = undefined,
+  initValue = undefined,
+}) {
   const allStringColumn = Object.keys(csvData[0]).filter(
     (val) => typeof csvData[0][val] === "string"
   );
@@ -22,20 +27,41 @@ function Encoding({ csvData }) {
   const [stringColumn, setStringColumn] = useState(allStringColumn[0]);
   const [method, setMethod] = useState(Method[0]);
   const [add_to_pipeline, setAddToPipeline] = useState(false);
-  const [stringValues, setStringValues] = useState();
+  let temp = csvData.map((val) => val[stringColumn]);
+  temp = new Set(temp);
+  temp = [...temp];
+  const [stringValues, setStringValues] = useState(temp);
   const [data, setData] = useState({});
   const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
   const render = useSelector((state) => state.uploadedFile.rerender);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (method === Method[0]) {
-      let temp = csvData.map((val) => val[stringColumn]);
-      temp = new Set(temp);
-      temp = [...temp];
-      setStringValues(temp);
+    if (type === "node" && initValue) {
+      setStringColumn(initValue.select_column || allStringColumn[0]);
+      setMethod(initValue.method || Method[0]);
+      setData(initValue.data || {});
     }
-  }, [method, stringColumn, csvData]);
+  }, []);
+
+  // useEffect(() => {
+  //   if (method === Method[0]) {
+  //     let temp = csvData.map((val) => val[stringColumn]);
+  //     temp = new Set(temp);
+  //     temp = [...temp];
+  //     setStringValues(temp);
+  //   }
+  // }, [method, stringColumn, csvData]);
+
+  useEffect(() => {
+    if (type === "node") {
+      onValueChange({
+        select_column: stringColumn,
+        method,
+        data,
+      });
+    }
+  }, [stringColumn, method, data]);
 
   const handleSave = async () => {
     try {
@@ -94,52 +120,76 @@ function Encoding({ csvData }) {
 
   return (
     <div className="mt-8">
-      <div className="flex items-center gap-8">
+      <div
+        className={`flex items-center gap-8 ${type === "node" && "flex-col"}`}
+      >
         <div className="w-full">
           <p>Select Column</p>
           <SingleDropDown
-            initValue={allStringColumn[0]}
+            initValue={stringColumn}
             columnNames={allStringColumn}
-            onValueChange={setStringColumn}
+            onValueChange={(e) => {
+              setStringColumn(e);
+              if (method === Method[0]) {
+                let temp = csvData.map((val) => val[e]);
+                temp = new Set(temp);
+                temp = [...temp];
+                setStringValues(temp);
+              }
+            }}
           />
         </div>
         <div className="w-full">
           <p>Select Method</p>
           <SingleDropDown
             columnNames={Method}
-            initValue={Method[0]}
+            initValue={method}
             onValueChange={(val) => {
               setMethod(val);
               setData({});
+              if (val === Method[0]) {
+                let temp = csvData.map((val) => val[stringColumn]);
+                temp = new Set(temp);
+                temp = [...temp];
+                setStringValues(temp);
+              }
             }}
           />
         </div>
-        <Checkbox
-          color="success"
-          className="w-full"
-          onChange={(e) => setAddToPipeline(e.valueOf())}
-        >
-          Add To Pipeline
-        </Checkbox>
+        {type === "function" && (
+          <Checkbox
+            color="success"
+            className="w-full"
+            onChange={(e) => setAddToPipeline(e.valueOf())}
+          >
+            Add To Pipeline
+          </Checkbox>
+        )}
       </div>
 
       {method === "Ordinal Encoding" && (
         <div className="mt-8">
           <div className="flex items-center gap-12">
             <Checkbox
+              size={type === "node" ? "sm" : "md"}
               color="success"
+              isSelected={data.start_from_0}
               onChange={(e) => setData({ ...data, start_from_0: e.valueOf() })}
             >
               Start from 0
             </Checkbox>
             <Checkbox
+              size={type === "node" ? "sm" : "md"}
               color="success"
+              isSelected={data.include_nan}
               onChange={(e) => setData({ ...data, include_nan: e.valueOf() })}
             >
               Include NaN
             </Checkbox>
             <Checkbox
+              size={type === "node" ? "sm" : "md"}
               color="success"
+              isSelected={data.sort_values}
               onChange={(e) => setData({ ...data, sort_values: e.valueOf() })}
             >
               Sort Values
@@ -153,6 +203,7 @@ function Encoding({ csvData }) {
                 setSelectedColumns={(val) =>
                   setData({ ...data, set_value_order: val })
                 }
+                defaultValue={data.set_value_order || []}
               />
             </div>
           )}
@@ -162,8 +213,10 @@ function Encoding({ csvData }) {
       {method === "One-Hot Encoding" && (
         <div className="mt-4">
           <Checkbox
+            size={type === "node" ? "sm" : "md"}
             color="success"
             className="mt-4"
+            isSelected={data.drop_first}
             onChange={(e) => setData({ ...data, drop_first: e.valueOf() })}
           >
             Drop First
@@ -177,16 +230,19 @@ function Encoding({ csvData }) {
           <SingleDropDown
             columnNames={allNumberColumn}
             onValueChange={(val) => setData({ ...data, select_target: val })}
+            initValue={data.select_target}
           />
         </div>
       )}
 
-      <button
-        className="self-start border-2 px-6 tracking-wider bg-primary-btn text-white font-medium rounded-md py-2 mt-8"
-        onClick={handleSave}
-      >
-        Submit
-      </button>
+      {type === "function" && (
+        <button
+          className="self-start border-2 px-6 tracking-wider bg-primary-btn text-white font-medium rounded-md py-2 mt-8"
+          onClick={handleSave}
+        >
+          Submit
+        </button>
+      )}
     </div>
   );
 }

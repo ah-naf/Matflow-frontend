@@ -410,12 +410,47 @@ export const handleScaling = async (rflow, params) => {
     });
 
     let data = await res.json();
-    console.log(data)
+    console.log(data);
     const tempNodes = rflow.getNodes().map((val) => {
       if (val.id === params.target)
         return {
           ...val,
           data: { table: data, file_name: scaling.dataset_name },
+        };
+      return val;
+    });
+    rflow.setNodes(tempNodes);
+
+    return true;
+  } catch (error) {
+    raiseErrorToast(rflow, params, error.message);
+    return false;
+  }
+};
+
+export const handleEncoding = async (rflow, params) => {
+  try {
+    let { encoding } = rflow.getNode(params.source).data;
+
+    if (!encoding) throw new Error("Check Encoding Node.");
+    let url = "http://127.0.0.1:8000/api/encoding/";
+    // console.log(encoding)
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(encoding),
+    });
+
+    let data = await res.json();
+    console.log(data);
+    const tempNodes = rflow.getNodes().map((val) => {
+      if (val.id === params.target)
+        return {
+          ...val,
+          data: { table: data, file_name: encoding.dataset_name },
         };
       return val;
     });

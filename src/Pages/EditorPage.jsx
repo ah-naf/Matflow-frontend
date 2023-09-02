@@ -19,6 +19,7 @@ import ChangeDtypeNode from "../NodeBased/CustomNodes/ChangeDTypeNode/ChangeDtyp
 import ChartNode from "../NodeBased/CustomNodes/ChartNode/ChartNode";
 import DropRowsColumnNode from "../NodeBased/CustomNodes/DropRowsColumnNode/DropRowsColumnNode";
 import EDANode from "../NodeBased/CustomNodes/EDANode/EDANode";
+import EncodingNode from "../NodeBased/CustomNodes/EncodingNode/EncodingNode";
 import MergeDatasetNode from "../NodeBased/CustomNodes/MergeDatasetNode/MergeDatasetNode";
 import ReverseMLNode from "../NodeBased/CustomNodes/ReverseMLNode/ReverseMLNode";
 import ScalingNode from "../NodeBased/CustomNodes/ScalingNode/ScalingNode";
@@ -31,6 +32,7 @@ import {
   handleAlterFieldName,
   handleChangeDtype,
   handleDropRowColumn,
+  handleEncoding,
   handleFileForMergeDataset,
   handleMergeDataset,
   handleOutputTable,
@@ -54,6 +56,7 @@ const nodeTypes = {
   "Alter Field Name": AlterFieldNameNode,
   "Drop Column/Rows": DropRowsColumnNode,
   Scaling: ScalingNode,
+  Encoding: EncodingNode,
 };
 
 const initialNodes = [
@@ -195,7 +198,8 @@ function EditorPage() {
           typeTarget === "Change Dtype" ||
           typeTarget === "Alter Field Name" ||
           typeTarget === "Drop Column/Rows" ||
-          typeTarget === "Scaling")
+          typeTarget === "Scaling" ||
+          typeTarget === "Encoding")
       ) {
         ok = await handleOutputTable(rflow, params);
       }
@@ -249,6 +253,10 @@ function EditorPage() {
 
       if (typeSource === "Scaling" && typeTarget === "upload") {
         ok = await handleScaling(rflow, params);
+      }
+
+      if (typeSource === "Encoding" && typeTarget === "upload") {
+        ok = await handleEncoding(rflow, params);
       }
 
       if (!ok) return;

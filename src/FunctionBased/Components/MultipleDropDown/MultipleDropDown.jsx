@@ -13,6 +13,7 @@ const MultipleDropDown = ({
   disabled = false,
   defaultValue,
 }) => {
+  // console.log({ columnNames, defaultValue });
   const [selectedItems, setSelectedItems] = useState([]);
 
   useEffect(() => {
@@ -29,7 +30,7 @@ const MultipleDropDown = ({
         disabled={disabled}
         disableCloseOnSelect
         value={selectedItems}
-        defaultValue={selectedItems.slice(0, 2)}
+        // defaultValue={selectedItems.slice(0, 2)}
         onChange={(e, newValue) => {
           setSelectedItems(newValue);
           setSelectedColumns(newValue, curInd);

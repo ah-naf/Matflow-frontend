@@ -21,6 +21,7 @@ import DropRowsColumnNode from "../NodeBased/CustomNodes/DropRowsColumnNode/Drop
 import EDANode from "../NodeBased/CustomNodes/EDANode/EDANode";
 import MergeDatasetNode from "../NodeBased/CustomNodes/MergeDatasetNode/MergeDatasetNode";
 import ReverseMLNode from "../NodeBased/CustomNodes/ReverseMLNode/ReverseMLNode";
+import ScalingNode from "../NodeBased/CustomNodes/ScalingNode/ScalingNode";
 import TableNode from "../NodeBased/CustomNodes/TableNode/TableNode";
 import TimeSeriesNode from "../NodeBased/CustomNodes/TimeSeiresNode/TimeSeriesNode";
 import UploadFile from "../NodeBased/CustomNodes/UploadFile/UploadFile";
@@ -35,6 +36,7 @@ import {
   handleOutputTable,
   handlePlotOptions,
   handleReverseML,
+  handleScaling,
   handleTimeSeriesAnalysis,
   isItTimeSeriesFile,
 } from "../util/NodeFunctions";
@@ -51,6 +53,7 @@ const nodeTypes = {
   "Change Dtype": ChangeDtypeNode,
   "Alter Field Name": AlterFieldNameNode,
   "Drop Column/Rows": DropRowsColumnNode,
+  Scaling: ScalingNode,
 };
 
 const initialNodes = [
@@ -191,7 +194,8 @@ function EditorPage() {
           typeTarget === "Add/Modify" ||
           typeTarget === "Change Dtype" ||
           typeTarget === "Alter Field Name" ||
-          typeTarget === "Drop Column/Rows")
+          typeTarget === "Drop Column/Rows" ||
+          typeTarget === "Scaling")
       ) {
         ok = await handleOutputTable(rflow, params);
       }
@@ -241,6 +245,10 @@ function EditorPage() {
 
       if (typeSource === "Drop Column/Rows" && typeTarget === "upload") {
         ok = await handleDropRowColumn(rflow, params);
+      }
+
+      if (typeSource === "Scaling" && typeTarget === "upload") {
+        ok = await handleScaling(rflow, params);
       }
 
       if (!ok) return;

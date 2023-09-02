@@ -325,7 +325,7 @@ export const handleChangeDtype = async (rflow, params) => {
 export const handleAlterFieldName = async (rflow, params) => {
   try {
     let { alterFieldName } = rflow.getNode(params.source).data;
-    
+
     if (!alterFieldName) throw new Error("Check Alter Field Name Node.");
 
     const res = await fetch("http://127.0.0.1:8000/api/alter_field_name/", {
@@ -359,7 +359,7 @@ export const handleDropRowColumn = async (rflow, params) => {
   try {
     let { dropColumnRow } = rflow.getNode(params.source).data;
 
-    if (!dropColumnRow) throw new Error("Check Alter Field Name Node.");
+    if (!dropColumnRow) throw new Error("Check Drop Row/Column Node.");
     let url = "http://127.0.0.1:8000/api/drop_column/";
     if (dropColumnRow.dropOption === "Row")
       url = "http://127.0.0.1:8000/api/drop_rows/";
@@ -376,12 +376,46 @@ export const handleDropRowColumn = async (rflow, params) => {
     });
 
     let data = await res.json();
-    console.log(data)
+    // console.log(data)
     const tempNodes = rflow.getNodes().map((val) => {
       if (val.id === params.target)
         return {
           ...val,
           data: { table: data, file_name: dropColumnRow.dataset_name },
+        };
+      return val;
+    });
+    rflow.setNodes(tempNodes);
+
+    return true;
+  } catch (error) {
+    raiseErrorToast(rflow, params, error.message);
+    return false;
+  }
+};
+
+export const handleScaling = async (rflow, params) => {
+  try {
+    let { scaling } = rflow.getNode(params.source).data;
+
+    if (!scaling) throw new Error("Check Scaling Node.");
+    let url = "http://127.0.0.1:8000/api/scaling/";
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(scaling),
+    });
+
+    let data = await res.json();
+    console.log(data)
+    const tempNodes = rflow.getNodes().map((val) => {
+      if (val.id === params.target)
+        return {
+          ...val,
+          data: { table: data, file_name: scaling.dataset_name },
         };
       return val;
     });

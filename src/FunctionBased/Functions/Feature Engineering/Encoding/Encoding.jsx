@@ -1,11 +1,14 @@
 import { Checkbox } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
-import MultipleDropDown from "../../../Components/MultipleDropDown/MultipleDropDown";
-import SingleDropDown from "../../../Components/SingleDropDown/SingleDropDown";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchDataFromIndexedDB, updateDataInIndexedDB } from "../../../../util/indexDB";
 import { toast } from "react-toastify";
 import { setReRender } from "../../../../Slices/UploadedFileSlice";
+import {
+  fetchDataFromIndexedDB,
+  updateDataInIndexedDB,
+} from "../../../../util/indexDB";
+import MultipleDropDown from "../../../Components/MultipleDropDown/MultipleDropDown";
+import SingleDropDown from "../../../Components/SingleDropDown/SingleDropDown";
 
 const Method = ["Ordinal Encoding", "One-Hot Encoding", "Target Encoding"];
 
@@ -23,7 +26,7 @@ function Encoding({ csvData }) {
   const [data, setData] = useState({});
   const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
   const render = useSelector((state) => state.uploadedFile.rerender);
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (method === Method[0]) {
@@ -45,7 +48,7 @@ function Encoding({ csvData }) {
           select_column: stringColumn,
           method,
           data,
-          file: csvData
+          file: csvData,
         }),
       });
       let Data = await res.json();
@@ -64,20 +67,17 @@ function Encoding({ csvData }) {
       const temp = await fetchDataFromIndexedDB(fileName);
       await updateDataInIndexedDB(fileName, Data);
 
-      toast.success(
-        `Data updated successfully!`,
-        {
-          position: "bottom-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "colored",
-        }
-      );
-      dispatch(setReRender(!render))
+      toast.success(`Data updated successfully!`, {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+      dispatch(setReRender(!render));
     } catch (error) {
       toast.error("Something went wrong. Please try again", {
         position: "bottom-right",
@@ -145,15 +145,17 @@ function Encoding({ csvData }) {
               Sort Values
             </Checkbox>
           </div>
-          <div className="mt-4">
-            <p>Set Value Order</p>
-            <MultipleDropDown
-              columnNames={stringValues}
-              setSelectedColumns={(val) =>
-                setData({ ...data, set_value_order: val })
-              }
-            />
-          </div>
+          {stringValues && (
+            <div className="mt-4">
+              <p>Set Value Order</p>
+              <MultipleDropDown
+                columnNames={stringValues}
+                setSelectedColumns={(val) =>
+                  setData({ ...data, set_value_order: val })
+                }
+              />
+            </div>
+          )}
         </div>
       )}
 

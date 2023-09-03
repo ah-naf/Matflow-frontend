@@ -243,7 +243,8 @@ export const handleMergeDataset = async (rflow, params) => {
     data = JSON.parse(data);
 
     const tempNodes = rflow.getNodes().map((val) => {
-      if (val.id === params.target) return { ...val, data: { table: data } };
+      if (val.id === params.target)
+        return { ...val, data: { table: data, file_name: merge.dataset_name } };
       return val;
     });
     rflow.setNodes(tempNodes);

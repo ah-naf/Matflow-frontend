@@ -13,6 +13,7 @@ import {
 } from "react-icons/ai";
 import { BiStats } from "react-icons/bi";
 import { BsTable } from "react-icons/bs";
+import { GrTableAdd } from "react-icons/gr";
 import {
   HiOutlineDocumentDuplicate,
   HiOutlineDocumentReport,
@@ -21,7 +22,6 @@ import {
 import { RiFileEditLine, RiFlowChart } from "react-icons/ri";
 import { RxRocket } from "react-icons/rx";
 import { TbCirclesRelation } from "react-icons/tb";
-import {GrTableAdd} from 'react-icons/gr'
 
 const FEATURE_ENGINEERING = [
   {
@@ -63,10 +63,17 @@ const FEATURE_ENGINEERING = [
   },
   {
     key: "2-10",
-    label: "Feature Selection",
+    label: "Merge Dataset",
+    icon: (
+      <AiOutlineMergeCells className="text-[rgba(0,0,0,0.54)]" size={"25"} />
+    ),
   },
   {
     key: "2-11",
+    label: "Feature Selection",
+  },
+  {
+    key: "2-12",
     label: "Cluster",
   },
 ];
@@ -173,14 +180,6 @@ const FUNCTION_NODES = [
     key: "8",
     label: "ReverseML",
     icon: <HiOutlinePuzzle className="text-[rgba(0,0,0,0.54)]" size={"25"} />,
-    children: [],
-  },
-  {
-    key: "9",
-    label: "Merge Dataset",
-    icon: (
-      <AiOutlineMergeCells className="text-[rgba(0,0,0,0.54)]" size={"25"} />
-    ),
     children: [],
   },
 ];

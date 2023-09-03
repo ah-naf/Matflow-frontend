@@ -235,7 +235,7 @@ function EditorPage() {
         ok = await handleFileForMergeDataset(rflow, params);
       }
 
-      if (typeSource === "Merge Dataset" && typeTarget === "output_table") {
+      if (typeSource === "Merge Dataset" && typeTarget === "upload") {
         ok = await handleMergeDataset(rflow, params);
       }
 

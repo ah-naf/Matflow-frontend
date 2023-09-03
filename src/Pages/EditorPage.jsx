@@ -17,6 +17,7 @@ import AddModify from "../NodeBased/CustomNodes/AddModify/AddModify";
 import AlterFieldNameNode from "../NodeBased/CustomNodes/AlterFieldNameNode/AlterFieldNameNode";
 import ChangeDtypeNode from "../NodeBased/CustomNodes/ChangeDTypeNode/ChangeDtypeNode";
 import ChartNode from "../NodeBased/CustomNodes/ChartNode/ChartNode";
+import ClusterNode from "../NodeBased/CustomNodes/ClusterNode/ClusterNode";
 import DropRowsColumnNode from "../NodeBased/CustomNodes/DropRowsColumnNode/DropRowsColumnNode";
 import EDANode from "../NodeBased/CustomNodes/EDANode/EDANode";
 import EncodingNode from "../NodeBased/CustomNodes/EncodingNode/EncodingNode";
@@ -31,6 +32,7 @@ import {
   handleAddModify,
   handleAlterFieldName,
   handleChangeDtype,
+  handleCluster,
   handleDropRowColumn,
   handleEncoding,
   handleFileForMergeDataset,
@@ -57,6 +59,7 @@ const nodeTypes = {
   "Drop Column/Rows": DropRowsColumnNode,
   Scaling: ScalingNode,
   Encoding: EncodingNode,
+  Cluster: ClusterNode,
 };
 
 const initialNodes = [
@@ -199,7 +202,8 @@ function EditorPage() {
           typeTarget === "Alter Field Name" ||
           typeTarget === "Drop Column/Rows" ||
           typeTarget === "Scaling" ||
-          typeTarget === "Encoding")
+          typeTarget === "Encoding" ||
+          typeTarget === "Cluster")
       ) {
         ok = await handleOutputTable(rflow, params);
       }
@@ -257,6 +261,14 @@ function EditorPage() {
 
       if (typeSource === "Encoding" && typeTarget === "upload") {
         ok = await handleEncoding(rflow, params);
+      }
+
+      if (typeSource === "Cluster" && typeTarget === "output_table") {
+        ok = await handleCluster(rflow, params, "table");
+      }
+
+      if (typeSource === "Cluster" && typeTarget === "output_graph") {
+        ok = await handleCluster(rflow, params, "graph");
       }
 
       if (!ok) return;

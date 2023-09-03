@@ -462,3 +462,41 @@ export const handleEncoding = async (rflow, params) => {
     return false;
   }
 };
+
+export const handleCluster = async (rflow, params, outputType) => {
+  try {
+    let { cluster } = rflow.getNode(params.source).data;
+
+    if (!cluster) throw new Error("Check Cluster Node.");
+    let url = "http://127.0.0.1:8000/api/cluster/";
+    // console.log(encoding)
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(cluster),
+    });
+
+    let data = await res.json();
+    console.log(data);
+    const tempNodes = rflow.getNodes().map((val) => {
+      if (val.id === params.target)
+        return {
+          ...val,
+          data: {
+            [outputType === "table" ? "table" : "graph"]:
+              outputType === "table" ? data.table : JSON.parse(data.graph),
+          },
+        };
+      return val;
+    });
+    rflow.setNodes(tempNodes);
+
+    return true;
+  } catch (error) {
+    raiseErrorToast(rflow, params, error.message);
+    return false;
+  }
+};

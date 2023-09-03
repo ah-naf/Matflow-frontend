@@ -15,6 +15,7 @@ import ReactFlow, {
 import "reactflow/dist/style.css";
 import AddModify from "../NodeBased/CustomNodes/AddModify/AddModify";
 import AlterFieldNameNode from "../NodeBased/CustomNodes/AlterFieldNameNode/AlterFieldNameNode";
+import AppendDatasetNode from "../NodeBased/CustomNodes/AppendDatasetNode/AppendDatasetNode";
 import ChangeDtypeNode from "../NodeBased/CustomNodes/ChangeDTypeNode/ChangeDtypeNode";
 import ChartNode from "../NodeBased/CustomNodes/ChartNode/ChartNode";
 import ClusterNode from "../NodeBased/CustomNodes/ClusterNode/ClusterNode";
@@ -31,6 +32,7 @@ import Sidebar from "../NodeBased/components/Sidebar/Sidebar";
 import {
   handleAddModify,
   handleAlterFieldName,
+  handleAppendDataset,
   handleChangeDtype,
   handleCluster,
   handleDropRowColumn,
@@ -60,6 +62,7 @@ const nodeTypes = {
   Scaling: ScalingNode,
   Encoding: EncodingNode,
   Cluster: ClusterNode,
+  "Append Dataset": AppendDatasetNode,
 };
 
 const initialNodes = [
@@ -175,7 +178,7 @@ function EditorPage() {
       const typeSource = rflow.getNode(params.source).type;
       const typeTarget = rflow.getNode(params.target).type;
       let ok = false;
-      if (typeTarget !== "Merge Dataset") {
+      if (typeTarget !== "Merge Dataset" && typeTarget !== 'Append Dataset') {
         const temp = edgeList.filter((val) => val.target === params.target);
         if (temp && temp.length > 0) {
           toast.error(`Connection limit of ${typeTarget} node is 1`, {
@@ -231,7 +234,10 @@ function EditorPage() {
         ok = await handleTimeSeriesAnalysis(rflow, params);
       }
 
-      if (typeSource === "upload" && typeTarget === "Merge Dataset") {
+      if (
+        typeSource === "upload" &&
+        (typeTarget === "Merge Dataset" || typeTarget === "Append Dataset")
+      ) {
         ok = await handleFileForMergeDataset(rflow, params);
       }
 
@@ -269,6 +275,10 @@ function EditorPage() {
 
       if (typeSource === "Cluster" && typeTarget === "output_graph") {
         ok = await handleCluster(rflow, params, "graph");
+      }
+
+      if (typeSource === "Append Dataset" && typeTarget === "upload") {
+        ok = await handleAppendDataset(rflow, params);
       }
 
       if (!ok) return;

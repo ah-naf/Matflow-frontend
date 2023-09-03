@@ -255,6 +255,36 @@ export const handleMergeDataset = async (rflow, params) => {
   }
 };
 
+export const handleAppendDataset = async (rflow, params) => {
+  try {
+    const { append } = rflow.getNode(params.source).data;
+
+    if (!append) throw new Error("Check Append Dataset Node.");
+
+    const res = await fetch("http://127.0.0.1:8000/api/append/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(append),
+    });
+
+    let data = await res.json();
+    data = JSON.parse(data);
+
+    const tempNodes = rflow.getNodes().map((val) => {
+      if (val.id === params.target)
+        return { ...val, data: { table: data, file_name: append.dataset_name } };
+      return val;
+    });
+    rflow.setNodes(tempNodes);
+    return true;
+  } catch (error) {
+    raiseErrorToast(rflow, params, error.message);
+    return false;
+  }
+};
+
 export const handleAddModify = async (rflow, params) => {
   try {
     let { addModify } = rflow.getNode(params.source).data;

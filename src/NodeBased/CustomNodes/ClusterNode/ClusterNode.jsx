@@ -1,11 +1,38 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Handle, Position, useReactFlow } from "reactflow";
+import { handleCluster } from "../../../util/NodeFunctions";
 import UpdateClusterNode from "../../UpdateNodes/UpdateClusterNode/UpdateClusterNode";
 
 function ClusterNode({ id, data }) {
   // console.log(data);
   const [visible, setVisible] = useState(false);
   const rflow = useReactFlow();
+
+  useEffect(() => {
+    (async function () {
+      const tempGraph = rflow
+        .getEdges()
+        .filter(
+          (edge) =>
+            edge.source === id &&
+            rflow.getNode(edge.target).type === "output_graph"
+        );
+
+      const tempTable = rflow
+        .getEdges()
+        .filter(
+          (edge) =>
+            edge.source === id &&
+            rflow.getNode(edge.target).type === "output_table"
+        );
+      tempGraph.forEach(async (val) => {
+        await handleCluster(rflow, val, "graph");
+      });
+      tempTable.forEach(async (val) => {
+        await handleCluster(rflow, val, "table");
+      });
+    })();
+  }, [data, rflow]);
 
   return (
     <>

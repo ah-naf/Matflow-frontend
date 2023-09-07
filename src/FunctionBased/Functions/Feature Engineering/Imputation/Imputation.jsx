@@ -54,7 +54,7 @@ function Imputation({ csvData }) {
         },
         body: JSON.stringify({
           file: csvData,
-          select_columns: select_column
+          select_columns: e
         }),
       });
 

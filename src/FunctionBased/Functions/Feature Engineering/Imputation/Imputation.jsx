@@ -10,15 +10,24 @@ import SingleDropDown from "../../../Components/SingleDropDown/SingleDropDown";
 function Imputation({ csvData }) {
   const [savedAsNewDataset, setSavedAsNewDataset] = useState(false);
   const dispatch = useDispatch();
-  const [imputationNotExist, setImputationNotExist] = useState(false);
+  const [imputationNotExist, setImputationNotExist] = useState(true);
   const [nullVar, setNullVar] = useState([]);
   const [select_column, setSelectColumn] = useState();
   const [group_by, setGroupBy] = useState([]);
   const [strategy, setStrategy] = useState([]);
   const [activeStrategy, setActiveStrategy] = useState();
+  const [catData, setCatData] = useState();
+  const [option, setOption] = useState("Select Mode");
+  const [constant, setConstant] = useState(0);
+  const [fill_group, setFillGroup] = useState();
 
   useEffect(() => {
-    (async function () {
+    setImputationNotExist(true);
+    setNullVar([]);
+    setStrategy(null);
+    setActiveStrategy();
+
+    const fetchData = async () => {
       const res = await fetch("http://127.0.0.1:8000/api/imputation_data1", {
         method: "POST",
         headers: {
@@ -30,16 +39,33 @@ function Imputation({ csvData }) {
       });
 
       const data = await res.json();
-      console.log(data);
+      // console.log(data);
       if (!data.null_var || data.null_var.length === 0)
         setImputationNotExist(true);
-
+      else setImputationNotExist(false);
       setNullVar(data.null_var);
-      setGroupBy(data.group_by);
-    })();
+    };
+    fetchData();
   }, [csvData]);
 
-  const handleSave = () => {};
+  const handleSave = async () => {
+    const res = await fetch("http://127.0.0.1:8000/api/imputation_result", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        file: csvData,
+        Select_columns: select_column,
+        strategy: activeStrategy,
+        fill_group,
+        constant,
+      }),
+    });
+
+    const data = await res.json();
+    console.log(data);
+  };
 
   const handleSelectColumn = async (e) => {
     if (typeof csvData[0][e] === "number")
@@ -59,7 +85,11 @@ function Imputation({ csvData }) {
     });
 
     const data = await res.json();
-    console.log(data);
+    // console.log(data);
+
+    setGroupBy(data.group_by);
+    setCatData(data);
+    setConstant(0);
   };
 
   if (imputationNotExist)
@@ -86,21 +116,59 @@ function Imputation({ csvData }) {
           onValueChange={setActiveStrategy}
         />
       </div>
-      {(activeStrategy === "mean" || activeStrategy === "median") && (
-        <div className="">
-          <p>Group By</p>
-          <SingleDropDown columnNames={group_by} />
-        </div>
-      )}
-      {activeStrategy === "constant" && (
-        <Input
-          label="Value"
-          type="number"
-          step={0.01}
-          fullWidth
-          value={0.0}
-          bordered
-        />
+
+      {strategy && (
+        <>
+          {(activeStrategy === "mean" || activeStrategy === "median") && (
+            <div className="">
+              <p>Group By</p>
+              <SingleDropDown
+                columnNames={group_by}
+                onValueChange={setFillGroup}
+              />
+            </div>
+          )}
+          {activeStrategy === "mode" && (
+            <div className="flex gap-4 w-full">
+              <div className="w-full">
+                <p>Options</p>
+                <SingleDropDown
+                  columnNames={["Select Mode", "Group Mode"]}
+                  onValueChange={setOption}
+                  initValue={option}
+                />
+              </div>
+              {option === "Select Mode" ? (
+                <div className="w-full">
+                  <p>Mode Value</p>
+                  <SingleDropDown
+                    columnNames={Object.values(catData.mode)}
+                    onValueChange={setFillGroup}
+                  />
+                </div>
+              ) : (
+                <div className="w-full">
+                  <p>Group By</p>
+                  <SingleDropDown
+                    columnNames={group_by}
+                    onChange={setFillGroup}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+          {(activeStrategy === "constant" || activeStrategy === "value") && (
+            <Input
+              label="Value"
+              type="number"
+              step={0.01}
+              fullWidth
+              value={constant}
+              onChange={(e) => setConstant(e.target.value)}
+              bordered
+            />
+          )}
+        </>
       )}
       <div className="mt-4 flex flex-col gap-4">
         <Checkbox

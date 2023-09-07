@@ -1,27 +1,19 @@
 import AutoFixHighOutlinedIcon from "@mui/icons-material/AutoFixHighOutlined";
 import AutoGraphOutlinedIcon from "@mui/icons-material/AutoGraphOutlined";
 import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import InsertChartOutlinedIcon from "@mui/icons-material/InsertChartOutlined";
 import RemoveCircleOutlineOutlinedIcon from "@mui/icons-material/RemoveCircleOutlineOutlined";
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import TextFieldsOutlinedIcon from "@mui/icons-material/TextFieldsOutlined";
 import { Collapse } from "@nextui-org/react";
-import {
-  AiOutlineGroup,
-  AiOutlineLineChart,
-  AiOutlineMergeCells,
-} from "react-icons/ai";
-import { BiStats } from "react-icons/bi";
+import { AiOutlineGroup, AiOutlineLineChart, AiOutlineMergeCells } from "react-icons/ai";
 import { BsTable } from "react-icons/bs";
 import { GrTableAdd } from "react-icons/gr";
-import {
-  HiOutlineDocumentDuplicate,
-  HiOutlineDocumentReport,
-  HiOutlinePuzzle,
-} from "react-icons/hi";
+import { HiOutlineDocumentDuplicate, HiOutlineDocumentReport, HiOutlinePuzzle } from "react-icons/hi";
 import { RiFileEditLine, RiFlowChart } from "react-icons/ri";
 import { RxRocket } from "react-icons/rx";
-import { TbCirclesRelation } from "react-icons/tb";
+import {TbCirclesRelation} from 'react-icons/tb'
+import {BiStats} from 'react-icons/bi'
 
 const FEATURE_ENGINEERING = [
   {
@@ -78,38 +70,40 @@ const FEATURE_ENGINEERING = [
   },
 ];
 
+const DATASET_NODES = [
+  {
+    key: "0-1",
+    icon: <InfoOutlinedIcon color="action" />,
+    label: "Information",
+  },
+  {
+    key: "0-2",
+    label: "Statistics",
+    icon: <BiStats size={20} />,
+  },
+  {
+    key: "0-3",
+    label: "Corelation",
+    icon: <TbCirclesRelation size={20} />,
+  },
+  {
+    key: "0-4",
+    label: "Duplicate",
+    icon: <HiOutlineDocumentDuplicate size={20} />,
+  },
+  {
+    key: "0-5",
+    label: "Group",
+    icon: <AiOutlineGroup size={20} />,
+  },
+];
+
 const FUNCTION_NODES = [
   {
     key: "0",
     label: "Dataset",
     // icon: <MdOutlineDataset size={"20"} />,
-    children: [
-      {
-        key: "0-1",
-        icon: <InfoOutlinedIcon color="action" />,
-        label: "Information",
-      },
-      {
-        key: "0-2",
-        label: "Statistics",
-        icon: <BiStats size={20} />,
-      },
-      {
-        key: "0-3",
-        label: "Corelation",
-        icon: <TbCirclesRelation size={20} />,
-      },
-      {
-        key: "0-4",
-        label: "Duplicate",
-        icon: <HiOutlineDocumentDuplicate size={20} />,
-      },
-      {
-        key: "0-5",
-        label: "Group",
-        icon: <AiOutlineGroup size={20} />,
-      },
-    ],
+    children: [],
   },
   {
     key: "1",
@@ -196,6 +190,7 @@ const Sidebar = () => {
         <h3 className="font-bold  text-3xl mb-2">Node Packet</h3>
         <p className=" mb-4">Drag and Drop nodes onto your editor.</p>
         <div className="grid gap-4">
+          {/* Input-Output Nodes */}
           <Collapse.Group bordered>
             <Collapse
               title={
@@ -232,6 +227,10 @@ const Sidebar = () => {
               </div>
             </Collapse>
           </Collapse.Group>
+
+          {/* Dataset Nodes */}
+
+          {/* Function Nodes */}
           <Collapse.Group bordered>
             <Collapse
               title={
@@ -257,6 +256,8 @@ const Sidebar = () => {
               </div>
             </Collapse>
           </Collapse.Group>
+
+          {/* Feature Engineering Nodes */}
           <Collapse.Group bordered>
             <Collapse
               title={

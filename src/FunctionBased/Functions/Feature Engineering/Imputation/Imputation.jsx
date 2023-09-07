@@ -46,20 +46,20 @@ function Imputation({ csvData }) {
       setStrategy(["mean", "median", "constant"]);
     else setStrategy(["mode", "value"]);
     setSelectColumn(e);
-    
-    const res = await fetch("http://127.0.0.1:8000/api/imputation_data2", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          file: csvData,
-          select_columns: e
-        }),
-      });
 
-      const data = await res.json();
-      console.log(data);
+    const res = await fetch("http://127.0.0.1:8000/api/imputation_data2", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        file: csvData,
+        Select_columns: e,
+      }),
+    });
+
+    const data = await res.json();
+    console.log(data);
   };
 
   if (imputationNotExist)

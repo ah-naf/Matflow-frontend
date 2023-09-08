@@ -23,6 +23,7 @@ import CorelationNode from "../NodeBased/CustomNodes/CorelationNode/CorelationNo
 import DropRowsColumnNode from "../NodeBased/CustomNodes/DropRowsColumnNode/DropRowsColumnNode";
 import EDANode from "../NodeBased/CustomNodes/EDANode/EDANode";
 import EncodingNode from "../NodeBased/CustomNodes/EncodingNode/EncodingNode";
+import GroupNode from "../NodeBased/CustomNodes/GroupNode/GroupNode";
 import InformationNode from "../NodeBased/CustomNodes/InformationNode/InformationNode";
 import MergeDatasetNode from "../NodeBased/CustomNodes/MergeDatasetNode/MergeDatasetNode";
 import ReverseMLNode from "../NodeBased/CustomNodes/ReverseMLNode/ReverseMLNode";
@@ -39,6 +40,7 @@ import {
   handleChangeDtype,
   handleCluster,
   handleDatasetCorrelation,
+  handleDatasetGroup,
   handleDatasetInformation,
   handleDatasetStatistics,
   handleDropRowColumn,
@@ -72,6 +74,7 @@ const nodeTypes = {
   Information: InformationNode,
   Statistics: StatisticsNode,
   Corelation: CorelationNode,
+  Group: GroupNode,
 };
 
 const initialNodes = [
@@ -218,7 +221,8 @@ function EditorPage() {
           typeTarget === "Cluster" ||
           typeTarget === "Information" ||
           typeTarget === "Statistics" ||
-          typeTarget === "Corelation")
+          typeTarget === "Corelation" ||
+          typeTarget === "Group")
       ) {
         ok = await handleOutputTable(rflow, params);
       }
@@ -302,11 +306,15 @@ function EditorPage() {
       }
 
       if (typeSource === "Corelation" && typeTarget === "output_table") {
-        ok = await handleDatasetCorrelation(rflow, params, 'table');
+        ok = await handleDatasetCorrelation(rflow, params, "table");
       }
 
       if (typeSource === "Corelation" && typeTarget === "output_graph") {
-        ok = await handleDatasetCorrelation(rflow, params, 'graph');
+        ok = await handleDatasetCorrelation(rflow, params, "graph");
+      }
+
+      if (typeSource === "Group" && typeTarget === "output_table") {
+        ok = await handleDatasetGroup(rflow, params);
       }
 
       if (!ok) return;

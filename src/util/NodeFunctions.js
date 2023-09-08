@@ -802,3 +802,41 @@ export const handleDatasetCorrelation = async (rflow, params, outputType) => {
     return false;
   }
 };
+
+export const handleDatasetGroup = async (rflow, params) => {
+  try {
+    let { group } = rflow.getNode(params.source).data;
+
+    if (!group) throw new Error("Check Group Node.");
+    let url = "http://127.0.0.1:8000/api/display_group/";
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        file: group.file,
+        group_var: group.selectedColumn,
+        agg_func: group.agg_func,
+      }),
+    });
+
+    let { data } = await res.json();
+    console.log(JSON.parse(data));
+    const tempNodes = rflow.getNodes().map((val) => {
+      if (val.id === params.target)
+        return {
+          ...val,
+          data: { table: JSON.parse(data) },
+        };
+      return val;
+    });
+    rflow.setNodes(tempNodes);
+
+    return true;
+  } catch (error) {
+    raiseErrorToast(rflow, params, error.message);
+    return false;
+  }
+};

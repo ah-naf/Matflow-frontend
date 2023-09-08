@@ -2,10 +2,10 @@ import CloseIcon from "@mui/icons-material/Close";
 import { Dialog } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useReactFlow } from "reactflow";
 import MultipleDropDown from "../../../FunctionBased/Components/MultipleDropDown/MultipleDropDown";
 import SingleDropDown from "../../../FunctionBased/Components/SingleDropDown/SingleDropDown";
-import { useReactFlow } from "reactflow";
 
 function UpdateCorelationNode({ visible, setVisible, csvData, nodeId }) {
   const theme = useTheme();
@@ -16,6 +16,14 @@ function UpdateCorelationNode({ visible, setVisible, csvData, nodeId }) {
   const rflow = useReactFlow();
   const nodeDetails = rflow.getNode(nodeId);
 
+  useEffect(() => {
+    let data = nodeDetails.data;
+    if (data && data.correlation) {
+      data = data.correlation;
+      setCorelation(data.method || "pearson");
+      setShowColumn(data.show_column || allColumn);
+    }
+  }, [nodeDetails]);
 
   const handleSave = () => {
     const tempNode = {
@@ -25,7 +33,7 @@ function UpdateCorelationNode({ visible, setVisible, csvData, nodeId }) {
         table: csvData,
         correlation: {
           method: corelation,
-          show_column
+          show_column,
         },
       },
     };

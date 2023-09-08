@@ -58,7 +58,7 @@ function Imputation({ csvData }) {
       body: JSON.stringify({
         file: csvData,
         Select_columns: select_column,
-        strategy: activeStrategy,
+        strategy: activeStrategy === 'mode' ? 'constant' : activeStrategy,
         fill_group,
         constant,
       }),

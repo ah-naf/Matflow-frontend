@@ -1,19 +1,27 @@
 import AutoFixHighOutlinedIcon from "@mui/icons-material/AutoFixHighOutlined";
 import AutoGraphOutlinedIcon from "@mui/icons-material/AutoGraphOutlined";
 import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import InsertChartOutlinedIcon from "@mui/icons-material/InsertChartOutlined";
 import RemoveCircleOutlineOutlinedIcon from "@mui/icons-material/RemoveCircleOutlineOutlined";
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import TextFieldsOutlinedIcon from "@mui/icons-material/TextFieldsOutlined";
 import { Collapse } from "@nextui-org/react";
-import { AiOutlineGroup, AiOutlineLineChart, AiOutlineMergeCells } from "react-icons/ai";
+import {
+  AiOutlineGroup,
+  AiOutlineLineChart,
+  AiOutlineMergeCells,
+} from "react-icons/ai";
+import { BiStats } from "react-icons/bi";
 import { BsTable } from "react-icons/bs";
 import { GrTableAdd } from "react-icons/gr";
-import { HiOutlineDocumentDuplicate, HiOutlineDocumentReport, HiOutlinePuzzle } from "react-icons/hi";
+import {
+  HiOutlineDocumentDuplicate,
+  HiOutlineDocumentReport,
+  HiOutlinePuzzle,
+} from "react-icons/hi";
 import { RiFileEditLine, RiFlowChart } from "react-icons/ri";
 import { RxRocket } from "react-icons/rx";
-import {TbCirclesRelation} from 'react-icons/tb'
-import {BiStats} from 'react-icons/bi'
+import { TbCirclesRelation } from "react-icons/tb";
 
 const FEATURE_ENGINEERING = [
   {
@@ -79,32 +87,31 @@ const DATASET_NODES = [
   {
     key: "0-2",
     label: "Statistics",
-    icon: <BiStats size={20} />,
+    icon: <BiStats size={20} className="text-[rgba(0,0,0,0.54)]" />,
   },
   {
     key: "0-3",
     label: "Corelation",
-    icon: <TbCirclesRelation size={20} />,
+    icon: <TbCirclesRelation size={20} className="text-[rgba(0,0,0,0.54)]" />,
   },
   {
     key: "0-4",
     label: "Duplicate",
-    icon: <HiOutlineDocumentDuplicate size={20} />,
+    icon: (
+      <HiOutlineDocumentDuplicate
+        size={20}
+        className="text-[rgba(0,0,0,0.54)]"
+      />
+    ),
   },
   {
     key: "0-5",
     label: "Group",
-    icon: <AiOutlineGroup size={20} />,
+    icon: <AiOutlineGroup size={20} className="text-[rgba(0,0,0,0.54)]" />,
   },
 ];
 
 const FUNCTION_NODES = [
-  {
-    key: "0",
-    label: "Dataset",
-    // icon: <MdOutlineDataset size={"20"} />,
-    children: [],
-  },
   {
     key: "1",
     label: "EDA",
@@ -185,7 +192,7 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="h-full grid place-items-center w-96">
+    <div className="h-screen overflow-y-auto grid place-items-center w-96">
       <aside className="bg-white h-full w-full p-4 border-l-2 shadow-2xl ">
         <h3 className="font-bold  text-3xl mb-2">Node Packet</h3>
         <p className=" mb-4">Drag and Drop nodes onto your editor.</p>
@@ -229,6 +236,29 @@ const Sidebar = () => {
           </Collapse.Group>
 
           {/* Dataset Nodes */}
+          <Collapse.Group bordered>
+            <Collapse
+              title={
+                <h1 className="font-medium tracking-wider">Dataset Nodes</h1>
+              }
+            >
+              <div className="grid grid-cols-3 gap-4">
+                {DATASET_NODES.map((node) => {
+                  return (
+                    <button
+                      key={node.key}
+                      className="grid gap-1 place-items-center border-2 px-2 py-3 rounded-md shadow text-sm "
+                      onDragStart={(event) => onDragStart(event, node.label)}
+                      draggable
+                    >
+                      {node.icon && <span>{node.icon}</span>}
+                      <span className="text-xs">{node.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </Collapse>
+          </Collapse.Group>
 
           {/* Function Nodes */}
           <Collapse.Group bordered>

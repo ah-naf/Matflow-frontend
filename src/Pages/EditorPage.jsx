@@ -19,12 +19,15 @@ import AppendDatasetNode from "../NodeBased/CustomNodes/AppendDatasetNode/Append
 import ChangeDtypeNode from "../NodeBased/CustomNodes/ChangeDTypeNode/ChangeDtypeNode";
 import ChartNode from "../NodeBased/CustomNodes/ChartNode/ChartNode";
 import ClusterNode from "../NodeBased/CustomNodes/ClusterNode/ClusterNode";
+import CorelationNode from "../NodeBased/CustomNodes/CorelationNode/CorelationNode";
 import DropRowsColumnNode from "../NodeBased/CustomNodes/DropRowsColumnNode/DropRowsColumnNode";
 import EDANode from "../NodeBased/CustomNodes/EDANode/EDANode";
 import EncodingNode from "../NodeBased/CustomNodes/EncodingNode/EncodingNode";
+import InformationNode from "../NodeBased/CustomNodes/InformationNode/InformationNode";
 import MergeDatasetNode from "../NodeBased/CustomNodes/MergeDatasetNode/MergeDatasetNode";
 import ReverseMLNode from "../NodeBased/CustomNodes/ReverseMLNode/ReverseMLNode";
 import ScalingNode from "../NodeBased/CustomNodes/ScalingNode/ScalingNode";
+import StatisticsNode from "../NodeBased/CustomNodes/StatisticsNode/StatisticsNode";
 import TableNode from "../NodeBased/CustomNodes/TableNode/TableNode";
 import TimeSeriesNode from "../NodeBased/CustomNodes/TimeSeiresNode/TimeSeriesNode";
 import UploadFile from "../NodeBased/CustomNodes/UploadFile/UploadFile";
@@ -35,6 +38,9 @@ import {
   handleAppendDataset,
   handleChangeDtype,
   handleCluster,
+  handleDatasetCorrelation,
+  handleDatasetInformation,
+  handleDatasetStatistics,
   handleDropRowColumn,
   handleEncoding,
   handleFileForMergeDataset,
@@ -63,6 +69,9 @@ const nodeTypes = {
   Encoding: EncodingNode,
   Cluster: ClusterNode,
   "Append Dataset": AppendDatasetNode,
+  Information: InformationNode,
+  Statistics: StatisticsNode,
+  Corelation: CorelationNode,
 };
 
 const initialNodes = [
@@ -178,7 +187,7 @@ function EditorPage() {
       const typeSource = rflow.getNode(params.source).type;
       const typeTarget = rflow.getNode(params.target).type;
       let ok = false;
-      if (typeTarget !== "Merge Dataset" && typeTarget !== 'Append Dataset') {
+      if (typeTarget !== "Merge Dataset" && typeTarget !== "Append Dataset") {
         const temp = edgeList.filter((val) => val.target === params.target);
         if (temp && temp.length > 0) {
           toast.error(`Connection limit of ${typeTarget} node is 1`, {
@@ -206,7 +215,10 @@ function EditorPage() {
           typeTarget === "Drop Column/Rows" ||
           typeTarget === "Scaling" ||
           typeTarget === "Encoding" ||
-          typeTarget === "Cluster")
+          typeTarget === "Cluster" ||
+          typeTarget === "Information" ||
+          typeTarget === "Statistics" ||
+          typeTarget === "Corelation")
       ) {
         ok = await handleOutputTable(rflow, params);
       }
@@ -279,6 +291,18 @@ function EditorPage() {
 
       if (typeSource === "Append Dataset" && typeTarget === "upload") {
         ok = await handleAppendDataset(rflow, params);
+      }
+
+      if (typeSource === "Information" && typeTarget === "output_table") {
+        ok = handleDatasetInformation(rflow, params);
+      }
+
+      if (typeSource === "Statistics" && typeTarget === "output_table") {
+        ok = handleDatasetStatistics(rflow, params);
+      }
+
+      if (typeSource === "Corelation" && typeTarget === "output_table") {
+        ok = await handleDatasetCorrelation(rflow, params, 'table');
       }
 
       if (!ok) return;

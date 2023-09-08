@@ -1,4 +1,6 @@
 import { toast } from "react-toastify";
+import * as stats from "simple-statistics";
+import * as Stat from "statistics.js";
 
 const EDA_LINK = {
   "Bar Plot": "eda_barplot",
@@ -274,7 +276,10 @@ export const handleAppendDataset = async (rflow, params) => {
 
     const tempNodes = rflow.getNodes().map((val) => {
       if (val.id === params.target)
-        return { ...val, data: { table: data, file_name: append.dataset_name } };
+        return {
+          ...val,
+          data: { table: data, file_name: append.dataset_name },
+        };
       return val;
     });
     rflow.setNodes(tempNodes);
@@ -526,6 +531,236 @@ export const handleCluster = async (rflow, params, outputType) => {
     rflow.setNodes(tempNodes);
 
     return true;
+  } catch (error) {
+    raiseErrorToast(rflow, params, error.message);
+    return false;
+  }
+};
+
+export const handleDatasetInformation = (rflow, params) => {
+  let { table: rowData } = rflow.getNode(params.source).data;
+
+  const columns = Object.keys(rowData[0] || {});
+  const columnInfo = [];
+
+  columns.forEach((column) => {
+    const uniqueValues = new Set();
+    let nonNullCount = 0;
+
+    if (column !== "id") {
+      rowData.forEach((row) => {
+        const value = row[column];
+        if (value !== undefined && value !== null) {
+          uniqueValues.add(value);
+          nonNullCount++;
+        }
+      });
+
+      const nullCount = rowData.length - nonNullCount;
+      const nullPercentage = (nullCount / rowData.length) * 100;
+      const dtype = typeof rowData[0][column];
+
+      columnInfo.push({
+        column,
+        uniqueValues: uniqueValues.size,
+        nonNullCount,
+        nullPercentage,
+        dtype,
+      });
+    }
+  });
+
+  const tempNodes = rflow.getNodes().map((val) => {
+    if (val.id === params.target)
+      return {
+        ...val,
+        data: {
+          table: columnInfo,
+        },
+      };
+    return val;
+  });
+  rflow.setNodes(tempNodes);
+  return true;
+};
+
+export const handleDatasetStatistics = (rflow, params) => {
+  let { table: rowData } = rflow.getNode(params.source).data;
+
+  let columns = Object.keys(rowData[0] || {});
+  const columnStatsData = [];
+  columns = columns.filter((item) => {
+    const dtype = typeof rowData[0][item];
+    return dtype === "number";
+  });
+
+  columns.forEach((column) => {
+    if (column !== "id") {
+      let values = rowData
+        .map((row) => parseFloat(row[column]))
+        .filter((value) => !isNaN(value));
+      const count = values.length;
+      if (count > 0) {
+        const min = stats.min(values).toFixed(3);
+        const max = stats.max(values).toFixed(3);
+        const std = stats.standardDeviation(values).toFixed(3);
+
+        const mean = stats.mean(values).toFixed(3);
+        const percentile25 = stats.quantile(values, 0.25).toFixed(3);
+        const median = stats.quantile(values, 0.5).toFixed(3);
+        const percentile75 = stats.quantile(values, 0.75).toFixed(3);
+
+        columnStatsData.push({
+          column,
+          count,
+          min,
+          max,
+          std,
+          mean,
+          "25%": percentile25,
+          "50%": median,
+          "75%": percentile75,
+        });
+      }
+    }
+  });
+
+  const tempNodes = rflow.getNodes().map((val) => {
+    if (val.id === params.target)
+      return {
+        ...val,
+        data: {
+          table: columnStatsData,
+        },
+      };
+    return val;
+  });
+  rflow.setNodes(tempNodes);
+  return true;
+};
+
+export const handleDatasetCorrelation = async (rflow, params, outputType) => {
+  try {
+    const { table: rowData, correlation } = rflow.getNode(params.source).data;
+
+    if (!correlation) throw new Error("Check Corelation Node");
+
+    const calculateCorrelations = (data) => {
+      let columnNames = Object.keys(data[0]);
+      columnNames = columnNames.filter(
+        (val) => typeof data[0][val] === "number" && val !== "id"
+      );
+      const correlations = {};
+
+      for (let i = 0; i < columnNames.length; i++) {
+        const column1 = columnNames[i];
+        correlations[column1] = {};
+
+        for (let j = 0; j < columnNames.length; j++) {
+          const column2 = columnNames[j];
+          const column1Data = [];
+          const column2Data = [];
+          const tempData = [];
+
+          for (let k = 0; k < data.length; k++) {
+            const val1 = parseFloat(data[k][column1]);
+            const val2 = parseFloat(data[k][column2]);
+
+            if (!isNaN(val1) && !isNaN(val2)) {
+              column1Data.push(val1);
+              column2Data.push(val2);
+
+              tempData.push({
+                [column1]: val1,
+                [column2]: val2,
+              });
+            }
+          }
+
+          const bodyVars = {
+            [column1]: "metric",
+            [column2]: "metric",
+          };
+
+          const temp = new Stat(tempData, bodyVars);
+          // Calculate the correlation coefficient using simple-statistics correlation function
+          const l = Object.keys(bodyVars);
+
+          if (correlation.method === "spearman") {
+            const cc = temp.spearmansRho(l[0], l[l.length === 1 ? 0 : 1], true);
+
+            // // Store the correlation coefficient in the correlations object
+            correlations[column1][column2] = cc.rho.toFixed(3);
+          } else if (correlation.method === "pearson") {
+            const cc = temp.correlationCoefficient(
+              l[0],
+              l[l.length === 1 ? 0 : 1]
+            );
+
+            // // Store the correlation coefficient in the correlations object
+            correlations[column1][column2] =
+              cc.correlationCoefficient.toFixed(3);
+          }
+        }
+      }
+
+      return correlations;
+    };
+
+    let cor = calculateCorrelations(rowData);
+
+    if(correlation.method === 'kendall') {
+      const resp = await fetch(
+        "http://127.0.0.1:8000/api/display_correlation/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            file: rowData,
+          }),
+        }
+      );
+      let { data } = await resp.json();
+
+      cor = JSON.parse(data)
+    }
+
+    const columnNames = Object.keys(rowData[0]);
+    let colWithInd = {};
+    for (let i = 0; i < columnNames.length; i++) {
+      colWithInd = { ...colWithInd, [columnNames[i]]: i };
+    }
+
+    const columnSelected = new Set(correlation.show_column);
+
+    let tempData = JSON.parse(JSON.stringify(cor));
+    for (let i = 0; i < columnNames.length; i++) {
+      if (columnSelected.has(columnNames[i])) continue;
+      const colInd = colWithInd[columnNames[i]];
+      for (let j = 0; j < tempData.length; j++) {
+        if (colInd === j) tempData[j] = {};
+        delete tempData[j][columnNames[i]];
+      }
+    }
+    tempData = tempData.filter((val) => Object.keys(val).length !== 0);
+
+    cor = tempData
+
+    const tempNodes = rflow.getNodes().map((val) => {
+      if (val.id === params.target)
+        return {
+          ...val,
+          data: {
+            [outputType === "table" ? "table" : "graph"]:
+              outputType === "table" ? data.table : JSON.parse(data.graph),
+          },
+        };
+      return val;
+    });
+    rflow.setNodes(tempNodes);
+
   } catch (error) {
     raiseErrorToast(rflow, params, error.message);
     return false;

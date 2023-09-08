@@ -709,7 +709,7 @@ export const handleDatasetCorrelation = async (rflow, params, outputType) => {
 
     let cor = calculateCorrelations(rowData);
 
-    if(correlation.method === 'kendall') {
+    if (correlation.method === "kendall") {
       const resp = await fetch(
         "http://127.0.0.1:8000/api/display_correlation/",
         {
@@ -724,7 +724,23 @@ export const handleDatasetCorrelation = async (rflow, params, outputType) => {
       );
       let { data } = await resp.json();
 
-      cor = JSON.parse(data)
+      cor = JSON.parse(data);
+      let columnName = Object.keys(cor[0]);
+      columnName = columnName.filter((val) => val !== "id");
+      let newData = [];
+      for (let i = 0; i < columnName.length; i++) {
+        const { id, ...rest } = cor[i];
+        newData.push({ ...rest, column_name: columnName[i] });
+      }
+      console.log({ newData });
+      cor = newData;
+    } else {
+      let ind = 0;
+      const columnName = Object.keys(cor);
+      cor = Object.values(cor);
+      cor = cor.map((val) => {
+        return { ...val, column_name: columnName[ind++] };
+      });
     }
 
     const columnNames = Object.keys(rowData[0]);
@@ -744,9 +760,28 @@ export const handleDatasetCorrelation = async (rflow, params, outputType) => {
         delete tempData[j][columnNames[i]];
       }
     }
+    console.log(tempData);
     tempData = tempData.filter((val) => Object.keys(val).length !== 0);
 
-    cor = tempData
+    cor = tempData;
+
+    let graphData = undefined;
+    if (outputType === "graph") {
+      const res = await fetch(
+        "http://127.0.0.1:8000/api/display_correlation_heatmap/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            file: cor,
+          }),
+        }
+      );
+      const data = await res.json();
+      graphData = JSON.parse(data);
+    }
 
     const tempNodes = rflow.getNodes().map((val) => {
       if (val.id === params.target)
@@ -754,13 +789,14 @@ export const handleDatasetCorrelation = async (rflow, params, outputType) => {
           ...val,
           data: {
             [outputType === "table" ? "table" : "graph"]:
-              outputType === "table" ? data.table : JSON.parse(data.graph),
+              outputType === "table" ? cor : graphData,
           },
         };
       return val;
     });
     rflow.setNodes(tempNodes);
 
+    return true;
   } catch (error) {
     raiseErrorToast(rflow, params, error.message);
     return false;

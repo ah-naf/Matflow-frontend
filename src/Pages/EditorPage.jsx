@@ -305,6 +305,10 @@ function EditorPage() {
         ok = await handleDatasetCorrelation(rflow, params, 'table');
       }
 
+      if (typeSource === "Corelation" && typeTarget === "output_graph") {
+        ok = await handleDatasetCorrelation(rflow, params, 'graph');
+      }
+
       if (!ok) return;
       setEdges((eds) => {
         const temp = {

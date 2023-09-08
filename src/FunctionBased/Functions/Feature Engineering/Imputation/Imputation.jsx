@@ -1,14 +1,18 @@
 import { Checkbox, Input } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import { setSaveAsNew } from "../../../../Slices/FeatureEngineeringSlice";
+import { setReRender } from "../../../../Slices/UploadedFileSlice";
 import {
-  setDatasetName,
-  setSaveAsNew,
-} from "../../../../Slices/FeatureEngineeringSlice";
+  fetchDataFromIndexedDB,
+  updateDataInIndexedDB,
+} from "../../../../util/indexDB";
 import SingleDropDown from "../../../Components/SingleDropDown/SingleDropDown";
 
 function Imputation({ csvData }) {
   const [savedAsNewDataset, setSavedAsNewDataset] = useState(false);
+  const [dataset_name, setDatasetName] = useState("");
   const dispatch = useDispatch();
   const [imputationNotExist, setImputationNotExist] = useState(true);
   const [nullVar, setNullVar] = useState([]);
@@ -19,8 +23,10 @@ function Imputation({ csvData }) {
   const [mode, setMode] = useState("Select Mode");
   const [modeData, setModeData] = useState([]);
   const [optionValue, setOptionValue] = useState();
+  const activeCsvFile = useSelector((state) => state.uploadedFile.activeFile);
   const [constant, setConstant] = useState();
   const [fill_group, setFillGroup] = useState();
+  const render = useSelector((state) => state.uploadedFile.rerender);
 
   useEffect(() => {
     setImputationNotExist(true);
@@ -58,14 +64,45 @@ function Imputation({ csvData }) {
       body: JSON.stringify({
         file: csvData,
         Select_columns: select_column,
-        strategy: activeStrategy === 'mode' ? 'constant' : activeStrategy,
+        strategy: activeStrategy === "mode" ? "constant" : activeStrategy,
         fill_group,
         constant,
       }),
     });
 
-    const data = await res.json();
-    console.log(data);
+    let Data = await res.json();
+    Data = Data.dataframe;
+
+    let fileName = activeCsvFile.name;
+
+    if (savedAsNewDataset) {
+      fileName = dataset_name;
+    }
+
+    // console.log(featureData)
+
+    const uploadedFiles = JSON.parse(localStorage.getItem("uploadedFiles"));
+    const fileExist = uploadedFiles.filter((val) => val.name === fileName);
+
+    if (fileExist.length === 0) {
+      uploadedFiles.push({ name: fileName });
+    }
+    localStorage.setItem("uploadedFiles", JSON.stringify(uploadedFiles));
+
+    const temp = await fetchDataFromIndexedDB(fileName);
+    await updateDataInIndexedDB(fileName, Data);
+
+    toast.success(`Data updated successfully!`, {
+      position: "bottom-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+    });
+    dispatch(setReRender(!render));
   };
 
   const handleSelectColumn = async (e) => {
@@ -209,8 +246,9 @@ function Imputation({ csvData }) {
               label="New Dataset Name"
               fullWidth
               clearable
+              value={dataset_name}
               onChange={(e) => {
-                dispatch(setDatasetName(e.target.value));
+                setDatasetName(e.target.value);
               }}
             />
           </div>

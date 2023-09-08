@@ -1,12 +1,41 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { TbCirclesRelation } from "react-icons/tb";
 import { Handle, Position, useReactFlow } from "reactflow";
+import { handleDatasetCorrelation } from "../../../util/NodeFunctions";
 import UpdateCorelationNode from "../../UpdateNodes/UpdateCorelationNode/UpdateCorelationNode";
 
 function CorelationNode({ id, data }) {
   console.log(data);
   const [visible, setVisible] = useState(false);
   const rflow = useReactFlow();
+
+  useEffect(() => {
+    (async function () {
+      const tempTable = rflow
+        .getEdges()
+        .filter(
+          (edge) =>
+            edge.source === id &&
+            rflow.getNode(edge.target).type === "output_table"
+        );
+
+      const tempGraph = rflow
+        .getEdges()
+        .filter(
+          (edge) =>
+            edge.source === id &&
+            rflow.getNode(edge.target).type === "output_graph"
+        );
+
+      tempTable.forEach(async (val) => {
+        await handleDatasetCorrelation(rflow, val, "table");
+      });
+
+      tempGraph.forEach(async (val) => {
+        await handleDatasetCorrelation(rflow, val, "graph");
+      });
+    })();
+  }, [data]);
 
   return (
     <>

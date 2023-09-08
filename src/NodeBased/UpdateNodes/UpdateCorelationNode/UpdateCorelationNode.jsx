@@ -3,14 +3,39 @@ import { Dialog } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import React, { useState } from "react";
+import MultipleDropDown from "../../../FunctionBased/Components/MultipleDropDown/MultipleDropDown";
 import SingleDropDown from "../../../FunctionBased/Components/SingleDropDown/SingleDropDown";
+import { useReactFlow } from "reactflow";
 
-function UpdateCorelationNode({ visible, setVisible }) {
+function UpdateCorelationNode({ visible, setVisible, csvData, nodeId }) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  const allColumn = Object.keys(csvData[0]);
   const [corelation, setCorelation] = useState("pearson");
+  const [show_column, setShowColumn] = useState(allColumn);
+  const rflow = useReactFlow();
+  const nodeDetails = rflow.getNode(nodeId);
 
-  const handleSave = () => {};
+
+  const handleSave = () => {
+    const tempNode = {
+      ...nodeDetails,
+      data: {
+        ...nodeDetails.data,
+        table: csvData,
+        correlation: {
+          method: corelation,
+          show_column
+        },
+      },
+    };
+
+    const tempNodes = rflow.getNodes().map((node) => {
+      if (node.id === nodeId) return tempNode;
+      return node;
+    });
+    rflow.setNodes(tempNodes);
+  };
 
   return (
     <div>
@@ -30,13 +55,21 @@ function UpdateCorelationNode({ visible, setVisible }) {
           Edit Dataset Correlation Options
         </h1>
 
-        <div className="min-w-[500px] min-h-[400px] mx-auto w-full p-6 py-4">
+        <div className="min-w-[500px] min-h-[400px] mx-auto w-full p-6 py-4 space-y-4">
           <div>
             <p>Correlation Method</p>
             <SingleDropDown
               columnNames={["pearson", "kendall", "spearman"]}
               initValue={corelation}
               onValueChange={setCorelation}
+            />
+          </div>
+          <div>
+            <p>Show Column</p>
+            <MultipleDropDown
+              columnNames={allColumn}
+              defaultValue={show_column}
+              setSelectedColumns={setShowColumn}
             />
           </div>
         </div>

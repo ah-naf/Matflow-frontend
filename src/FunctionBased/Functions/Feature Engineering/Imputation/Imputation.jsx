@@ -16,9 +16,10 @@ function Imputation({ csvData }) {
   const [group_by, setGroupBy] = useState([]);
   const [strategy, setStrategy] = useState([]);
   const [activeStrategy, setActiveStrategy] = useState();
-  const [catData, setCatData] = useState();
-  const [option, setOption] = useState("Select Mode");
-  const [constant, setConstant] = useState(0);
+  const [mode, setMode] = useState("Select Mode");
+  const [modeData, setModeData] = useState([]);
+  const [optionValue, setOptionValue] = useState();
+  const [constant, setConstant] = useState();
   const [fill_group, setFillGroup] = useState();
 
   useEffect(() => {
@@ -85,11 +86,10 @@ function Imputation({ csvData }) {
     });
 
     const data = await res.json();
-    // console.log(data);
+    console.log(data);
 
     setGroupBy(data.group_by);
-    setCatData(data);
-    setConstant(0);
+    setModeData(Object.values(data.mode));
   };
 
   if (imputationNotExist)
@@ -113,14 +113,26 @@ function Imputation({ csvData }) {
         <p>Strategy</p>
         <SingleDropDown
           columnNames={strategy}
-          onValueChange={setActiveStrategy}
+          onValueChange={(e) => {
+            setActiveStrategy(e);
+            setConstant();
+          }}
         />
       </div>
 
-      {strategy && (
-        <>
-          {(activeStrategy === "mean" || activeStrategy === "median") && (
-            <div className="">
+      {activeStrategy && strategy && strategy[0] === "mean" && (
+        <div>
+          {activeStrategy === "constant" ? (
+            <Input
+              fullWidth
+              label="Value"
+              type="number"
+              step={0.01}
+              value={constant || 0}
+              onChange={(e) => setConstant(e.target.value)}
+            />
+          ) : (
+            <div>
               <p>Group By</p>
               <SingleDropDown
                 columnNames={group_by}
@@ -128,48 +140,59 @@ function Imputation({ csvData }) {
               />
             </div>
           )}
-          {activeStrategy === "mode" && (
-            <div className="flex gap-4 w-full">
+        </div>
+      )}
+      {activeStrategy && strategy && strategy[0] === "mode" && (
+        <div>
+          {activeStrategy === "value" ? (
+            <Input
+              fullWidth
+              label="Value"
+              type="number"
+              step={0.01}
+              value={constant || 0}
+              onChange={(e) => setConstant(e.target.value)}
+            />
+          ) : (
+            <div className="flex gap-4">
               <div className="w-full">
                 <p>Options</p>
                 <SingleDropDown
                   columnNames={["Select Mode", "Group Mode"]}
-                  onValueChange={setOption}
-                  initValue={option}
+                  onValueChange={(e) => {
+                    setMode(e);
+                    setOptionValue("");
+                    setConstant();
+                    setFillGroup();
+                  }}
                 />
               </div>
-              {option === "Select Mode" ? (
-                <div className="w-full">
-                  <p>Mode Value</p>
-                  <SingleDropDown
-                    columnNames={Object.values(catData.mode)}
-                    onValueChange={setFillGroup}
-                  />
-                </div>
-              ) : (
+              {mode === "Group Mode" && (
                 <div className="w-full">
                   <p>Group By</p>
                   <SingleDropDown
                     columnNames={group_by}
-                    onChange={setFillGroup}
+                    initValue={optionValue}
+                    onValueChange={setFillGroup}
+                  />
+                </div>
+              )}
+
+              {mode === "Select Mode" && (
+                <div className="w-full">
+                  <p>Mode value</p>
+                  <SingleDropDown
+                    columnNames={modeData}
+                    initValue={optionValue}
+                    onValueChange={setConstant}
                   />
                 </div>
               )}
             </div>
           )}
-          {(activeStrategy === "constant" || activeStrategy === "value") && (
-            <Input
-              label="Value"
-              type="number"
-              step={0.01}
-              fullWidth
-              value={constant}
-              onChange={(e) => setConstant(e.target.value)}
-              bordered
-            />
-          )}
-        </>
+        </div>
       )}
+
       <div className="mt-4 flex flex-col gap-4">
         <Checkbox
           color="success"

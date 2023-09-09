@@ -25,6 +25,7 @@ import DuplicateNode from "../NodeBased/CustomNodes/DuplicateNode/DuplicateNode"
 import EDANode from "../NodeBased/CustomNodes/EDANode/EDANode";
 import EncodingNode from "../NodeBased/CustomNodes/EncodingNode/EncodingNode";
 import GroupNode from "../NodeBased/CustomNodes/GroupNode/GroupNode";
+import ImputationNode from "../NodeBased/CustomNodes/ImputationNode/ImputationNode";
 import InformationNode from "../NodeBased/CustomNodes/InformationNode/InformationNode";
 import MergeDatasetNode from "../NodeBased/CustomNodes/MergeDatasetNode/MergeDatasetNode";
 import ReverseMLNode from "../NodeBased/CustomNodes/ReverseMLNode/ReverseMLNode";
@@ -48,6 +49,8 @@ import {
   handleDropRowColumn,
   handleEncoding,
   handleFileForMergeDataset,
+  handleImputation,
+  handleImputationInit,
   handleMergeDataset,
   handleOutputTable,
   handlePlotOptions,
@@ -78,6 +81,7 @@ const nodeTypes = {
   Corelation: CorelationNode,
   Group: GroupNode,
   Duplicate: DuplicateNode,
+  Imputation: ImputationNode,
 };
 
 const initialNodes = [
@@ -323,6 +327,14 @@ function EditorPage() {
 
       if (typeSource === "Duplicate" && typeTarget === "output_table") {
         ok = await handleDatasetDuplicate(rflow, params);
+      }
+
+      if (typeSource === "upload" && typeTarget === "Imputation") {
+        ok = await handleImputationInit(rflow, params);
+      }
+
+      if (typeSource === "Imputation" && typeTarget === "upload") {
+        ok = await handleImputation(rflow, params);
       }
 
       if (!ok) return;

@@ -21,6 +21,7 @@ import ChartNode from "../NodeBased/CustomNodes/ChartNode/ChartNode";
 import ClusterNode from "../NodeBased/CustomNodes/ClusterNode/ClusterNode";
 import CorelationNode from "../NodeBased/CustomNodes/CorelationNode/CorelationNode";
 import DropRowsColumnNode from "../NodeBased/CustomNodes/DropRowsColumnNode/DropRowsColumnNode";
+import DuplicateNode from "../NodeBased/CustomNodes/DuplicateNode/DuplicateNode";
 import EDANode from "../NodeBased/CustomNodes/EDANode/EDANode";
 import EncodingNode from "../NodeBased/CustomNodes/EncodingNode/EncodingNode";
 import GroupNode from "../NodeBased/CustomNodes/GroupNode/GroupNode";
@@ -40,6 +41,7 @@ import {
   handleChangeDtype,
   handleCluster,
   handleDatasetCorrelation,
+  handleDatasetDuplicate,
   handleDatasetGroup,
   handleDatasetInformation,
   handleDatasetStatistics,
@@ -75,6 +77,7 @@ const nodeTypes = {
   Statistics: StatisticsNode,
   Corelation: CorelationNode,
   Group: GroupNode,
+  Duplicate: DuplicateNode,
 };
 
 const initialNodes = [
@@ -222,7 +225,8 @@ function EditorPage() {
           typeTarget === "Information" ||
           typeTarget === "Statistics" ||
           typeTarget === "Corelation" ||
-          typeTarget === "Group")
+          typeTarget === "Group" ||
+          typeTarget === "Duplicate")
       ) {
         ok = await handleOutputTable(rflow, params);
       }
@@ -315,6 +319,10 @@ function EditorPage() {
 
       if (typeSource === "Group" && typeTarget === "output_table") {
         ok = await handleDatasetGroup(rflow, params);
+      }
+
+      if (typeSource === "Duplicate" && typeTarget === "output_table") {
+        ok = await handleDatasetDuplicate(rflow, params);
       }
 
       if (!ok) return;

@@ -840,3 +840,58 @@ export const handleDatasetGroup = async (rflow, params) => {
     return false;
   }
 };
+
+export const handleDatasetDuplicate = async (rflow, params) => {
+  try {
+    let { table: rowData, duplicate } = rflow.getNode(params.source).data;
+
+    if (!duplicate) throw new Error("Check Duplicate Node.");
+
+    const duplicates = [];
+    const seen = new Set();
+
+    rowData.forEach((obj) => {
+      const excludedObj = {};
+      for (const key in obj) {
+        if (!duplicate.excludeKeys.includes(key)) {
+          excludedObj[key] = obj[key];
+        }
+      }
+      const key = Object.values(excludedObj).join("|");
+      if (seen.has(key)) {
+        duplicates.push(obj);
+      } else {
+        seen.add(key);
+      }
+    });
+
+    if (duplicates.length === 0) {
+      toast.warning("No duplicate data found", {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+      return false;
+    }
+
+    const tempNodes = rflow.getNodes().map((val) => {
+      if (val.id === params.target)
+        return {
+          ...val,
+          data: { table: duplicates },
+        };
+      return val;
+    });
+    rflow.setNodes(tempNodes);
+
+    return true;
+  } catch (error) {
+    raiseErrorToast(rflow, params, error.message);
+    return false;
+  }
+};

@@ -4,6 +4,7 @@ import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import InsertChartOutlinedIcon from "@mui/icons-material/InsertChartOutlined";
 import RemoveCircleOutlineOutlinedIcon from "@mui/icons-material/RemoveCircleOutlineOutlined";
+import SplitscreenIcon from "@mui/icons-material/Splitscreen";
 import TextFieldsOutlinedIcon from "@mui/icons-material/TextFieldsOutlined";
 import { Collapse } from "@nextui-org/react";
 import {
@@ -111,6 +112,30 @@ const DATASET_NODES = [
   },
 ];
 
+const MODEL_BUILDING = [
+  {
+    key: "5-0",
+    label: "Split Dataset",
+    icon: <SplitscreenIcon color="action" />,
+  },
+  {
+    key: "5-1",
+    label: "Build Model",
+  },
+  {
+    key: "5-2",
+    label: "Model Evaluation",
+  },
+  {
+    key: "5-3",
+    label: "Model Prediction",
+  },
+  // {
+  //   key: "5-4",
+  //   label: "Models",
+  // },
+];
+
 const FUNCTION_NODES = [
   {
     key: "1",
@@ -137,33 +162,6 @@ const FUNCTION_NODES = [
     children: [],
   },
   {
-    key: "5",
-    label: "Model Building",
-    // icon: <TbBrain className='text-[rgba(0,0,0,0.54)]' size={"20"} />,
-    children: [
-      {
-        key: "5-0",
-        label: "Split Dataset",
-      },
-      {
-        key: "5-1",
-        label: "Build Model",
-      },
-      {
-        key: "5-2",
-        label: "Model Evaluation",
-      },
-      {
-        key: "5-3",
-        label: "Model Prediction",
-      },
-      {
-        key: "5-4",
-        label: "Models",
-      },
-    ],
-  },
-  {
     key: "6",
     label: "Model Deployment",
     icon: <RxRocket className="text-[rgba(0,0,0,0.54)]" size={"25"} />,
@@ -185,6 +183,28 @@ const FUNCTION_NODES = [
   },
 ];
 
+const IO_NODES = [
+  {
+    key: "0-0-1",
+    label: "Upload File",
+    icon: <CloudUploadOutlinedIcon color="action" />,
+  },
+  {
+    key: "0-0-2",
+    label: "Graph",
+    icon: <AutoGraphOutlinedIcon color="action" />,
+  },
+  {
+    key: "0-0-3",
+    label: "Table",
+    icon: <BsTable className="text-[rgba(0,0,0,0.54)]" size={20} />,
+  },
+  {
+    key: "0-0-4",
+    label: "Test-Train Dataset",
+  },
+];
+
 const Sidebar = () => {
   const onDragStart = (event, nodeType) => {
     event.dataTransfer.setData("application/reactflow", nodeType);
@@ -202,35 +222,24 @@ const Sidebar = () => {
             <Collapse
               title={
                 <h1 className="font-medium tracking-wider">
-                  Input/Output Nodes
+                  Input-Output Nodes
                 </h1>
               }
             >
               <div className="grid grid-cols-3 gap-4">
-                <button
-                  className="grid gap-1 place-items-center border-2 px-2 py-3 rounded-md shadow text-sm "
-                  onDragStart={(event) => onDragStart(event, "upload")}
-                  draggable
-                >
-                  <CloudUploadOutlinedIcon color="action" />
-                  <span className="text-xs">Upload File</span>
-                </button>
-                <button
-                  className="grid gap-1 place-items-center border-2 px-2 py-3 rounded-md shadow text-sm "
-                  onDragStart={(event) => onDragStart(event, "output_graph")}
-                  draggable
-                >
-                  <AutoGraphOutlinedIcon color="action" />
-                  <span className="text-xs">Graph</span>
-                </button>
-                <button
-                  className="grid gap-1 place-items-center border-2 px-2 py-3 rounded-md shadow text-sm "
-                  onDragStart={(event) => onDragStart(event, "output_table")}
-                  draggable
-                >
-                  <BsTable className="text-[rgba(0,0,0,0.54)]" size={20} />
-                  <span className="text-xs">Table</span>
-                </button>
+                {IO_NODES.map((node) => {
+                  return (
+                    <button
+                      key={node.key}
+                      className="grid gap-1 place-items-center border-2 px-2 py-3 rounded-md shadow text-sm "
+                      onDragStart={(event) => onDragStart(event, node.label)}
+                      draggable
+                    >
+                      {node.icon && <span>{node.icon}</span>}
+                      <span className="text-xs">{node.label}</span>
+                    </button>
+                  );
+                })}
               </div>
             </Collapse>
           </Collapse.Group>
@@ -311,6 +320,31 @@ const Sidebar = () => {
               </div>
             </Collapse>
           </Collapse.Group>
+
+          {/* Model Building Nodes */}
+          <Collapse.Group bordered>
+            <Collapse
+              title={
+                <h1 className="font-medium tracking-wider">
+                  Model Building Nodes
+                </h1>
+              }
+            >
+              <div className="grid grid-cols-3 gap-4">
+                {MODEL_BUILDING.map((node) => (
+                  <button
+                    className="grid gap-1 place-items-center border-2 px-2 py-3 rounded-md shadow text-sm "
+                    onDragStart={(event) => onDragStart(event, node.label)}
+                    draggable
+                    key={node.key}
+                  >
+                    {node.icon && <span>{node.icon}</span>}
+                    <span className="text-xs">{node.label}</span>
+                  </button>
+                ))}
+              </div>
+            </Collapse>
+          </Collapse.Group>
         </div>
       </aside>
     </div>
@@ -318,34 +352,3 @@ const Sidebar = () => {
 };
 
 export default Sidebar;
-
-// {FUNCTION_NODES.map((node) => {
-//   if (node.children.length > 0)
-//     return (
-//       <Collapse.Group key={node.key} bordered>
-//         <Collapse
-//           title={
-//             <h1 className="font-medium tracking-wider">
-//               {node.label} Nodes
-//             </h1>
-//           }
-//         >
-//           <div className="grid grid-cols-3 gap-4">
-//             {node.children.map((child) => (
-//               <button
-//                 key={child.key}
-//                 className="grid gap-1 place-items-center border-2 px-2 py-3 rounded-md shadow text-sm "
-//                 onDragStart={(event) =>
-//                   onDragStart(event, child.label)
-//                 }
-//                 draggable
-//               >
-//                 {child.icon && <span>{child.icon}</span>}
-//                 <span>{child.label}</span>
-//               </button>
-//             ))}
-//           </div>
-//         </Collapse>
-//       </Collapse.Group>
-//     );
-// })}

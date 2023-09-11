@@ -100,7 +100,6 @@ function Imputation({
         if (typeof csvData[0][select_column] === "number")
           setStrategy(["mean", "median", "constant"]);
         else setStrategy(["mode", "value"]);
-
       }
     };
     fetchData();
@@ -122,7 +121,8 @@ function Imputation({
     });
 
     let Data = await res.json();
-    Data = Data.dataframe;
+
+    Data = Data.dataset;
 
     let fileName = activeCsvFile.name;
 

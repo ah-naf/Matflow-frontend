@@ -326,43 +326,51 @@ function BuildModel({ csvData, nodeData = undefined, type = "function" }) {
           {whatKind && whatKind === "Continuous" ? (
             <div className="mt-12">
               {regressor === REGRESSOR[0] && (
-                <LinearRegression train={train} test={test} />
+                <LinearRegression train={train} test={test} Type={type} />
               )}
               {regressor === REGRESSOR[1] && (
-                <RidgeRegression train={train} test={test} />
+                <RidgeRegression train={train} test={test} Type={type} />
               )}
               {regressor === REGRESSOR[2] && (
-                <LassoRegression train={train} test={test} />
+                <LassoRegression train={train} test={test} Type={type} />
               )}
               {regressor === REGRESSOR[3] && (
-                <DecisionTreeRegression train={train} test={test} />
+                <DecisionTreeRegression train={train} test={test} Type={type} />
               )}
               {regressor === REGRESSOR[4] && (
-                <RandomForestRegression train={train} test={test} />
+                <RandomForestRegression train={train} test={test} Type={type} />
               )}
               {regressor === REGRESSOR[5] && (
-                <SupportVectorRegressor train={train} test={test} />
+                <SupportVectorRegressor train={train} test={test} Type={type} />
               )}
             </div>
           ) : (
             <div className="mt-12">
               {regressor === CLASSIFIER[0] && (
-                <KNearestNeighbour train={train} test={test} />
+                <KNearestNeighbour train={train} test={test} Type={type} />
               )}
               {regressor === CLASSIFIER[1] && (
-                <SupportVectorMachine train={train} test={test} />
+                <SupportVectorMachine train={train} test={test} Type={type} />
               )}
               {regressor === CLASSIFIER[2] && (
-                <LogisticRegression train={train} test={test} />
+                <LogisticRegression train={train} test={test} Type={type} />
               )}
               {regressor === CLASSIFIER[3] && (
-                <DecisionTreeClassification train={train} test={test} />
+                <DecisionTreeClassification
+                  train={train}
+                  test={test}
+                  Type={type}
+                />
               )}
               {regressor === CLASSIFIER[4] && (
-                <RandomForestClassification train={train} test={test} />
+                <RandomForestClassification
+                  train={train}
+                  test={test}
+                  Type={type}
+                />
               )}
               {regressor === CLASSIFIER[5] && (
-                <MultilayerPerceptron train={train} test={test} />
+                <MultilayerPerceptron train={train} test={test} Type={type} />
               )}
             </div>
           )}

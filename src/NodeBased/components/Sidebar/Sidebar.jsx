@@ -130,10 +130,10 @@ const MODEL_BUILDING = [
     key: "5-3",
     label: "Model Prediction",
   },
-  // {
-  //   key: "5-4",
-  //   label: "Models",
-  // },
+  {
+    key: "5-4",
+    label: "Hyper-parameter Optimization",
+  },
 ];
 
 const FUNCTION_NODES = [

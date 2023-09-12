@@ -84,16 +84,16 @@ function BuildModel({ csvData, nodeData = undefined, type = "function" }) {
       setWhatKind(nodeData.whatKind);
       if (nodeData.whatKind === "Continuous") {
         setAllRegressor(REGRESSOR);
-        setRegressor(REGRESSOR[0]);
-        dispatch(setReg(REGRESSOR[0]));
+        setRegressor(nodeData.regressor || REGRESSOR[0]);
+        dispatch(setReg(nodeData.regressor || REGRESSOR[0]));
         dispatch(setType("regressor"));
-        setModelName("LR_Regression");
+        setModelName(nodeData.model_name || "LR_Regression");
       } else {
         setAllRegressor(CLASSIFIER);
-        setRegressor(CLASSIFIER[0]);
-        dispatch(setReg(CLASSIFIER[0]));
+        setRegressor(nodeData.regressor || CLASSIFIER[0]);
+        dispatch(setReg(nodeData.regressor || CLASSIFIER[0]));
         dispatch(setType("classifier"));
-        setModelName("KNN_Classification");
+        setModelName(nodeData.model_name || "KNN_Classification");
       }
       dispatch(setTargetVariable(nodeData.target_variable));
       dispatch(setHyperparameterData({}));
@@ -291,40 +291,42 @@ function BuildModel({ csvData, nodeData = undefined, type = "function" }) {
       )}
       {allRegressor && (
         <>
-          <div
-            className={`flex items-center gap-8 mt-8 ${
-              type === "node" && "flex-col !gap-4"
-            }`}
-          >
-            <div className="w-full">
-              <p>{whatKind === "Continuous" ? "Regressor" : "Classifier"}</p>
-              <SingleDropDown
-                columnNames={allRegressor}
-                onValueChange={(e) => {
-                  setRegressor(e);
-                  dispatch(setReg(e));
-                  dispatch(setHyperparameterData({}));
-                  dispatch(setModelSetting({}));
-                  setNicherData("");
-                }}
-                initValue={allRegressor[0]}
-              />
+          {type === "function" && (
+            <div
+              className={`flex items-center gap-8 mt-8 ${
+                type === "node" && "flex-col !gap-4"
+              }`}
+            >
+              <div className="w-full">
+                <p>{whatKind === "Continuous" ? "Regressor" : "Classifier"}</p>
+                <SingleDropDown
+                  columnNames={allRegressor}
+                  onValueChange={(e) => {
+                    setRegressor(e);
+                    dispatch(setReg(e));
+                    dispatch(setHyperparameterData({}));
+                    dispatch(setModelSetting({}));
+                    setNicherData("");
+                  }}
+                  initValue={allRegressor[0]}
+                />
+              </div>
+              <div className="w-full">
+                <Input
+                  fullWidth
+                  label="Model Name"
+                  size="lg"
+                  value={model_name}
+                  onChange={(e) => setModelName(e.target.value)}
+                />
+              </div>
             </div>
-            <div className="w-full">
-              <Input
-                fullWidth
-                label="Model Name"
-                size="lg"
-                value={model_name}
-                onChange={(e) => setModelName(e.target.value)}
-              />
-            </div>
-          </div>
+          )}
 
           {/* Regressor (for Numerical Column) */}
 
           {whatKind && whatKind === "Continuous" ? (
-            <div className="mt-12">
+            <div className={`${type === "function" && "mt-12"}`}>
               {regressor === REGRESSOR[0] && (
                 <LinearRegression train={train} test={test} Type={type} />
               )}
@@ -345,7 +347,7 @@ function BuildModel({ csvData, nodeData = undefined, type = "function" }) {
               )}
             </div>
           ) : (
-            <div className="mt-12">
+            <div className={`${type === "function" && "mt-12"}`}>
               {regressor === CLASSIFIER[0] && (
                 <KNearestNeighbour train={train} test={test} Type={type} />
               )}

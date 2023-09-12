@@ -28,9 +28,9 @@ function UpdateBuildModelNode({ visible, setVisible, nodeData, nodeId }) {
         >
           <CloseIcon color="action" />
         </span>
-        <h1 className="text-center font-medium tracking-wider text-2xl">
-          Edit Build Model Options
-        </h1>
+        {/* <h1 className="text-center font-medium tracking-wider text-2xl">
+          Edit Model Settings
+        </h1> */}
 
         <div className="min-w-[500px] mx-auto w-full p-6 py-4">
           <BuildModel

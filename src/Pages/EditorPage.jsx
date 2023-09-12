@@ -26,6 +26,7 @@ import DuplicateNode from "../NodeBased/CustomNodes/DuplicateNode/DuplicateNode"
 import EDANode from "../NodeBased/CustomNodes/EDANode/EDANode";
 import EncodingNode from "../NodeBased/CustomNodes/EncodingNode/EncodingNode";
 import GroupNode from "../NodeBased/CustomNodes/GroupNode/GroupNode";
+import HyperParameterNode from "../NodeBased/CustomNodes/HyperparameterNode/HyperParameterNode";
 import ImputationNode from "../NodeBased/CustomNodes/ImputationNode/ImputationNode";
 import InformationNode from "../NodeBased/CustomNodes/InformationNode/InformationNode";
 import MergeDatasetNode from "../NodeBased/CustomNodes/MergeDatasetNode/MergeDatasetNode";
@@ -90,6 +91,7 @@ const nodeTypes = {
   "Split Dataset": SplitDatasetNode,
   "Test-Train Dataset": TestTrainDatasetNode,
   "Build Model": BuildModelNode,
+  "Hyper-parameter Optimization": HyperParameterNode,
 };
 
 const initialNodes = [
@@ -356,7 +358,11 @@ function EditorPage() {
         ok = await handleSplitDataset(rflow, params);
       }
 
-      if (typeSource === "Test-Train Dataset" && typeTarget === "Build Model") {
+      if (
+        typeSource === "Test-Train Dataset" &&
+        (typeTarget === "Build Model" ||
+          typeTarget === "Hyper-parameter Optimization")
+      ) {
         ok = await handleTestTrainDataset(rflow, params);
       }
 

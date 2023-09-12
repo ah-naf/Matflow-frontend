@@ -1043,7 +1043,10 @@ export const handleTestTrainDataset = async (rflow, params) => {
     let testTrain = rflow.getNode(params.source).data;
 
     if (!testTrain) throw new Error("Check Test-Train Dataset Node.");
-    
+    if (rflow.getNode(params.target).type === "Hyper-parameter Optimization") {
+      if (!testTrain.regressor)
+        throw new Error("Check Test-Train Dataset Node.");
+    }
     const tempNodes = rflow.getNodes().map((val) => {
       if (val.id === params.target)
         return {

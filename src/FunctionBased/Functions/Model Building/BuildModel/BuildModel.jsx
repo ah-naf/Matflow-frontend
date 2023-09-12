@@ -45,7 +45,7 @@ const CLASSIFIER = [
   "Multilayer Perceptron",
 ];
 
-function BuildModel({ csvData }) {
+function BuildModel({ csvData, nodeData = undefined, type = "function" }) {
   // const [regressor, setRegressor] = useState(Regressor[0]);
   const [allRegressor, setAllRegressor] = useState();
   const [regressor, setRegressor] = useState();
@@ -60,7 +60,7 @@ function BuildModel({ csvData }) {
   const model_setting = useSelector(
     (state) => state.modelBuilding.model_setting
   );
-  const type = useSelector((state) => state.modelBuilding.type);
+  const Type = useSelector((state) => state.modelBuilding.type);
   const target_variable = useSelector(
     (state) => state.modelBuilding.target_variable
   );
@@ -78,6 +78,31 @@ function BuildModel({ csvData }) {
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (type === "node" && nodeData) {
+      setWhatKind(nodeData.whatKind);
+      if (nodeData.whatKind === "Continuous") {
+        setAllRegressor(REGRESSOR);
+        setRegressor(REGRESSOR[0]);
+        dispatch(setReg(REGRESSOR[0]));
+        dispatch(setType("regressor"));
+        setModelName("LR_Regression");
+      } else {
+        setAllRegressor(CLASSIFIER);
+        setRegressor(CLASSIFIER[0]);
+        dispatch(setReg(CLASSIFIER[0]));
+        dispatch(setType("classifier"));
+        setModelName("KNN_Classification");
+      }
+      dispatch(setTargetVariable(nodeData.target_variable));
+      dispatch(setHyperparameterData({}));
+      dispatch(setModelSetting({}));
+      setNicherData("");
+      setTrain(nodeData.train);
+      setTest(nodeData.test);
+    }
+  }, [nodeData]);
 
   const handleDatasetChange = async (e) => {
     let tempDatasets = await fetchDataFromIndexedDB("splitted_dataset");
@@ -149,16 +174,14 @@ function BuildModel({ csvData }) {
           test,
           train,
           target_var: target_variable,
-          type,
-          [type === "regressor" ? "regressor" : "classifier"]: reg,
+          type: Type,
+          [Type === "regressor" ? "regressor" : "classifier"]: reg,
           ...model_setting,
           file: csvData,
         }),
       });
       const data = await res.json();
       console.log(data);
-
-      
 
       // return;
       setNicherData(data.metrics);
@@ -173,7 +196,7 @@ function BuildModel({ csvData }) {
             metrics: data.metrics,
             metrics_table: data.metrics_table,
             y_pred: JSON.parse(data.y_pred),
-            type,
+            type: Type,
             regressor,
             model_deploy: data.model_deploy,
           },
@@ -185,7 +208,7 @@ function BuildModel({ csvData }) {
               metrics: data.metrics,
               metrics_table: data.metrics_table,
               y_pred: JSON.parse(data.y_pred),
-              type,
+              type: Type,
               regressor,
               model_deploy: data.model_deploy,
             },
@@ -219,6 +242,7 @@ function BuildModel({ csvData }) {
   };
 
   useEffect(() => {
+    console.log({ whatKind, regressor });
     if (whatKind === "Continuous") {
       if (regressor === REGRESSOR[0]) setModelName("LR_Regression");
       if (regressor === REGRESSOR[1]) setModelName("Ridge_Regression");
@@ -256,16 +280,22 @@ function BuildModel({ csvData }) {
         draggable
         theme="light"
       />
-      <div>
-        <p>Select Train Test Dataset</p>
-        <SingleDropDown
-          columnNames={allDatasetName}
-          onValueChange={(e) => handleDatasetChange(e)}
-        />
-      </div>
+      {type === "function" && (
+        <div>
+          <p>Select Train Test Dataset</p>
+          <SingleDropDown
+            columnNames={allDatasetName}
+            onValueChange={(e) => handleDatasetChange(e)}
+          />
+        </div>
+      )}
       {allRegressor && (
         <>
-          <div className="flex items-center gap-8 mt-8">
+          <div
+            className={`flex items-center gap-8 mt-8 ${
+              type === "node" && "flex-col !gap-4"
+            }`}
+          >
             <div className="w-full">
               <p>{whatKind === "Continuous" ? "Regressor" : "Classifier"}</p>
               <SingleDropDown
@@ -337,16 +367,20 @@ function BuildModel({ csvData }) {
             </div>
           )}
 
-          <button
-            className="self-start border-2 px-6 tracking-wider bg-primary-btn text-white font-medium rounded-md py-2 mt-8"
-            onClick={handleSave}
-          >
-            Submit
-          </button>
-          {nicherData && (
-            <p className="mt-4 text-xl tracking-widest">
-              {JSON.stringify(nicherData)}
-            </p>
+          {type === "function" && (
+            <>
+              <button
+                className="self-start border-2 px-6 tracking-wider bg-primary-btn text-white font-medium rounded-md py-2 mt-8"
+                onClick={handleSave}
+              >
+                Submit
+              </button>
+              {nicherData && (
+                <p className="mt-4 text-xl tracking-widest">
+                  {JSON.stringify(nicherData)}
+                </p>
+              )}
+            </>
           )}
         </>
       )}

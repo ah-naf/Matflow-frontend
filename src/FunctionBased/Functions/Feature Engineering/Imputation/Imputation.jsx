@@ -185,6 +185,7 @@ function Imputation({
       <h1 className="my-8 text-3xl font-medium">Imputation doesn't exist</h1>
     );
 
+    
   return (
     <div className="my-8 space-y-4">
       <div className="flex gap-4 items-center">

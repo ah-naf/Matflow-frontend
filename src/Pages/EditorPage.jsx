@@ -16,6 +16,7 @@ import "reactflow/dist/style.css";
 import AddModify from "../NodeBased/CustomNodes/AddModify/AddModify";
 import AlterFieldNameNode from "../NodeBased/CustomNodes/AlterFieldNameNode/AlterFieldNameNode";
 import AppendDatasetNode from "../NodeBased/CustomNodes/AppendDatasetNode/AppendDatasetNode";
+import BuildModelNode from "../NodeBased/CustomNodes/BuildModelNode/BuildModelNode";
 import ChangeDtypeNode from "../NodeBased/CustomNodes/ChangeDTypeNode/ChangeDtypeNode";
 import ChartNode from "../NodeBased/CustomNodes/ChartNode/ChartNode";
 import ClusterNode from "../NodeBased/CustomNodes/ClusterNode/ClusterNode";
@@ -59,6 +60,7 @@ import {
   handleReverseML,
   handleScaling,
   handleSplitDataset,
+  handleTestTrainDataset,
   handleTimeSeriesAnalysis,
   isItTimeSeriesFile,
 } from "../util/NodeFunctions";
@@ -87,6 +89,7 @@ const nodeTypes = {
   Imputation: ImputationNode,
   "Split Dataset": SplitDatasetNode,
   "Test-Train Dataset": TestTrainDatasetNode,
+  "Build Model": BuildModelNode,
 };
 
 const initialNodes = [
@@ -351,6 +354,10 @@ function EditorPage() {
         typeTarget === "Test-Train Dataset"
       ) {
         ok = await handleSplitDataset(rflow, params);
+      }
+
+      if (typeSource === "Test-Train Dataset" && typeTarget === "Build Model") {
+        ok = await handleTestTrainDataset(rflow, params);
       }
 
       if (!ok) return;

@@ -1017,15 +1017,38 @@ export const handleSplitDataset = async (rflow, params) => {
       if (val.id === params.target)
         return {
           ...val,
-          table: splitDataset.file,
           data: {
             ...data,
             test_dataset_name: "test_" + splitDataset.testDataName,
             train_dataset_name: "train_" + splitDataset.trainDataName,
             splitted_dataset_name: splitDataset.splittedName,
             whatKind: splitDataset.whatKind,
-            target_variable: splitDataset.target_variable
+            target_variable: splitDataset.target_variable,
+            table: splitDataset.file,
           },
+        };
+      return val;
+    });
+    rflow.setNodes(tempNodes);
+
+    return true;
+  } catch (error) {
+    raiseErrorToast(rflow, params, error.message);
+    return false;
+  }
+};
+
+export const handleTestTrainDataset = async (rflow, params) => {
+  try {
+    let testTrain = rflow.getNode(params.source).data;
+
+    if (!testTrain) throw new Error("Check Test-Train Dataset Node.");
+    
+    const tempNodes = rflow.getNodes().map((val) => {
+      if (val.id === params.target)
+        return {
+          ...val,
+          data: { testTrain },
         };
       return val;
     });

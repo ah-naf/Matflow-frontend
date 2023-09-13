@@ -54,8 +54,9 @@ function KNearestNeighbour({ train, test, Type = "function" }) {
           }),
         }
       );
+
       const data = await res.json();
-      console.log(data);
+      // console.log(data);
       setHData(data);
       setOptimizedData({ ...optimized_data, ...data.param });
     } catch (error) {

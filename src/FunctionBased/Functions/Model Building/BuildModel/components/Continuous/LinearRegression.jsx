@@ -57,6 +57,14 @@ function LinearRegression({ train, test, Type = "function" }) {
           }),
         }
       );
+      console.log({
+        train,
+        test,
+        [type === "regressor" ? "regressor" : "classifier"]: regressor,
+        type,
+        target_var: target_variable,
+        ...hyperparameterOption,
+      });
       const data = await res.json();
       setHData(data);
       setOptimizedData({ ...optimizedData, ...data.param });

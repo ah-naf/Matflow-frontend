@@ -4,7 +4,6 @@ import { handleTestTrainDataset } from "../../../util/NodeFunctions";
 import UpdateTestTrainDatasetNode from "../../UpdateNodes/UpdateTestTrainDatasetNode/UpdateTestTrainDatasetNode";
 
 function TestTrainDatasetNode({ id, data }) {
-  console.log(data);
   const [visible, setVisible] = useState(false);
   const rflow = useReactFlow();
 

@@ -1,11 +1,27 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Handle, Position, useReactFlow } from "reactflow";
 import UpdateHyperparameterNode from "../../UpdateNodes/UpdateHyperparameterNode/UpdateHyperparameterNode";
+import { handleHyperParameter } from "../../../util/NodeFunctions";
 
 function HyperParameterNode({ id, data }) {
   console.log(data);
   const [visible, setVisible] = useState(false);
   const rflow = useReactFlow();
+
+  useEffect(() => {
+    (async function () {
+      const temp = rflow
+        .getEdges()
+        .filter(
+          (edge) =>
+            edge.source === id &&
+            rflow.getNode(edge.target).type === "Build Model"
+        );
+      temp.forEach(async (val) => {
+        await handleHyperParameter(rflow, val);
+      });
+    })();
+  }, [data]);
 
   return (
     <>

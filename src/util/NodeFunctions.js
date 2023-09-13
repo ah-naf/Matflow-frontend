@@ -15,6 +15,46 @@ const EDA_LINK = {
   "Violin Plot": "eda_violinplot",
 };
 
+const CROSS_VALID = [
+  "Linear Regression",
+  "Ridge Regression",
+  "Lasso Regression",
+  "Decision Tree Regression",
+  "Random Forest Regression",
+  "Support Vector Regressor",
+  "K-Nearest Neighbors",
+  "Support Vector Machine",
+  "Logistic Regression",
+  "Decision Tree Classification",
+  "Random Forest Classification",
+  "Multilayer Perceptron",
+];
+const RANDOM_STATE = [
+  "Linear Regression",
+  "Ridge Regression",
+  "Lasso Regression",
+  "Decision Tree Regression",
+  "Random Forest Regression",
+  "K-Nearest Neighbors",
+  "Support Vector Machine",
+  "Logistic Regression",
+  "Decision Tree Classification",
+  "Random Forest Classification",
+  "Multilayer Perceptron",
+];
+const ITER = [
+  "Ridge Regression",
+  "Lasso Regression",
+  "Decision Tree Regression",
+  "Random Forest Regression",
+  "K-Nearest Neighbors",
+  "Support Vector Machine",
+  "Logistic Regression",
+  "Decision Tree Classification",
+  "Random Forest Classification",
+  "Multilayer Perceptron",
+];
+
 const raiseErrorToast = (rflow, params, error) => {
   // Error paile connected node er data delete kore dibe
   const tempNodes = rflow.getNodes().map((val) => {
@@ -1047,11 +1087,60 @@ export const handleTestTrainDataset = async (rflow, params) => {
       if (!testTrain.regressor)
         throw new Error("Check Test-Train Dataset Node.");
     }
+    let hyper = {};
+    // TODO: Add init hyper setting
+
+
+    
     const tempNodes = rflow.getNodes().map((val) => {
       if (val.id === params.target)
         return {
           ...val,
-          data: { testTrain },
+          data: { testTrain, hyper },
+        };
+      return val;
+    });
+    rflow.setNodes(tempNodes);
+
+    return true;
+  } catch (error) {
+    raiseErrorToast(rflow, params, error.message);
+    return false;
+  }
+};
+
+export const handleHyperParameter = async (rflow, params) => {
+  try {
+    let { hyper, testTrain } = rflow.getNode(params.source).data;
+
+    if (!hyper) throw new Error("Check Hyperparameter Optimization Node.");
+
+    const res = await fetch(
+      "http://127.0.0.1:8000/api/hyperparameter_optimization/",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          train: testTrain.train,
+          test: testTrain.test,
+          [testTrain.whatKind === "Continuous" ? "regressor" : "classifier"]:
+            testTrain.regressor,
+          type:
+            testTrain.whatKind === "Continuous" ? "regressor" : "classifier",
+          target_var: testTrain.target_variable,
+          ...hyper,
+        }),
+      }
+    );
+    const data = await res.json();
+
+    const tempNodes = rflow.getNodes().map((val) => {
+      if (val.id === params.target)
+        return {
+          ...val,
+          data: { testTrain, hyper: data.param },
         };
       return val;
     });

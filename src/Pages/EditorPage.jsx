@@ -53,6 +53,7 @@ import {
   handleDropRowColumn,
   handleEncoding,
   handleFileForMergeDataset,
+  handleHyperParameter,
   handleImputation,
   handleImputationInit,
   handleMergeDataset,
@@ -364,6 +365,13 @@ function EditorPage() {
           typeTarget === "Hyper-parameter Optimization")
       ) {
         ok = await handleTestTrainDataset(rflow, params);
+      }
+
+      if (
+        typeSource === "Hyper-parameter Optimization" &&
+        typeTarget === "Build Model"
+      ) {
+        ok = await handleHyperParameter(rflow, params);
       }
 
       if (!ok) return;

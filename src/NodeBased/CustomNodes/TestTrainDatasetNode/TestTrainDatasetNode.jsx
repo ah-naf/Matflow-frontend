@@ -15,7 +15,8 @@ function TestTrainDatasetNode({ id, data }) {
           (edge) =>
             edge.source === id &&
             (rflow.getNode(edge.target).type === "Build Model" ||
-              rflow.getNode(edge.target).type === "Hyper-parameter Optimization")
+              rflow.getNode(edge.target).type ===
+                "Hyper-parameter Optimization")
         );
       temp.forEach(async (val) => {
         await handleTestTrainDataset(rflow, val);
@@ -33,6 +34,8 @@ function TestTrainDatasetNode({ id, data }) {
       >
         <Handle type="source" position={Position.Right}></Handle>
         <Handle type="target" position={Position.Left}></Handle>
+        <Handle type="source" position={Position.Top} id="test"></Handle>
+        <Handle type="source" position={Position.Bottom} id="train"></Handle>
         <div className="grid place-items-center gap-1 p-2 py-3 min-w-[80px]">
           {!data ? (
             <>

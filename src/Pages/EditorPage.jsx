@@ -63,6 +63,7 @@ import {
   handleScaling,
   handleSplitDataset,
   handleTestTrainDataset,
+  handleTestTrainPrint,
   handleTimeSeriesAnalysis,
   isItTimeSeriesFile,
 } from "../util/NodeFunctions";
@@ -365,6 +366,10 @@ function EditorPage() {
           typeTarget === "Hyper-parameter Optimization")
       ) {
         ok = await handleTestTrainDataset(rflow, params);
+      }
+
+      if (typeSource === "Test-Train Dataset" && typeTarget === "Upload File") {
+        ok = await handleTestTrainPrint(rflow, params);
       }
 
       if (

@@ -99,12 +99,11 @@ function UpdateHyperparameterNode({ visible, setVisible, nodeData, nodeId }) {
             <div>
               <p className="mb-2">Number of cross-validation folds</p>
               <Input
-                type="number"
                 step={1}
                 fullWidth
                 color="success"
                 bordered
-                value={hyper["Number of cross-validation folds"] || 0}
+                value={hyper["Number of cross-validation folds"]}
                 onChange={(e) =>
                   setHyper({
                     ...hyper,
@@ -118,12 +117,11 @@ function UpdateHyperparameterNode({ visible, setVisible, nodeData, nodeId }) {
             <div>
               <p className="mb-2">Random state for hyperparameter search</p>
               <Input
-                type="number"
                 step={1}
                 fullWidth
                 color="success"
                 bordered
-                value={hyper["Random state for hyperparameter search"] || 0}
+                value={hyper["Random state for hyperparameter search"]}
                 onChange={(e) =>
                   setHyper({
                     ...hyper,
@@ -139,14 +137,11 @@ function UpdateHyperparameterNode({ visible, setVisible, nodeData, nodeId }) {
                 Number of iterations for hyperparameter search
               </p>
               <Input
-                type="number"
                 step={1}
                 fullWidth
                 color="success"
                 bordered
-                value={
-                  hyper["Number of iterations for hyperparameter search"] || 0
-                }
+                value={hyper["Number of iterations for hyperparameter search"]}
                 onChange={(e) =>
                   setHyper({
                     ...hyper,

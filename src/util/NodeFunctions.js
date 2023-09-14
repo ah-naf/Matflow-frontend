@@ -1058,6 +1058,7 @@ export const handleSplitDataset = async (rflow, params) => {
         return {
           ...val,
           data: {
+            ...val.data,
             ...data,
             test_dataset_name: "test_" + splitDataset.testDataName,
             train_dataset_name: "train_" + splitDataset.trainDataName,
@@ -1078,6 +1079,30 @@ export const handleSplitDataset = async (rflow, params) => {
   }
 };
 
+export const handleTestTrainPrint = async (rflow, params) => {
+  let testTrain = rflow.getNode(params.source).data;
+  const edgeId = params.sourceHandle;
+
+  const tempNodes = rflow.getNodes().map((val) => {
+    if (val.id === params.target)
+      return {
+        ...val,
+        data: {
+          ...val.data,
+          table: edgeId === "test" ? testTrain.test : testTrain.train,
+          file_name:
+            edgeId === "test"
+              ? testTrain.test_dataset_name
+              : testTrain.train_dataset_name,
+        },
+      };
+    return val;
+  });
+  rflow.setNodes(tempNodes);
+
+  return true;
+};
+
 export const handleTestTrainDataset = async (rflow, params) => {
   try {
     let testTrain = rflow.getNode(params.source).data;
@@ -1087,16 +1112,12 @@ export const handleTestTrainDataset = async (rflow, params) => {
       if (!testTrain.regressor)
         throw new Error("Check Test-Train Dataset Node.");
     }
-    let hyper = {};
-    // TODO: Add init hyper setting
 
-
-    
     const tempNodes = rflow.getNodes().map((val) => {
       if (val.id === params.target)
         return {
           ...val,
-          data: { testTrain, hyper },
+          data: { ...val.data, testTrain },
         };
       return val;
     });
@@ -1114,6 +1135,14 @@ export const handleHyperParameter = async (rflow, params) => {
     let { hyper, testTrain } = rflow.getNode(params.source).data;
 
     if (!hyper) throw new Error("Check Hyperparameter Optimization Node.");
+
+    if (
+      Object.values(hyper).length !==
+      ITER.includes(testTrain.regressor) +
+        RANDOM_STATE.includes(testTrain.regressor) +
+        CROSS_VALID.includes(testTrain.regressor)
+    )
+      return false;
 
     const res = await fetch(
       "http://127.0.0.1:8000/api/hyperparameter_optimization/",
@@ -1135,12 +1164,13 @@ export const handleHyperParameter = async (rflow, params) => {
       }
     );
     const data = await res.json();
+    console.log({ data, hyper });
 
     const tempNodes = rflow.getNodes().map((val) => {
       if (val.id === params.target)
         return {
           ...val,
-          data: { testTrain, hyper: data.param },
+          data: { testTrain, hyper: data.param, ...val.data },
         };
       return val;
     });

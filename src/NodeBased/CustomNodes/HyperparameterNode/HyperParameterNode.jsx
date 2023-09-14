@@ -18,8 +18,10 @@ function HyperParameterNode({ id, data }) {
             rflow.getNode(edge.target).type === "Build Model"
         );
       temp.forEach(async (val) => {
+        // console.log(temp)
         await handleHyperParameter(rflow, val);
       });
+      // console.log(data)
     })();
   }, [data]);
 

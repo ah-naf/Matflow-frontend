@@ -2,7 +2,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { Dialog } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useReactFlow } from "reactflow";
 import BuildModel from "../../../FunctionBased/Functions/Model Building/BuildModel/BuildModel";
 
@@ -11,8 +11,31 @@ function UpdateBuildModelNode({ visible, setVisible, nodeData, nodeId }) {
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const rflow = useReactFlow();
   const nodeDetails = rflow.getNode(nodeId);
+  const Data = nodeDetails.data;
+  const [data, setData] = useState({});
 
-  const handleSave = () => {};
+  useEffect(() => {
+    console.log(Data)
+    if (Data.hyper) {
+      setData(Data.hyper);
+    }
+  }, [Data]);
+
+  const handleSave = () => {
+    const tempNode = {
+      ...nodeDetails,
+      data: {
+        ...nodeDetails.data,
+        hyper: data,
+      },
+    };
+
+    const tempNodes = rflow.getNodes().map((node) => {
+      if (node.id === nodeId) return tempNode;
+      return node;
+    });
+    rflow.setNodes(tempNodes);
+  };
 
   return (
     <div>
@@ -36,6 +59,8 @@ function UpdateBuildModelNode({ visible, setVisible, nodeData, nodeId }) {
           <BuildModel
             csvData={nodeData.table}
             nodeData={nodeData}
+            initValue={data}
+            onValueChange={setData}
             type="node"
           />
         </div>

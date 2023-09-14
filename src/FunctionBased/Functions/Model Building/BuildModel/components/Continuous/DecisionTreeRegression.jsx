@@ -23,7 +23,13 @@ const CRITERION = [
   "squared_error",
 ];
 
-function DecisionTreeRegression({ train, test, Type = "function" }) {
+function DecisionTreeRegression({
+  train,
+  test,
+  Type = "function",
+  initValue = undefined,
+  onValueChange = undefined,
+}) {
   const hyperparameterOption = useSelector(
     (state) => state.modelBuilding.hyperparameter
   );
@@ -45,7 +51,20 @@ function DecisionTreeRegression({ train, test, Type = "function" }) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    if (Type === "node" && initValue) {
+      // console.log(initValue)
+      setOptimizedData({
+        ...optimizedData,
+        ...initValue,
+      });
+    }
+  }, []);
+
+  useEffect(() => {
     dispatch(setModelSetting(optimizedData));
+    if (Type === "node") {
+      onValueChange(optimizedData);
+    }
   }, [dispatch, optimizedData]);
 
   const handleOptimization = async () => {

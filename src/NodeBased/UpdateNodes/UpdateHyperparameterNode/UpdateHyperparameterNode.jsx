@@ -64,7 +64,7 @@ function UpdateHyperparameterNode({ visible, setVisible, nodeData, nodeId }) {
     const tempNode = {
       ...nodeDetails,
       data: {
-        ...nodeDetails.data,
+        testTrain: nodeData,
         hyper,
       },
     };

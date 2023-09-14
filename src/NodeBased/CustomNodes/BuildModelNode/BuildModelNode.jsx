@@ -5,7 +5,7 @@ import UpdateBuildModelNode from "../../UpdateNodes/UpdateBuildModelNode/UpdateB
 function BuildModelNode({ id, data }) {
   const [visible, setVisible] = useState(false);
   const rflow = useReactFlow();
-  console.log(data)
+  console.log({ data, id });
 
   return (
     <>

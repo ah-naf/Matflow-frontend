@@ -45,7 +45,13 @@ const CLASSIFIER = [
   "Multilayer Perceptron",
 ];
 
-function BuildModel({ csvData, nodeData = undefined, type = "function" }) {
+function BuildModel({
+  csvData,
+  nodeData = undefined,
+  type = "function",
+  initValue = undefined,
+  onValueChange = undefined,
+}) {
   // const [regressor, setRegressor] = useState(Regressor[0]);
   const [allRegressor, setAllRegressor] = useState();
   const [regressor, setRegressor] = useState();
@@ -328,22 +334,58 @@ function BuildModel({ csvData, nodeData = undefined, type = "function" }) {
           {whatKind && whatKind === "Continuous" ? (
             <div className={`${type === "function" && "mt-12"}`}>
               {regressor === REGRESSOR[0] && (
-                <LinearRegression train={train} test={test} Type={type} />
+                <LinearRegression
+                  train={train}
+                  test={test}
+                  Type={type}
+                  initValue={initValue}
+                  onValueChange={onValueChange}
+                />
               )}
               {regressor === REGRESSOR[1] && (
-                <RidgeRegression train={train} test={test} Type={type} />
+                <RidgeRegression
+                  train={train}
+                  test={test}
+                  Type={type}
+                  initValue={initValue}
+                  onValueChange={onValueChange}
+                />
               )}
               {regressor === REGRESSOR[2] && (
-                <LassoRegression train={train} test={test} Type={type} />
+                <LassoRegression
+                  train={train}
+                  test={test}
+                  Type={type}
+                  initValue={initValue}
+                  onValueChange={onValueChange}
+                />
               )}
               {regressor === REGRESSOR[3] && (
-                <DecisionTreeRegression train={train} test={test} Type={type} />
+                <DecisionTreeRegression
+                  train={train}
+                  test={test}
+                  Type={type}
+                  initValue={initValue}
+                  onValueChange={onValueChange}
+                />
               )}
               {regressor === REGRESSOR[4] && (
-                <RandomForestRegression train={train} test={test} Type={type} />
+                <RandomForestRegression
+                  train={train}
+                  test={test}
+                  Type={type}
+                  initValue={initValue}
+                  onValueChange={onValueChange}
+                />
               )}
               {regressor === REGRESSOR[5] && (
-                <SupportVectorRegressor train={train} test={test} Type={type} />
+                <SupportVectorRegressor
+                  train={train}
+                  test={test}
+                  Type={type}
+                  initValue={initValue}
+                  onValueChange={onValueChange}
+                />
               )}
             </div>
           ) : (

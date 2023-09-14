@@ -18,7 +18,13 @@ const DISPLAY_METRICES = [
 
 const SOLVER = ["auto", "svd", "cholesky", "lsqr", "sparse_cg", "sag", "saga"];
 
-function RidgeRegression({ train, test, Type = "function" }) {
+function RidgeRegression({
+  train,
+  test,
+  Type = "function",
+  initValue = undefined,
+  onValueChange = undefined,
+}) {
   const hyperparameterOption = useSelector(
     (state) => state.modelBuilding.hyperparameter
   );
@@ -40,7 +46,20 @@ function RidgeRegression({ train, test, Type = "function" }) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    if (Type === "node" && initValue) {
+      // console.log(initValue)
+      setOptimizedData({
+        ...optimizedData,
+        ...initValue,
+      });
+    }
+  }, []);
+
+  useEffect(() => {
     dispatch(setModelSetting(optimizedData));
+    if (Type === "node") {
+      onValueChange(optimizedData);
+    }
   }, [dispatch, optimizedData]);
 
   const handleOptimization = async () => {

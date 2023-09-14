@@ -1113,11 +1113,20 @@ export const handleTestTrainDataset = async (rflow, params) => {
         throw new Error("Check Test-Train Dataset Node.");
     }
 
+    let hyper = {};
+
+    if (ITER.includes(testTrain.regressor))
+      hyper["Number of iterations for hyperparameter search"] = 2;
+    if (CROSS_VALID.includes(testTrain.regressor))
+      hyper["Number of cross-validation folds"] = 2;
+    if (RANDOM_STATE.includes(testTrain.regressor))
+      hyper["Random state for hyperparameter search"] = 2;
+
     const tempNodes = rflow.getNodes().map((val) => {
       if (val.id === params.target)
         return {
           ...val,
-          data: { ...val.data, testTrain },
+          data: { ...val.data, testTrain, hyper },
         };
       return val;
     });
@@ -1136,6 +1145,13 @@ export const handleHyperParameter = async (rflow, params) => {
 
     if (!hyper) throw new Error("Check Hyperparameter Optimization Node.");
 
+    if (!ITER.includes(testTrain.regressor))
+      delete hyper["Number of iterations for hyperparameter search"];
+    if (!CROSS_VALID.includes(testTrain.regressor))
+      delete hyper["Number of cross-validation folds"];
+    if (!RANDOM_STATE.includes(testTrain.regressor))
+      delete hyper["Random state for hyperparameter search"];
+
     if (
       Object.values(hyper).length !==
       ITER.includes(testTrain.regressor) +
@@ -1144,6 +1160,7 @@ export const handleHyperParameter = async (rflow, params) => {
     )
       return false;
 
+    console.log("first");
     const res = await fetch(
       "http://127.0.0.1:8000/api/hyperparameter_optimization/",
       {
@@ -1165,12 +1182,12 @@ export const handleHyperParameter = async (rflow, params) => {
     );
     const data = await res.json();
     console.log({ data, hyper });
-
+    console.log(testTrain);
     const tempNodes = rflow.getNodes().map((val) => {
       if (val.id === params.target)
         return {
           ...val,
-          data: { testTrain, hyper: data.param, ...val.data },
+          data: { ...val.data, hyper: data.param, testTrain },
         };
       return val;
     });

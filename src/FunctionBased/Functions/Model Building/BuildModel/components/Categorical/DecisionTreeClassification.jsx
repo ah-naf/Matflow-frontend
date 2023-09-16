@@ -11,7 +11,13 @@ import SingleDropDown from "../../../../../Components/SingleDropDown/SingleDropD
 
 const DISPLAY_METRICES = ["Accuracy", "Precision", "Recall", "F1-Score"];
 
-function DecisionTreeClassification({ train, test, Type = "function" }) {
+function DecisionTreeClassification({
+  train,
+  test,
+  Type = "function",
+  initValue = undefined,
+  onValueChange = undefined,
+}) {
   const hyperparameterOption = useSelector(
     (state) => state.modelBuilding.hyperparameter
   );
@@ -33,7 +39,20 @@ function DecisionTreeClassification({ train, test, Type = "function" }) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    if (Type === "node" && initValue) {
+      // console.log(initValue)
+      setOptimizedData({
+        ...optimizedData,
+        ...initValue,
+      });
+    }
+  }, []);
+
+  useEffect(() => {
     dispatch(setModelSetting(optimizedData));
+    if (Type === "node") {
+      onValueChange(optimizedData);
+    }
   }, [dispatch, optimizedData]);
 
   const handleOptimization = async () => {
@@ -232,7 +251,7 @@ function DecisionTreeClassification({ train, test, Type = "function" }) {
             <p>Multiclass Average</p>
             <SingleDropDown
               columnNames={["micro", "macro", "weighted"]}
-              initValue={"micro"}
+              initValue={optimizedData["Multiclass Average"] || "micro"}
               onValueChange={(e) =>
                 setOptimizedData({
                   ...optimizedData,
@@ -243,7 +262,7 @@ function DecisionTreeClassification({ train, test, Type = "function" }) {
           </div>
           <Checkbox
             color="success"
-            defaultSelected
+            isSelected={!!optimizedData.none}
             onChange={(e) =>
               setOptimizedData({ ...optimizedData, none: e.valueOf() })
             }
@@ -256,7 +275,10 @@ function DecisionTreeClassification({ train, test, Type = "function" }) {
           <p className="mb-2">Display Metrices</p>
           <MultipleDropDown
             columnNames={DISPLAY_METRICES}
-            defaultValue={DISPLAY_METRICES}
+            defaultValue={optimizedData["Display Metrices"] || DISPLAY_METRICES}
+            setSelectedColumns={(e) =>
+              setOptimizedData({ ...optimizedData, "Display Metrices": e })
+            }
           />
         </div>
       </div>

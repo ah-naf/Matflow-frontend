@@ -50,7 +50,6 @@ function UpdateTestTrainDatasetNode({ visible, setVisible, nodeId, whatKind }) {
   }, [nodeDetails.data, whatKind]);
 
   useEffect(() => {
-    console.log({ whatKind, regressor });
     if (whatKind === "Continuous") {
       if (regressor === REGRESSOR[0]) setModelName("LR_Regression");
       if (regressor === REGRESSOR[1]) setModelName("Ridge_Regression");

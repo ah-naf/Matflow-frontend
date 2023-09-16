@@ -30,6 +30,7 @@ import HyperParameterNode from "../NodeBased/CustomNodes/HyperparameterNode/Hype
 import ImputationNode from "../NodeBased/CustomNodes/ImputationNode/ImputationNode";
 import InformationNode from "../NodeBased/CustomNodes/InformationNode/InformationNode";
 import MergeDatasetNode from "../NodeBased/CustomNodes/MergeDatasetNode/MergeDatasetNode";
+import ModelNode from "../NodeBased/CustomNodes/ModelNode/ModelNode";
 import ReverseMLNode from "../NodeBased/CustomNodes/ReverseMLNode/ReverseMLNode";
 import ScalingNode from "../NodeBased/CustomNodes/ScalingNode/ScalingNode";
 import SplitDatasetNode from "../NodeBased/CustomNodes/SplitDatasetNode/SplitDatasetNode";
@@ -57,6 +58,7 @@ import {
   handleImputation,
   handleImputationInit,
   handleMergeDataset,
+  handleModel,
   handleOutputTable,
   handlePlotOptions,
   handleReverseML,
@@ -94,6 +96,7 @@ const nodeTypes = {
   "Test-Train Dataset": TestTrainDatasetNode,
   "Build Model": BuildModelNode,
   "Hyper-parameter Optimization": HyperParameterNode,
+  Model: ModelNode,
 };
 
 const initialNodes = [
@@ -377,6 +380,10 @@ function EditorPage() {
         typeTarget === "Build Model"
       ) {
         ok = await handleHyperParameter(rflow, params);
+      }
+
+      if (typeSource === "Build Model" && typeTarget === "Model") {
+        ok = await handleModel(rflow, params);
       }
 
       if (!ok) return;

@@ -4,7 +4,7 @@ import UpdateHyperparameterNode from "../../UpdateNodes/UpdateHyperparameterNode
 import { handleHyperParameter } from "../../../util/NodeFunctions";
 
 function HyperParameterNode({ id, data }) {
-  console.log(data);
+  // console.log(data);
   const [visible, setVisible] = useState(false);
   const rflow = useReactFlow();
 

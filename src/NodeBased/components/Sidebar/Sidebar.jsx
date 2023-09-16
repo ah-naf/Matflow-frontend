@@ -203,6 +203,10 @@ const IO_NODES = [
     key: "0-0-4",
     label: "Test-Train Dataset",
   },
+  {
+    key: "0-0-5",
+    label: "Model",
+  },
 ];
 
 const Sidebar = () => {

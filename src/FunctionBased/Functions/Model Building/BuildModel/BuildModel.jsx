@@ -171,6 +171,17 @@ function BuildModel({
           }
         }
       });
+
+      console.log({
+        test,
+        train,
+        target_var: target_variable,
+        type: Type,
+        [Type === "regressor" ? "regressor" : "classifier"]: reg,
+        ...model_setting,
+        file: csvData,
+      });
+
       const res = await fetch("http://127.0.0.1:8000/api/build_model/", {
         method: "POST",
         headers: {
@@ -391,19 +402,39 @@ function BuildModel({
           ) : (
             <div className={`${type === "function" && "mt-12"}`}>
               {regressor === CLASSIFIER[0] && (
-                <KNearestNeighbour train={train} test={test} Type={type} />
+                <KNearestNeighbour
+                  train={train}
+                  test={test}
+                  Type={type}
+                  initValue={initValue}
+                  onValueChange={onValueChange}
+                />
               )}
               {regressor === CLASSIFIER[1] && (
-                <SupportVectorMachine train={train} test={test} Type={type} />
+                <SupportVectorMachine
+                  train={train}
+                  test={test}
+                  Type={type}
+                  initValue={initValue}
+                  onValueChange={onValueChange}
+                />
               )}
               {regressor === CLASSIFIER[2] && (
-                <LogisticRegression train={train} test={test} Type={type} />
+                <LogisticRegression
+                  train={train}
+                  test={test}
+                  Type={type}
+                  initValue={initValue}
+                  onValueChange={onValueChange}
+                />
               )}
               {regressor === CLASSIFIER[3] && (
                 <DecisionTreeClassification
                   train={train}
                   test={test}
                   Type={type}
+                  initValue={initValue}
+                  onValueChange={onValueChange}
                 />
               )}
               {regressor === CLASSIFIER[4] && (
@@ -411,10 +442,18 @@ function BuildModel({
                   train={train}
                   test={test}
                   Type={type}
+                  initValue={initValue}
+                  onValueChange={onValueChange}
                 />
               )}
               {regressor === CLASSIFIER[5] && (
-                <MultilayerPerceptron train={train} test={test} Type={type} />
+                <MultilayerPerceptron
+                  train={train}
+                  test={test}
+                  Type={type}
+                  initValue={initValue}
+                  onValueChange={onValueChange}
+                />
               )}
             </div>
           )}

@@ -1126,7 +1126,7 @@ export const handleTestTrainDataset = async (rflow, params) => {
       if (val.id === params.target)
         return {
           ...val,
-          data: { ...val.data, testTrain, hyper },
+          data: { testTrain, hyper },
         };
       return val;
     });
@@ -1152,6 +1152,8 @@ export const handleHyperParameter = async (rflow, params) => {
     if (!RANDOM_STATE.includes(testTrain.regressor))
       delete hyper["Random state for hyperparameter search"];
 
+    // console.log({ hyper }, testTrain.regressor);
+
     if (
       Object.values(hyper).length !==
       ITER.includes(testTrain.regressor) +
@@ -1160,7 +1162,8 @@ export const handleHyperParameter = async (rflow, params) => {
     )
       return false;
 
-    console.log("first");
+    // console.log("first");
+
     const res = await fetch(
       "http://127.0.0.1:8000/api/hyperparameter_optimization/",
       {
@@ -1181,18 +1184,78 @@ export const handleHyperParameter = async (rflow, params) => {
       }
     );
     const data = await res.json();
-    console.log({ data, hyper });
-    console.log(testTrain);
+    let tmp = data.param;
+    if (testTrain.whatKind !== "Continuous") {
+      tmp = { ...tmp, "Multiclass Average": "micro" };
+    }
+    // console.log({ data, hyper });
+    // console.log(testTrain);
     const tempNodes = rflow.getNodes().map((val) => {
       if (val.id === params.target)
         return {
           ...val,
-          data: { ...val.data, hyper: data.param, testTrain },
+          data: { ...val.data, hyper: tmp, testTrain },
         };
       return val;
     });
     rflow.setNodes(tempNodes);
 
+    return true;
+  } catch (error) {
+    raiseErrorToast(rflow, params, error.message);
+    return false;
+  }
+};
+
+export const handleModel = async (rflow, params) => {
+  try {
+    let { testTrain, hyper } = rflow.getNode(params.source).data;
+    if (!testTrain || !hyper) throw new Error("Check Build Model Node");
+
+    console.log({
+      train: testTrain.train,
+      test: testTrain.test,
+      [testTrain.whatKind === "Continuous" ? "regressor" : "classifier"]:
+        testTrain.regressor,
+      type: testTrain.whatKind === "Continuous" ? "regressor" : "classifier",
+      target_var: testTrain.target_variable,
+      ...hyper,
+      file: testTrain.table,
+    });
+
+    const res = await fetch("http://127.0.0.1:8000/api/build_model/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        train: testTrain.train,
+        test: testTrain.test,
+        [testTrain.whatKind === "Continuous" ? "regressor" : "classifier"]:
+          testTrain.regressor,
+        type: testTrain.whatKind === "Continuous" ? "regressor" : "classifier",
+        target_var: testTrain.target_variable,
+        ...hyper,
+        file: testTrain.table,
+      }),
+    });
+    const data = await res.json();
+
+    const tempNodes = rflow.getNodes().map((val) => {
+      if (val.id === params.target)
+        return {
+          ...val,
+          data: {
+            ...val.data,
+            model: {
+              name: testTrain.model_name,
+              ...data,
+            },
+          },
+        };
+      return val;
+    });
+    rflow.setNodes(tempNodes);
     return true;
   } catch (error) {
     raiseErrorToast(rflow, params, error.message);

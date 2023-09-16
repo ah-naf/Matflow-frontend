@@ -15,7 +15,6 @@ function UpdateBuildModelNode({ visible, setVisible, nodeData, nodeId }) {
   const [data, setData] = useState({});
 
   useEffect(() => {
-    console.log(Data)
     if (Data.hyper) {
       setData(Data.hyper);
     }

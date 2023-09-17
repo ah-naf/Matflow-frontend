@@ -3,7 +3,6 @@ import { toast } from "react-toastify";
 import uuid from "react-uuid";
 import ReactFlow, {
   Background,
-  Controls,
   MarkerType,
   Panel,
   addEdge,
@@ -69,6 +68,7 @@ import {
   handleTimeSeriesAnalysis,
   isItTimeSeriesFile,
 } from "../util/NodeFunctions";
+import Controls from "../NodeBased/components/Controls/Controls";
 
 const nodeTypes = {
   "Upload File": UploadFile,
@@ -440,7 +440,9 @@ function EditorPage() {
               Save
             </button>
           </Panel>
-          <Controls />
+          <Panel position="top-left">
+            <Controls />
+          </Panel>
         </ReactFlow>
       </div>
     </div>

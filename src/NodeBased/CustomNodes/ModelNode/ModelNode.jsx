@@ -1,3 +1,4 @@
+import { Download, DownloadDone } from "@mui/icons-material";
 import React from "react";
 import { Handle, Position } from "reactflow";
 
@@ -20,6 +21,13 @@ function ModelNode({ id, data }) {
             <span>{data.model.name}</span>
           ) : (
             <span>Model</span>
+          )}
+          {data && data.model && (
+            <div className="mx-auto">
+              <button className="border-2 border-gray-600 rounded shadow px-1 hover:bg-black hover:border-black hover:text-white" title="Download Model">
+                <Download fontSize="small" />
+              </button>
+            </div>
           )}
         </div>
       </div>

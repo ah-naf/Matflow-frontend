@@ -2,7 +2,7 @@ import { Table } from "@nextui-org/react";
 import React from "react";
 
 function NextTable({ rowData }) {
-  
+  // console.log(rowData);
   const columnName = Object.keys(rowData[0]);
   return (
     <Table shadow={false} lined striped compact>

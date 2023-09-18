@@ -1,12 +1,18 @@
 import { Input, Radio } from "@nextui-org/react";
 import React, { useState } from "react";
+import Plot from "react-plotly.js";
 import { useSelector } from "react-redux";
+import NextTable from "../../../../Components/NextTable/NextTable";
 
 function BestOverallFeature({ csvData }) {
   const [k_fold, setKFoldValue] = useState(2);
   const [method, setMethod] = useState("None");
   const selectionMethod = useSelector((state) => state.featureSelection.method);
-  const target_var = useSelector((state) => state.featureSelection.target_variable);
+  const target_var = useSelector(
+    (state) => state.featureSelection.target_variable
+  );
+  const [graph_data, setGraphData] = useState();
+  const [selected_feature_data, setSelectedFeatureData] = useState();
 
   const handleMethod = async (e) => {
     setMethod(e);
@@ -25,7 +31,20 @@ function BestOverallFeature({ csvData }) {
       });
 
       const data = await res.json();
-      console.log(JSON.parse(data.selected_features))
+      console.log(data);
+      const selectedFeatureData =
+        data.selected_features.custom_feature_data.group.selected_features_data;
+      let tempResult = [];
+      selectedFeatureData.rows.forEach((row) => {
+        let tmp = {};
+        row.forEach((val, ind) => {
+          tmp = { ...tmp, [selectedFeatureData.headers[ind]]: val };
+        });
+        tempResult.push(tmp);
+      });
+      setSelectedFeatureData(tempResult);
+      setGraphData(data.selected_features.graph_data);
+      // console.log(data.selected_features.graph_data);
     }
   };
 
@@ -58,6 +77,36 @@ function BestOverallFeature({ csvData }) {
           </Radio>
         </Radio.Group>
       </div>
+      {selected_feature_data && (
+        <div className="mt-4">
+          <h1 className="text-2xl mb-2 font-medium">Selected Features:</h1>
+          <NextTable rowData={selected_feature_data} />
+        </div>
+      )}
+      {graph_data && (
+        <>
+          <div className="flex justify-center mt-4">
+            <Plot
+              data={JSON.parse(graph_data.bar_plot).data}
+              layout={{
+                ...JSON.parse(graph_data.bar_plot).layout,
+                showlegend: true,
+              }}
+              config={{ scrollZoom: true, editable: true, responsive: true }}
+            />
+          </div>
+          <div className="flex justify-center mt-4">
+            <Plot
+              data={JSON.parse(graph_data.scatter_plot).data}
+              layout={{
+                ...JSON.parse(graph_data.scatter_plot).layout,
+                showlegend: true,
+              }}
+              config={{ scrollZoom: true, editable: true, responsive: true }}
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 }

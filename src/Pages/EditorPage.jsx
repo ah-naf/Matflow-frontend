@@ -29,6 +29,7 @@ import HyperParameterNode from "../NodeBased/CustomNodes/HyperparameterNode/Hype
 import ImputationNode from "../NodeBased/CustomNodes/ImputationNode/ImputationNode";
 import InformationNode from "../NodeBased/CustomNodes/InformationNode/InformationNode";
 import MergeDatasetNode from "../NodeBased/CustomNodes/MergeDatasetNode/MergeDatasetNode";
+import ModelDeploymentNode from "../NodeBased/CustomNodes/ModelDeploymentNode/ModelDeploymentNode";
 import ModelNode from "../NodeBased/CustomNodes/ModelNode/ModelNode";
 import ReverseMLNode from "../NodeBased/CustomNodes/ReverseMLNode/ReverseMLNode";
 import ScalingNode from "../NodeBased/CustomNodes/ScalingNode/ScalingNode";
@@ -38,6 +39,7 @@ import TableNode from "../NodeBased/CustomNodes/TableNode/TableNode";
 import TestTrainDatasetNode from "../NodeBased/CustomNodes/TestTrainDatasetNode/TestTrainDatasetNode";
 import TimeSeriesNode from "../NodeBased/CustomNodes/TimeSeiresNode/TimeSeriesNode";
 import UploadFile from "../NodeBased/CustomNodes/UploadFile/UploadFile";
+import Controls from "../NodeBased/components/Controls/Controls";
 import Sidebar from "../NodeBased/components/Sidebar/Sidebar";
 import {
   handleAddModify,
@@ -68,7 +70,6 @@ import {
   handleTimeSeriesAnalysis,
   isItTimeSeriesFile,
 } from "../util/NodeFunctions";
-import Controls from "../NodeBased/components/Controls/Controls";
 
 const nodeTypes = {
   "Upload File": UploadFile,
@@ -97,6 +98,7 @@ const nodeTypes = {
   "Build Model": BuildModelNode,
   "Hyper-parameter Optimization": HyperParameterNode,
   Model: ModelNode,
+  "Model Deployment": ModelDeploymentNode,
 };
 
 const initialNodes = [

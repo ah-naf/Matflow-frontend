@@ -6,11 +6,9 @@ import SingleDropDown from "../../../../Components/SingleDropDown/SingleDropDown
 function ProgressiveFeature() {
   const [kFoldValue, setKFoldValue] = useState(2);
   const [method, setMethod] = useState("None");
-  const featureSelection = useSelector(
-    (state) => state.featureEngineering.feature_selection
-  );
+  const d_type = useSelector((state) => state.featureSelection.data_type);
   const ESTIMATOR =
-    featureSelection.data_type === "number"
+    d_type === "number"
       ? [
           "ExtraTreesRegressor",
           "RandomForestRegressor",

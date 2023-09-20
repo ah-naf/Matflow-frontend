@@ -52,8 +52,9 @@ function FileTab() {
         parsedData = await parseCsv(file);
       } else {
         parsedData = await parseExcel(file);
-        console.log(parsedData);
+        
       }
+      
       storeDataInIndexedDB(parsedData, file.name);
     }
   };
@@ -97,7 +98,7 @@ function FileTab() {
         parsedData = await parseCsv(uploadedFile);
       } else {
         parsedData = await parseExcel(uploadedFile);
-        console.log(parsedData);
+        // console.log(parsedData);
       }
       await storeDataInIndexedDB(parsedData, uploadedFile.name);
       setUploadedFile("");

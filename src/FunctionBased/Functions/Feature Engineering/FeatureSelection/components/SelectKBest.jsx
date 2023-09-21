@@ -42,7 +42,7 @@ function SelectKBest({ csvData }) {
         );
 
         const Data = await res.json();
-        // console.log(Data);
+        
         setData(Data.selected_features);
       })();
     }
@@ -115,7 +115,6 @@ function SelectKBest({ csvData }) {
                   showlegend: true,
                 }}
                 config={{
-                  scrollZoom: true,
                   editable: true,
                   responsive: true,
                 }}
@@ -131,7 +130,6 @@ function SelectKBest({ csvData }) {
                   showlegend: true,
                 }}
                 config={{
-                  scrollZoom: true,
                   editable: true,
                   responsive: true,
                 }}

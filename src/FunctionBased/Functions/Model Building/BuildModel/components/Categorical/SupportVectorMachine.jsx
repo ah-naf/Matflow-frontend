@@ -76,7 +76,7 @@ function SupportVectorMachine({
         }
       );
       const data = await res.json();
-      console.log(data);
+
       setHData(data);
       setOptimizedData({ ...optimizedData, ...data.param });
     } catch (error) {
@@ -276,7 +276,7 @@ function SupportVectorMachine({
           <p className="mb-2">Display Metrices</p>
           <MultipleDropDown
             columnNames={DISPLAY_METRICES}
-            defaultValue={optimizedData['Display Metrices'] || DISPLAY_METRICES}
+            defaultValue={optimizedData["Display Metrices"] || DISPLAY_METRICES}
             setSelectedColumns={(e) =>
               setOptimizedData({ ...optimizedData, "Display Metrices": e })
             }

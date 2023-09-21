@@ -50,13 +50,6 @@ function AgGridAutoDataComponent({
     gridRef.current.columnApi.autoSizeAllColumns(skipHeader);
   }, []);
 
-  // TODO: autosize distureb korle remove kore daw
-  useEffect(() => {
-    if (gridRef.current && gridRef.current.columnApi) {
-      autoSizeAll(false);
-    }
-  }, [gridRef]);
-
   return (
     <div className="ag-theme-alpine mb-12" style={{ height, width: "100%" }}>
       <AgGridReact

@@ -82,7 +82,7 @@ function MultilayerPerceptron({
         }
       );
       const data = await res.json();
-      console.log(data);
+      
       setHData(data);
       setOptimizedData({ ...optimizedData, ...data.param });
     } catch (error) {

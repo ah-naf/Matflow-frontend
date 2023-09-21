@@ -43,7 +43,7 @@ function FileTab() {
     e.preventDefault();
     e.stopPropagation();
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      // handleFiles(e.dataTransfer.files);
+      
       const file = e.dataTransfer.files[0];
       setUploadedFile(file);
       let parsedData;
@@ -70,7 +70,7 @@ function FileTab() {
       dispatch(setActiveFunction(""));
       localStorage.removeItem("activeFunction");
     }
-    // window.location.reload();
+    
     await deleteIndexedDB(name);
   };
 
@@ -79,10 +79,8 @@ function FileTab() {
     const active = files.filter((item) => item.name === name)[0];
     dispatch(setActiveFile(active));
     localStorage.setItem("activeFile", JSON.stringify(active));
-    // localStorage.setItem("menu-Dataset", true);
-    // localStorage.setItem("activeFunction", "Display");
     dispatch(setActiveFunction(localStorage.getItem("activeFunction")));
-    // window.location.reload();
+    
     dispatch(setReRender(!render));
   };
 

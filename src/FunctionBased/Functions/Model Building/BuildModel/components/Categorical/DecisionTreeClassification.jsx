@@ -40,7 +40,6 @@ function DecisionTreeClassification({
 
   useEffect(() => {
     if (Type === "node" && initValue) {
-      // console.log(initValue)
       setOptimizedData({
         ...optimizedData,
         ...initValue,
@@ -58,7 +57,6 @@ function DecisionTreeClassification({
   const handleOptimization = async () => {
     try {
       setLoading(true);
-      console.log("first");
       const res = await fetch(
         "http://127.0.0.1:8000/api/hyperparameter_optimization/",
         {
@@ -78,7 +76,6 @@ function DecisionTreeClassification({
       );
       let data = await res.json();
 
-      console.log(data);
       setHData({ ...data, result: JSON.parse(data.result) });
       setOptimizedData({ ...optimizedData, ...data.param });
     } catch (error) {

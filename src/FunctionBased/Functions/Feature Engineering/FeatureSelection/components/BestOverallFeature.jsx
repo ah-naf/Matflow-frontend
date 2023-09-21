@@ -42,7 +42,6 @@ function BestOverallFeature({ csvData }) {
       setData();
     } else if (e === "All") {
       setLoading(true);
-      console.log(csvData)
       const res = await fetch("http://127.0.0.1:8000/api/feature_selection/", {
         method: "POST",
         headers: {
@@ -62,7 +61,6 @@ function BestOverallFeature({ csvData }) {
       setTimeout(() => setLoading(false), 500);
 
       const Data = await res.json();
-      console.log(Data);
 
       // For group data
       let selectedFeatureData =
@@ -89,7 +87,8 @@ function BestOverallFeature({ csvData }) {
 
       // For Single Data
       selectedFeatureData =
-        Data.selected_features.custom_feature_data.single.selected_features_data;
+        Data.selected_features.custom_feature_data.single
+          .selected_features_data;
       let tempResult3 = [];
       selectedFeatureData.rows.forEach((row) => {
         let tmp = {};
@@ -117,7 +116,8 @@ function BestOverallFeature({ csvData }) {
         selected_feature_data: tempResult1,
         single_selected: tempResult3,
         single_dropped: tempResult4,
-        single_graph: Data.selected_features.custom_feature_data.single.graph_data
+        single_graph:
+          Data.selected_features.custom_feature_data.single.graph_data,
       });
     }
   };

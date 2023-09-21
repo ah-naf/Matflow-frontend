@@ -35,8 +35,6 @@ function Imputation({
 
   useEffect(() => {
     if (type === "node" && initValue) {
-      console.log(initValue);
-
       setGroupBy(initValue.group_by || []);
       setModeData(initValue.modeData || []);
 
@@ -90,7 +88,7 @@ function Imputation({
       });
 
       const data = await res.json();
-      // console.log(data);
+      
       if ((!data.null_var || data.null_var.length === 0) && type === "function")
         setImputationNotExist(true);
       else setImputationNotExist(false);
@@ -130,7 +128,6 @@ function Imputation({
       fileName = dataset_name;
     }
 
-    // console.log(featureData)
 
     const uploadedFiles = JSON.parse(localStorage.getItem("uploadedFiles"));
     const fileExist = uploadedFiles.filter((val) => val.name === fileName);
@@ -174,7 +171,6 @@ function Imputation({
     });
 
     const data = await res.json();
-    // console.log(data);
 
     setGroupBy(data.group_by);
     if (data.mode) setModeData(Object.values(data.mode));
@@ -185,7 +181,6 @@ function Imputation({
       <h1 className="my-8 text-3xl font-medium">Imputation doesn't exist</h1>
     );
 
-    
   return (
     <div className="my-8 space-y-4">
       <div className="flex gap-4 items-center">

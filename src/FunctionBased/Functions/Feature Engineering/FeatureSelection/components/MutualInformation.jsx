@@ -29,7 +29,7 @@ function MutualInformation({ csvData }) {
         );
 
         const Data = await res.json();
-        console.log(Data);
+        
         setData(Data.selected_features);
       })();
     }
@@ -54,7 +54,6 @@ function MutualInformation({ csvData }) {
                   showlegend: true,
                 }}
                 config={{
-                  scrollZoom: true,
                   editable: true,
                   responsive: true,
                 }}
@@ -70,7 +69,6 @@ function MutualInformation({ csvData }) {
                   showlegend: true,
                 }}
                 config={{
-                  scrollZoom: true,
                   editable: true,
                   responsive: true,
                 }}

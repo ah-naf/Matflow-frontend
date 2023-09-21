@@ -138,7 +138,7 @@ function BuildModel({
 
         const trainData = await fetchDataFromIndexedDB(val[e][1]);
         const testData = await fetchDataFromIndexedDB(val[e][2]);
-        console.log({ trainData, testData });
+
         if (!testData || !trainData || !testData.length || !trainData.length) {
           setAllRegressor();
           toast.warn("Properly Split Dataset First.", {
@@ -172,16 +172,6 @@ function BuildModel({
         }
       });
 
-      console.log({
-        test,
-        train,
-        target_var: target_variable,
-        type: Type,
-        [Type === "regressor" ? "regressor" : "classifier"]: reg,
-        ...model_setting,
-        file: csvData,
-      });
-
       const res = await fetch("http://127.0.0.1:8000/api/build_model/", {
         method: "POST",
         headers: {
@@ -198,7 +188,6 @@ function BuildModel({
         }),
       });
       const data = await res.json();
-      console.log(data);
 
       // return;
       setNicherData(data.metrics);
@@ -259,7 +248,6 @@ function BuildModel({
   };
 
   useEffect(() => {
-    console.log({ whatKind, regressor });
     if (whatKind === "Continuous") {
       if (regressor === REGRESSOR[0]) setModelName("LR_Regression");
       if (regressor === REGRESSOR[1]) setModelName("Ridge_Regression");

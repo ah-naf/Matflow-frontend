@@ -41,7 +41,6 @@ function LogisticRegression({
 
   useEffect(() => {
     if (Type === "node" && initValue) {
-      // console.log(initValue)
       setOptimizedData({
         ...optimizedData,
         ...initValue,
@@ -77,7 +76,7 @@ function LogisticRegression({
         }
       );
       const data = await res.json();
-      console.log(data);
+
       setHData({ ...data, result: JSON.parse(data.result) });
       setOptimizedData({ ...optimizedData, ...data.param });
     } catch (error) {

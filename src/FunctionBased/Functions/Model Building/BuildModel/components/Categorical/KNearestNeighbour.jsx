@@ -38,7 +38,6 @@ function KNearestNeighbour({
 
   useEffect(() => {
     if (Type === "node" && initValue) {
-      // console.log(initValue)
       setOptimizedData({
         ...optimized_data,
         ...initValue,
@@ -75,7 +74,7 @@ function KNearestNeighbour({
       );
 
       const data = await res.json();
-      // console.log(data);
+
       setHData(data);
       setOptimizedData({ ...optimized_data, ...data.param });
     } catch (error) {
@@ -236,7 +235,9 @@ function KNearestNeighbour({
           <p className="mb-2">Display Metrices</p>
           <MultipleDropDown
             columnNames={DISPLAY_METRICES}
-            defaultValue={optimized_data['Display Metrices'] || DISPLAY_METRICES}
+            defaultValue={
+              optimized_data["Display Metrices"] || DISPLAY_METRICES
+            }
             setSelectedColumns={(e) =>
               setOptimizedData({ ...optimized_data, "Display Metrices": e })
             }

@@ -17,12 +17,7 @@ function BestOverallFeature({ csvData }) {
   const [loading, setLoading] = useState();
   const [progress, setProgress] = useState(0);
   const [intervalId, setIntervalId] = useState();
-  const [groupGraph, setGroupGraph] = useState();
   const [data, setData] = useState();
-
-  useEffect(() => {
-    console.log(data);
-  }, [data]);
 
   useEffect(() => {
     if (loading) {

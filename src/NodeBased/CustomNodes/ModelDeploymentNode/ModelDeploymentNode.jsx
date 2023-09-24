@@ -4,6 +4,7 @@ import { Handle, Position, useReactFlow } from "reactflow";
 import UpdateModelDeploymentNode from "../../UpdateNodes/UpdateModelDeploymentNode/UpdateModelDeploymentNode";
 
 function ModelDeploymentNode({ id, data }) {
+  console.log(data);
   const [visible, setVisible] = useState(false);
   const rflow = useReactFlow();
 

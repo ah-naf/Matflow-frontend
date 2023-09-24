@@ -60,6 +60,7 @@ import {
   handleImputationInit,
   handleMergeDataset,
   handleModel,
+  handleModelDeploymentInit,
   handleOutputTable,
   handlePlotOptions,
   handleReverseML,
@@ -386,6 +387,14 @@ function EditorPage() {
 
       if (typeSource === "Build Model" && typeTarget === "Model") {
         ok = await handleModel(rflow, params);
+      }
+
+      if (typeSource === "Model" && typeTarget === "Model Deployment") {
+        ok = await handleModelDeploymentInit(rflow, params);
+      }
+
+      if (typeSource === "Model Deployment" && typeTarget === "Table") {
+        ok = await handleOutputTable(rflow, params);
       }
 
       if (!ok) return;

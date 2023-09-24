@@ -73,6 +73,13 @@ const CLASSIFIER = [
   "Multilayer Perceptron",
 ];
 
+const DISPLAY_METRICES = [
+  "R-Squared",
+  "Mean Absolute Error",
+  "Mean Squared Error",
+  "Root Mean Squared Error",
+];
+
 const raiseErrorToast = (rflow, params, error) => {
   // Error paile connected node er data delete kore dibe
   const tempNodes = rflow.getNodes().map((val) => {
@@ -1121,13 +1128,6 @@ export const handleTestTrainPrint = async (rflow, params) => {
   return true;
 };
 
-const DISPLAY_METRICES = [
-  "R-Squared",
-  "Mean Absolute Error",
-  "Mean Squared Error",
-  "Root Mean Squared Error",
-];
-
 export const handleTestTrainDataset = async (rflow, params) => {
   try {
     let testTrain = rflow.getNode(params.source).data;
@@ -1414,10 +1414,50 @@ export const handleModel = async (rflow, params) => {
           ...val,
           data: {
             ...val.data,
+            testTrain,
             model: {
               name: testTrain.model_name,
               ...data,
             },
+          },
+        };
+      return val;
+    });
+    rflow.setNodes(tempNodes);
+    return true;
+  } catch (error) {
+    raiseErrorToast(rflow, params, error.message);
+    return false;
+  }
+};
+
+export const handleModelDeploymentInit = async (rflow, params) => {
+  try {
+    let { testTrain, model } = rflow.getNode(params.source).data;
+
+    if (!testTrain || !model)
+      throw new Error("Check if the model is built successfully");
+
+    const res = await fetch("http://127.0.0.1:8000/api/deploy_data/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        train: testTrain.train,
+        target_var: testTrain.target_variable,
+      }),
+    });
+    const data = await res.json();
+
+    const tempNodes = rflow.getNodes().map((val) => {
+      if (val.id === params.target)
+        return {
+          ...val,
+          data: {
+            ...val.data,
+            table: data.dataframe,
+            result: data.result,
           },
         };
       return val;

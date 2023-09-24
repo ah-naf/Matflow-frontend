@@ -25,7 +25,7 @@ function UpdateModelDeploymentNode({visible, setVisible, nodeId, csvData}) {
           <CloseIcon color="action" />
         </span>
         <h1 className="text-center font-medium tracking-wider text-3xl">
-          Edit Cluster Options
+          Edit Model Deployment Options
         </h1>
 
 

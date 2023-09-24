@@ -55,6 +55,24 @@ const ITER = [
   "Multilayer Perceptron",
 ];
 
+const REGRESSOR = [
+  "Linear Regression",
+  "Ridge Regression",
+  "Lasso Regression",
+  "Decision Tree Regression",
+  "Random Forest Regression",
+  "Support Vector Regressor",
+];
+
+const CLASSIFIER = [
+  "K-Nearest Neighbors",
+  "Support Vector Machine",
+  "Logistic Regression",
+  "Decision Tree Classification",
+  "Random Forest Classification",
+  "Multilayer Perceptron",
+];
+
 const raiseErrorToast = (rflow, params, error) => {
   // Error paile connected node er data delete kore dibe
   const tempNodes = rflow.getNodes().map((val) => {
@@ -1103,10 +1121,17 @@ export const handleTestTrainPrint = async (rflow, params) => {
   return true;
 };
 
+const DISPLAY_METRICES = [
+  "R-Squared",
+  "Mean Absolute Error",
+  "Mean Squared Error",
+  "Root Mean Squared Error",
+];
+
 export const handleTestTrainDataset = async (rflow, params) => {
   try {
     let testTrain = rflow.getNode(params.source).data;
-
+    console.log({ testTrain });
     if (!testTrain) throw new Error("Check Test-Train Dataset Node.");
     if (rflow.getNode(params.target).type === "Hyper-parameter Optimization") {
       if (!testTrain.regressor)
@@ -1122,11 +1147,148 @@ export const handleTestTrainDataset = async (rflow, params) => {
     if (RANDOM_STATE.includes(testTrain.regressor))
       hyper["Random state for hyperparameter search"] = 2;
 
+    let model_setting = {};
+    if (testTrain.whatKind === "Continuous" && testTrain.regressor) {
+      const regressor = testTrain.regressor;
+      if (regressor === REGRESSOR[0]) {
+        model_setting = {
+          ...model_setting,
+          "Number of jobs": -1,
+          fit_intercept: true,
+          "Display Metrices": DISPLAY_METRICES,
+        };
+      }
+      if (regressor === REGRESSOR[1]) {
+        model_setting = {
+          ...model_setting,
+          fit_intercept: true,
+          "Display Metrices": DISPLAY_METRICES,
+          max_iter: 1000,
+          solver: "auto",
+          alpha: 1,
+          tol: 0,
+        };
+      }
+      if (regressor === REGRESSOR[2]) {
+        model_setting = {
+          ...model_setting,
+          warm_start: true,
+          fit_intercept: true,
+          "Display Metrices": DISPLAY_METRICES,
+          alpha: 1,
+          max_iter: 1000,
+          tol: 0,
+          selection: "cyclic",
+        };
+      }
+      if (regressor === REGRESSOR[3]) {
+        model_setting = {
+          ...model_setting,
+          min_samples_leaf: 1,
+          min_samples_split: 2,
+          "Display Metrices": DISPLAY_METRICES,
+          random_state: 0,
+          criterion: "mse",
+          none: true,
+        };
+      }
+      if (regressor === REGRESSOR[4]) {
+        model_setting = {
+          ...model_setting,
+          min_samples_leaf: 1,
+          min_samples_split: 2,
+          "Display Metrices": DISPLAY_METRICES,
+          max_features: "sqrt",
+          max_depth: 0,
+          criterion: "friedman_mse",
+        };
+      }
+      if (regressor === REGRESSOR[5]) {
+        model_setting = {
+          ...model_setting,
+          "Display Metrices": DISPLAY_METRICES,
+          C: 1,
+          epsilon: 0.1,
+          kernel: "linear",
+        };
+      }
+    } else if (testTrain.regressor) {
+      const regressor = testTrain.regressor;
+      if (regressor === CLASSIFIER[0]) {
+        model_setting = {
+          ...model_setting,
+          "Multiclass Average": "micro",
+          n_neighbors: 2,
+          weights: "uniform",
+          metric: "minkowski",
+        };
+      }
+      if (regressor === CLASSIFIER[1]) {
+        model_setting = {
+          ...model_setting,
+          "Multiclass Average": "micro",
+          C: 1,
+          tol: 0.001,
+          degree: 3,
+          kernel: "linear",
+          gamma: "scale",
+        };
+      }
+      if (regressor === CLASSIFIER[2]) {
+        model_setting = {
+          ...model_setting,
+          "Multiclass Average": "micro",
+          C: 1,
+          tol: 0.0001,
+          max_iter: 100,
+          random_state: 42,
+          penalty: "l2",
+          solver: "lbfgs",
+        };
+      }
+      if (regressor === CLASSIFIER[3]) {
+        model_setting = {
+          ...model_setting,
+          "Multiclass Average": "micro",
+          min_samples_split: 2,
+          min_samples_leaf: 2,
+          random_state: 2,
+          criterion: "gini",
+          none: true,
+        };
+      }
+      if (regressor === CLASSIFIER[4]) {
+        model_setting = {
+          ...model_setting,
+          "Multiclass Average": "micro",
+          n_estimators: 100,
+          min_samples_split: 2,
+          min_samples_leaf: 2,
+          random_state: 0,
+          criterion: "gini",
+          max_depth: "None",
+          auto: true,
+        };
+      }
+      if (regressor === CLASSIFIER[5]) {
+        model_setting = {
+          ...model_setting,
+          "Multiclass Average": "micro",
+          activation: "relu",
+          hidden_layer_sizes: 3,
+          max_iter: 1000,
+          alpha: 0.0001,
+          learning_rate_init: 0.001,
+          tol: 0.001,
+        };
+      }
+    }
+
     const tempNodes = rflow.getNodes().map((val) => {
       if (val.id === params.target)
         return {
           ...val,
-          data: { testTrain, hyper },
+          data: { ...val.data, testTrain, hyper, model_setting },
         };
       return val;
     });
@@ -1141,7 +1303,7 @@ export const handleTestTrainDataset = async (rflow, params) => {
 
 export const handleHyperParameter = async (rflow, params) => {
   try {
-    let { hyper, testTrain } = rflow.getNode(params.source).data;
+    let { hyper, testTrain, model_setting } = rflow.getNode(params.source).data;
 
     if (!hyper) throw new Error("Check Hyperparameter Optimization Node.");
 
@@ -1194,7 +1356,11 @@ export const handleHyperParameter = async (rflow, params) => {
       if (val.id === params.target)
         return {
           ...val,
-          data: { ...val.data, hyper: tmp, testTrain },
+          data: {
+            ...val.data,
+            model_setting: { ...model_setting, ...tmp },
+            testTrain,
+          },
         };
       return val;
     });
@@ -1209,8 +1375,9 @@ export const handleHyperParameter = async (rflow, params) => {
 
 export const handleModel = async (rflow, params) => {
   try {
-    let { testTrain, hyper } = rflow.getNode(params.source).data;
-    if (!testTrain || !hyper) throw new Error("Check Build Model Node");
+    let { testTrain, model_setting } = rflow.getNode(params.source).data;
+
+    if (!testTrain || !model_setting) throw new Error("Check Build Model Node");
 
     console.log({
       train: testTrain.train,
@@ -1219,7 +1386,7 @@ export const handleModel = async (rflow, params) => {
         testTrain.regressor,
       type: testTrain.whatKind === "Continuous" ? "regressor" : "classifier",
       target_var: testTrain.target_variable,
-      ...hyper,
+      ...model_setting,
       file: testTrain.table,
     });
 
@@ -1235,7 +1402,7 @@ export const handleModel = async (rflow, params) => {
           testTrain.regressor,
         type: testTrain.whatKind === "Continuous" ? "regressor" : "classifier",
         target_var: testTrain.target_variable,
-        ...hyper,
+        ...model_setting,
         file: testTrain.table,
       }),
     });

@@ -15,8 +15,8 @@ function UpdateBuildModelNode({ visible, setVisible, nodeData, nodeId }) {
   const [data, setData] = useState({});
 
   useEffect(() => {
-    if (Data.hyper) {
-      setData(Data.hyper);
+    if (Data.model_setting) {
+      setData(Data.model_setting);
     }
   }, [Data]);
 
@@ -25,7 +25,7 @@ function UpdateBuildModelNode({ visible, setVisible, nodeData, nodeId }) {
       ...nodeDetails,
       data: {
         ...nodeDetails.data,
-        hyper: data,
+        model_setting: data,
       },
     };
 
@@ -50,9 +50,9 @@ function UpdateBuildModelNode({ visible, setVisible, nodeData, nodeId }) {
         >
           <CloseIcon color="action" />
         </span>
-        {/* <h1 className="text-center font-medium tracking-wider text-2xl">
+        <h1 className="text-center font-medium tracking-wider text-2xl">
           Edit Model Settings
-        </h1> */}
+        </h1>
 
         <div className="min-w-[500px] mx-auto w-full p-6 py-4">
           <BuildModel

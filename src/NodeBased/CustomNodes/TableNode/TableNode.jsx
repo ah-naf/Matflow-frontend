@@ -26,7 +26,9 @@ function TableNode({ id, data }) {
           : [];
 
       if (tempColDefs && tempColDefs.length - 1 >= 0)
-        tempColDefs = tempColDefs.slice(tempColDefs.length-1).concat(tempColDefs.slice(0, tempColDefs.length-1));
+        tempColDefs = tempColDefs
+          .slice(tempColDefs.length - 1)
+          .concat(tempColDefs.slice(0, tempColDefs.length - 1));
       console.log(tempColDefs);
       setColDefs(tempColDefs);
     }

@@ -1,18 +1,72 @@
-import React from 'react'
 import CloseIcon from "@mui/icons-material/Close";
 import { Dialog } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { Input, Radio } from "@nextui-org/react";
+import React, { useEffect, useState } from "react";
+import { useReactFlow } from "reactflow";
+import MultipleDropDown from "../../../FunctionBased/Components/MultipleDropDown/MultipleDropDown";
 
-function UpdateModelDeploymentNode({visible, setVisible, nodeId, csvData}) {
-    const theme = useTheme();
+function UpdateModelDeploymentNode({ visible, setVisible, nodeId, csvData }) {
+  const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  const [allColumnNames, setAllColumnNames] = useState([]);
+  const [allColumnValues, setAllColumnValues] = useState([]);
+  const [filtered_column, setFilteredColumn] = useState(allColumnValues);
+  const [select_columns, setSelectColumns] = useState("all");
+  const [model_deploy, setModelDeploy] = useState();
+  const [train, setTrain] = useState();
+  const [target_var, setTargetVar] = useState();
+  const rflow = useReactFlow();
+  const nodeDetails = rflow.getNode(nodeId);
 
-  const handleSave = () => {}
+  useEffect(() => {
+    let data = nodeDetails.data;
+    console.log(data);
+    setAllColumnValues(data.result);
+    setAllColumnNames(data.result.map((val) => val.col));
+    setFilteredColumn(data.result);
+    setModelDeploy(data.model.model_deploy);
+    setTrain(data.train);
+    setTargetVar(data.target_var);
+  }, [nodeDetails]);
+
+  const handleChangeValue = (ind, value) => {
+    setFilteredColumn(
+      filtered_column.map((val, i) => {
+        if (i === ind) return { ...val, value };
+        return val;
+      })
+    );
+  };
+
+  const handleSave = () => {
+    let result = {};
+    filtered_column.forEach((val) => {
+      result = { ...result, [val.col]: val.value };
+    });
+
+    const tempNode = {
+      ...nodeDetails,
+      data: {
+        ...nodeDetails.data,
+        model_deploy,
+        result,
+        train,
+        target_var,
+      },
+    };
+
+    const tempNodes = rflow.getNodes().map((node) => {
+      if (node.id === nodeId) return tempNode;
+      return node;
+    });
+    rflow.setNodes(tempNodes);
+  };
 
   return (
     <div>
-        <Dialog
+      <Dialog
         open={visible}
         onClose={() => setVisible(false)}
         fullScreen={fullScreen}
@@ -28,7 +82,65 @@ function UpdateModelDeploymentNode({visible, setVisible, nodeId, csvData}) {
           Edit Model Deployment Options
         </h1>
 
-
+        <div className="min-w-[600px] mx-auto w-full p-6 py-4 space-y-4">
+          <div className="mt-4">
+            <Radio.Group
+              label="Select Columns"
+              orientation="horizontal"
+              color="success"
+              defaultValue={select_columns}
+              onChange={(e) => {
+                if (e === "all") {
+                  setFilteredColumn(allColumnValues);
+                } else {
+                  setFilteredColumn([]);
+                }
+                setSelectColumns(e);
+              }}
+            >
+              <Radio value="all">All Columns</Radio>
+              <Radio value="custom">Custom Columns</Radio>
+            </Radio.Group>
+          </div>
+          {select_columns === "custom" && (
+            <div className="mt-4">
+              <p>Custom Columns</p>
+              <MultipleDropDown
+                columnNames={allColumnNames}
+                setSelectedColumns={(e) => {
+                  const tempSet = new Set(e);
+                  const temp = allColumnValues.filter((val) =>
+                    tempSet.has(val.col)
+                  );
+                  setFilteredColumn(temp);
+                }}
+              />
+            </div>
+          )}
+          {filtered_column && filtered_column.length > 0 && (
+            <div className="mt-4">
+              <div className="flex flex-col gap-4">
+                {filtered_column.map((val, ind) => (
+                  <div key={ind}>
+                    <p className="mb-1">{filtered_column[ind].col}</p>
+                    <Input
+                      bordered
+                      color="success"
+                      value={filtered_column[ind].value}
+                      onChange={(e) => handleChangeValue(ind, e.target.value)}
+                      fullWidth
+                      step={
+                        filtered_column[ind].data_type === "float" ? 0.01 : 1
+                      }
+                      type="number"
+                      size="lg"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
 
         <div className="sticky bottom-0 bg-white border-t-2 shadow-md border-gray-200 flex items-center gap-4 w-full justify-end px-6 py-3 pt-6 mt-4 z-[100]">
           <button
@@ -51,7 +163,7 @@ function UpdateModelDeploymentNode({visible, setVisible, nodeId, csvData}) {
         </div>
       </Dialog>
     </div>
-  )
+  );
 }
 
-export default UpdateModelDeploymentNode
+export default UpdateModelDeploymentNode;

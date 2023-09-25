@@ -1458,6 +1458,9 @@ export const handleModelDeploymentInit = async (rflow, params) => {
             ...val.data,
             table: data.dataframe,
             result: data.result,
+            model,
+            train: testTrain.train,
+            target_var: testTrain.target_variable
           },
         };
       return val;

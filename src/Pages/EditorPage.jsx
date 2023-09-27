@@ -37,6 +37,7 @@ import SplitDatasetNode from "../NodeBased/CustomNodes/SplitDatasetNode/SplitDat
 import StatisticsNode from "../NodeBased/CustomNodes/StatisticsNode/StatisticsNode";
 import TableNode from "../NodeBased/CustomNodes/TableNode/TableNode";
 import TestTrainDatasetNode from "../NodeBased/CustomNodes/TestTrainDatasetNode/TestTrainDatasetNode";
+import TextNode from "../NodeBased/CustomNodes/TextNode/TextNode";
 import TimeSeriesNode from "../NodeBased/CustomNodes/TimeSeiresNode/TimeSeriesNode";
 import UploadFile from "../NodeBased/CustomNodes/UploadFile/UploadFile";
 import Controls from "../NodeBased/components/Controls/Controls";
@@ -60,6 +61,7 @@ import {
   handleImputationInit,
   handleMergeDataset,
   handleModel,
+  handleModelDeployment,
   handleModelDeploymentInit,
   handleOutputTable,
   handlePlotOptions,
@@ -100,6 +102,7 @@ const nodeTypes = {
   "Hyper-parameter Optimization": HyperParameterNode,
   Model: ModelNode,
   "Model Deployment": ModelDeploymentNode,
+  Text: TextNode,
 };
 
 const initialNodes = [
@@ -395,6 +398,10 @@ function EditorPage() {
 
       if (typeSource === "Model Deployment" && typeTarget === "Table") {
         ok = await handleOutputTable(rflow, params);
+      }
+
+      if (typeSource === "Model Deployment" && typeTarget === "Text") {
+        ok = await handleModelDeployment(rflow, params);
       }
 
       if (!ok) return;

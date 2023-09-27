@@ -17,43 +17,55 @@ function UpdateModelDeploymentNode({ visible, setVisible, nodeId, csvData }) {
   const [model_deploy, setModelDeploy] = useState();
   const [train, setTrain] = useState();
   const [target_var, setTargetVar] = useState();
+  const [filter_col_name, setFilterColName] = useState([]);
   const rflow = useReactFlow();
   const nodeDetails = rflow.getNode(nodeId);
 
   useEffect(() => {
     let data = nodeDetails.data;
-    console.log(data);
-    setAllColumnValues(data.result);
-    setAllColumnNames(data.result.map((val) => val.col));
+    // console.log(data);
+    setAllColumnValues(data.result_init);
+    setAllColumnNames(data.result_init.map((val) => val.col));
     setFilteredColumn(data.result);
     setModelDeploy(data.model.model_deploy);
     setTrain(data.train);
     setTargetVar(data.target_var);
+    setSelectColumns(data.select_columns || "all");
+    setFilterColName(data.filter_col_name || []);
   }, [nodeDetails]);
 
   const handleChangeValue = (ind, value) => {
     setFilteredColumn(
       filtered_column.map((val, i) => {
-        if (i === ind) return { ...val, value };
+        if (i === ind)
+          return {
+            ...val,
+            value:
+              val.data_type === "float" ? parseFloat(value) : parseInt(value),
+          };
         return val;
       })
     );
   };
 
   const handleSave = () => {
-    let result = {};
-    filtered_column.forEach((val) => {
-      result = { ...result, [val.col]: val.value };
-    });
-
+    let table = nodeDetails.data.table;
+    if (select_columns === "custom") {
+      table = nodeDetails.data.table.filter((val) =>
+        filter_col_name.includes(val["Name of Features"])
+      );
+    }
     const tempNode = {
       ...nodeDetails,
       data: {
         ...nodeDetails.data,
         model_deploy,
-        result,
         train,
         target_var,
+        select_columns,
+        result: filtered_column,
+        table,
+        filter_col_name,
       },
     };
 
@@ -90,6 +102,7 @@ function UpdateModelDeploymentNode({ visible, setVisible, nodeId, csvData }) {
               color="success"
               defaultValue={select_columns}
               onChange={(e) => {
+                setFilterColName([]);
                 if (e === "all") {
                   setFilteredColumn(allColumnValues);
                 } else {
@@ -107,7 +120,9 @@ function UpdateModelDeploymentNode({ visible, setVisible, nodeId, csvData }) {
               <p>Custom Columns</p>
               <MultipleDropDown
                 columnNames={allColumnNames}
+                defaultValue={filter_col_name}
                 setSelectedColumns={(e) => {
+                  setFilterColName(e);
                   const tempSet = new Set(e);
                   const temp = allColumnValues.filter((val) =>
                     tempSet.has(val.col)
@@ -126,7 +141,11 @@ function UpdateModelDeploymentNode({ visible, setVisible, nodeId, csvData }) {
                     <Input
                       bordered
                       color="success"
-                      value={filtered_column[ind].value}
+                      value={
+                        filtered_column[ind].data_type === "float"
+                          ? parseFloat(filtered_column[ind].value)
+                          : parseInt(filtered_column[ind].value)
+                      }
                       onChange={(e) => handleChangeValue(ind, e.target.value)}
                       fullWidth
                       step={

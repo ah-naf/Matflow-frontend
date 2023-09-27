@@ -1457,10 +1457,58 @@ export const handleModelDeploymentInit = async (rflow, params) => {
           data: {
             ...val.data,
             table: data.dataframe,
+            result_init: data.result,
             result: data.result,
             model,
             train: testTrain.train,
-            target_var: testTrain.target_variable
+            target_var: testTrain.target_variable,
+            model_deploy: model.model_deploy,
+          },
+        };
+      return val;
+    });
+    rflow.setNodes(tempNodes);
+    return true;
+  } catch (error) {
+    raiseErrorToast(rflow, params, error.message);
+    return false;
+  }
+};
+
+export const handleModelDeployment = async (rflow, params) => {
+  try {
+    let model_deploy = rflow.getNode(params.source).data;
+
+    if (!model_deploy) throw new Error("Check Model Deployment Node");
+
+    let result = {};
+    model_deploy.result.forEach((val) => {
+      result = { ...result, [val.col]: val.value };
+    });
+
+    const res = await fetch("http://127.0.0.1:8000/api/deploy_result/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        train: model_deploy.train,
+        target_var: model_deploy.target_var,
+        result,
+        model_deploy: model_deploy.model_deploy,
+      }),
+    });
+    const data = await res.json();
+    // console.log(data);
+
+    const tempNodes = rflow.getNodes().map((val) => {
+      if (val.id === params.target)
+        return {
+          ...val,
+          data: {
+            ...val.data,
+            type: "Prediction",
+            result: `${model_deploy.target_var}: ${data.pred}`,
           },
         };
       return val;

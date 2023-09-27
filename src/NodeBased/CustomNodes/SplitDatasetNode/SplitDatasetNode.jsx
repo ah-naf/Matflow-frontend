@@ -1,13 +1,29 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Handle, Position, useReactFlow } from "reactflow";
 import UpdateSplitDatasetNode from "../../UpdateNodes/UpdateSplitDatasetNode/UpdateSplitDatasetNode";
 
 import SplitscreenIcon from "@mui/icons-material/Splitscreen";
+import { handleSplitDataset } from "../../../util/NodeFunctions";
 
 function SplitDatasetNode({ id, data }) {
   // console.log(data);
   const [visible, setVisible] = useState(false);
   const rflow = useReactFlow();
+
+  useEffect(() => {
+    (async function () {
+      const temp = rflow
+        .getEdges()
+        .filter(
+          (edge) =>
+            edge.source === id &&
+            rflow.getNode(edge.target).type === "Test-Train Dataset"
+        );
+      temp.forEach(async (val) => {
+        await handleSplitDataset(rflow, val);
+      });
+    })();
+  }, [data]);
 
   return (
     <>

@@ -21,7 +21,6 @@ function TextNode({ id, data }) {
           setVisible(!visible);
         }}
       >
-        <Handle type="source" position={Position.Right}></Handle>
         <Handle type="target" position={Position.Left}></Handle>
 
         <div className="grid place-items-center gap-1 p-2 py-3 min-w-[80px]">
@@ -44,7 +43,9 @@ function TextNode({ id, data }) {
           </span>
 
           <div className="min-w-[400px] mx-auto w-full p-6 py-4 pt-0 mb-4">
-            <h1 className="text-3xl tracking-wide font-semibold mb-3">{data.type}</h1>
+            <h1 className="text-3xl tracking-wide font-semibold mb-3">
+              {data.type}
+            </h1>
             <p className="text-xl font-medium">{data.result}</p>
           </div>
         </Dialog>

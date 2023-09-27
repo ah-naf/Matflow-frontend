@@ -15,16 +15,14 @@ function CorelationNode({ id, data }) {
         .getEdges()
         .filter(
           (edge) =>
-            edge.source === id &&
-            rflow.getNode(edge.target).type === "output_table"
+            edge.source === id && rflow.getNode(edge.target).type === "Table"
         );
 
       const tempGraph = rflow
         .getEdges()
         .filter(
           (edge) =>
-            edge.source === id &&
-            rflow.getNode(edge.target).type === "output_graph"
+            edge.source === id && rflow.getNode(edge.target).type === "Graph"
         );
 
       tempTable.forEach(async (val) => {

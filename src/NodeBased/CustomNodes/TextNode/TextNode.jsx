@@ -2,16 +2,24 @@ import CloseIcon from "@mui/icons-material/Close";
 import { Dialog } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BiText } from "react-icons/bi";
 import { Handle, Position, useReactFlow } from "reactflow";
 
 function TextNode({ id, data }) {
-  console.log(data);
+  // console.log(data);
   const [visible, setVisible] = useState(false);
   const rflow = useReactFlow();
   const theme = useTheme();
+  const [result, setResult] = useState("");
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
+
+  useEffect(() => {
+    if (data && data.type === "Classification Report") {
+      const temp = data.result.replaceAll("\n", "<br />");
+      setResult(temp);
+    }
+  }, [data]);
 
   return (
     <>
@@ -42,12 +50,20 @@ function TextNode({ id, data }) {
             <CloseIcon color="action" />
           </span>
 
-          <div className="min-w-[400px] mx-auto w-full p-6 py-4 pt-0 mb-4">
-            <h1 className="text-3xl tracking-wide font-semibold mb-3">
-              {data.type}
-            </h1>
-            <p className="text-xl font-medium">{data.result}</p>
-          </div>
+          {data.type && data.type === "Classification Report" ? (
+            <div className="px-4 py-3">
+              <pre dangerouslySetInnerHTML={{ __html: result }}></pre>
+            </div>
+          ) : (
+            <div className="min-w-[400px] mx-auto w-full p-6 py-4 pt-0 mb-4">
+              {data.type && (
+                <h1 className="text-3xl tracking-wide font-semibold mb-3">
+                  {data.type}
+                </h1>
+              )}
+              <p className="text-xl font-medium">{data.result}</p>
+            </div>
+          )}
         </Dialog>
       )}
     </>

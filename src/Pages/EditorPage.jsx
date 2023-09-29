@@ -32,6 +32,7 @@ import MergeDatasetNode from "../NodeBased/CustomNodes/MergeDatasetNode/MergeDat
 import ModelDeploymentNode from "../NodeBased/CustomNodes/ModelDeploymentNode/ModelDeploymentNode";
 import ModelEvaluationNode from "../NodeBased/CustomNodes/ModelEvaluationNode/ModelEvaluationNode";
 import ModelNode from "../NodeBased/CustomNodes/ModelNode/ModelNode";
+import ModelPredictionNode from "../NodeBased/CustomNodes/ModelPredictionNode/ModelPredictionNode";
 import ReverseMLNode from "../NodeBased/CustomNodes/ReverseMLNode/ReverseMLNode";
 import ScalingNode from "../NodeBased/CustomNodes/ScalingNode/ScalingNode";
 import SplitDatasetNode from "../NodeBased/CustomNodes/SplitDatasetNode/SplitDatasetNode";
@@ -66,6 +67,9 @@ import {
   handleModelDeploymentInit,
   handleModelEvaluation,
   handleModelEvaluationInit,
+  handleModelPrediction,
+  handleModelPredictionInit,
+  handleModelPredictionText,
   handleOutputTable,
   handlePlotOptions,
   handleReverseML,
@@ -107,6 +111,7 @@ const nodeTypes = {
   "Model Deployment": ModelDeploymentNode,
   Text: TextNode,
   "Model Evaluation": ModelEvaluationNode,
+  "Model Prediction": ModelPredictionNode,
 };
 
 const initialNodes = [
@@ -418,6 +423,21 @@ function EditorPage() {
 
       if (typeSource === "Model Evaluation" && typeTarget === "Graph") {
         ok = await handleModelEvaluation(rflow, params, "graph");
+      }
+
+      if (typeSource === "Model" && typeTarget === "Model Prediction") {
+        ok = await handleModelPredictionInit(rflow, params);
+      }
+
+      if (
+        typeSource === "Model Prediction" &&
+        (typeTarget === "Graph" || typeTarget === "Table")
+      ) {
+        ok = await handleModelPrediction(rflow, params);
+      }
+
+      if (typeSource === "Model Prediction" && typeTarget === "Text") {
+        ok = await handleModelPredictionText(rflow, params);
       }
 
       if (!ok) return;

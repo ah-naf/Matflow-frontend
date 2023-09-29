@@ -160,7 +160,7 @@ export const handlePlotOptions = async (rflow, params) => {
 export const handleReverseML = async (rflow, params) => {
   try {
     const { table, reverseml } = rflow.getNode(params.source).data;
-    console.log("first");
+    // console.log("first");
     if (!table) throw new Error("Check your file in upload node.");
     const res = await fetch("http://127.0.0.1:8000/api/reverseml/", {
       method: "POST",
@@ -234,7 +234,7 @@ export const handleTimeSeriesAnalysis = async (rflow, params) => {
   try {
     const { table, timeSeries } = rflow.getNode(params.source).data;
     if (!timeSeries) return;
-    console.log(timeSeries);
+    // console.log(timeSeries);
     const res = await fetch("http://127.0.0.1:8000/api/time_series_analysis/", {
       method: "POST",
       headers: {
@@ -514,7 +514,7 @@ export const handleScaling = async (rflow, params) => {
     });
 
     let data = await res.json();
-    console.log(data);
+    // console.log(data);
     const tempNodes = rflow.getNodes().map((val) => {
       if (val.id === params.target)
         return {
@@ -549,7 +549,7 @@ export const handleEncoding = async (rflow, params) => {
     });
 
     let data = await res.json();
-    console.log(data);
+    // console.log(data);
     const tempNodes = rflow.getNodes().map((val) => {
       if (val.id === params.target)
         return {
@@ -584,7 +584,7 @@ export const handleCluster = async (rflow, params, outputType) => {
     });
 
     let data = await res.json();
-    console.log(data);
+    // console.log(data);
     const tempNodes = rflow.getNodes().map((val) => {
       if (val.id === params.target)
         return {
@@ -800,7 +800,7 @@ export const handleDatasetCorrelation = async (rflow, params, outputType) => {
         const { id, ...rest } = cor[i];
         newData.push({ ...rest, column_name: columnName[i] });
       }
-      console.log({ newData });
+      // console.log({ newData });
       cor = newData;
     } else {
       let ind = 0;
@@ -828,7 +828,7 @@ export const handleDatasetCorrelation = async (rflow, params, outputType) => {
         delete tempData[j][columnNames[i]];
       }
     }
-    console.log(tempData);
+    // console.log(tempData);
     tempData = tempData.filter((val) => Object.keys(val).length !== 0);
 
     cor = tempData;
@@ -891,7 +891,7 @@ export const handleDatasetGroup = async (rflow, params) => {
     });
 
     let { data } = await res.json();
-    console.log(JSON.parse(data));
+    // console.log(JSON.parse(data));
     const tempNodes = rflow.getNodes().map((val) => {
       if (val.id === params.target)
         return {
@@ -1035,7 +1035,7 @@ export const handleImputation = async (rflow, params) => {
     });
 
     let data = await res.json();
-    console.log(data);
+    // console.log(data);
     const tempNodes = rflow.getNodes().map((val) => {
       if (val.id === params.target)
         return {
@@ -1131,7 +1131,7 @@ export const handleTestTrainPrint = async (rflow, params) => {
 export const handleTestTrainDataset = async (rflow, params) => {
   try {
     let testTrain = rflow.getNode(params.source).data;
-    console.log({ testTrain });
+    // console.log({ testTrain });
     if (!testTrain) throw new Error("Check Test-Train Dataset Node.");
     if (rflow.getNode(params.target).type === "Hyper-parameter Optimization") {
       if (!testTrain.regressor)
@@ -1379,17 +1379,6 @@ export const handleModel = async (rflow, params) => {
 
     if (!testTrain || !model_setting) throw new Error("Check Build Model Node");
 
-    console.log({
-      train: testTrain.train,
-      test: testTrain.test,
-      [testTrain.whatKind === "Continuous" ? "regressor" : "classifier"]:
-        testTrain.regressor,
-      type: testTrain.whatKind === "Continuous" ? "regressor" : "classifier",
-      target_var: testTrain.target_variable,
-      ...model_setting,
-      file: testTrain.table,
-    });
-
     const res = await fetch("http://127.0.0.1:8000/api/build_model/", {
       method: "POST",
       headers: {
@@ -1600,6 +1589,175 @@ export const handleModelEvaluation = async (rflow, params, type) => {
       return val;
     });
     rflow.setNodes(tempNodes);
+    return true;
+  } catch (error) {
+    raiseErrorToast(rflow, params, error.message);
+    return false;
+  }
+};
+
+export const handleModelPredictionInit = async (rflow, params, type) => {
+  // console.log("s");
+  try {
+    let { model, testTrain } = rflow.getNode(params.source).data;
+
+    if (!model || !testTrain)
+      throw new Error("Check if the model is built successfully");
+
+    const tempNodes = rflow.getNodes().map((val) => {
+      if (val.id === params.target)
+        return {
+          ...val,
+          data: {
+            ...val.data,
+            model,
+            testTrain,
+            result: "Target Value",
+          },
+        };
+      return val;
+    });
+    rflow.setNodes(tempNodes);
+
+    return true;
+  } catch (error) {
+    raiseErrorToast(rflow, params, error.message);
+    return false;
+  }
+};
+
+export const handleModelPrediction = async (rflow, params) => {
+  // console.log("s");
+  try {
+    let { model, testTrain, result } = rflow.getNode(params.source).data;
+
+    if (!model || !testTrain)
+      throw new Error("Check if the model is built successfully");
+
+    if (!result) throw new Error("Check Model Prediction Node");
+
+    let text = "",
+      table,
+      graph;
+
+    if (model.metrics[result]) {
+      text = `${result}: ${model.metrics[result]}`;
+      const tempNodes = rflow.getNodes().map((val) => {
+        if (val.id === params.target)
+          return {
+            ...val,
+            data: {
+              // ...val.data,
+              type: result,
+              result: text,
+            },
+          };
+        return val;
+      });
+      rflow.setNodes(tempNodes);
+      return true;
+    } else {
+      const res = await fetch("http://127.0.0.1:8000/api/model_prediction/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          "Target Variable": testTrain.target_variable,
+          model: model.metrics_table,
+          file: testTrain.table,
+          Result: result,
+          y_pred: JSON.parse(model.y_pred),
+          type:
+            testTrain.whatKind === "Continuous" ? "regressor" : "classifier",
+          regressor: testTrain.regressor,
+        }),
+      });
+
+      const data = await res.json();
+      if (typeof data === "string") text = data;
+      else {
+        if (data.table) {
+          table = JSON.parse(data.table);
+        }
+        if (data.graph) {
+          graph = JSON.parse(data.graph);
+        }
+      }
+    }
+
+    const tempNodes = rflow.getNodes().map((val) => {
+      if (val.id === params.target)
+        return {
+          ...val,
+          data: {
+            // ...val.data,
+            table,
+            graph,
+            type: result,
+            result: text,
+          },
+        };
+      return val;
+    });
+    rflow.setNodes(tempNodes);
+
+    return true;
+  } catch (error) {
+    raiseErrorToast(rflow, params, error.message);
+    return false;
+  }
+};
+
+export const handleModelPredictionText = async (rflow, params) => {
+  // console.log("s");
+  try {
+    let { model, testTrain, result } = rflow.getNode(params.source).data;
+
+    if (!model || !testTrain)
+      throw new Error("Check if the model is built successfully");
+
+    if (!result) throw new Error("Check Model Prediction Node");
+
+    let text = "";
+
+    if (model.metrics[result]) {
+      text = `${result}: ${model.metrics[result]}`;
+    } else if (result === "Classification Report") {
+      const res = await fetch("http://127.0.0.1:8000/api/model_prediction/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          "Target Variable": testTrain.target_variable,
+          model: model.metrics_table,
+          file: testTrain.table,
+          Result: result,
+          y_pred: JSON.parse(model.y_pred),
+          type:
+            testTrain.whatKind === "Continuous" ? "regressor" : "classifier",
+          regressor: testTrain.regressor,
+        }),
+      });
+
+      const data = await res.json();
+      if (typeof data === "string") text = data;
+    }
+
+    const tempNodes = rflow.getNodes().map((val) => {
+      if (val.id === params.target)
+        return {
+          ...val,
+          data: {
+            type: result,
+            result: text,
+          },
+        };
+      return val;
+    });
+    rflow.setNodes(tempNodes);
+
     return true;
   } catch (error) {
     raiseErrorToast(rflow, params, error.message);

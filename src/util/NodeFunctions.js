@@ -1520,3 +1520,89 @@ export const handleModelDeployment = async (rflow, params) => {
     return false;
   }
 };
+
+export const handleModelEvaluationInit = async (rflow, params) => {
+  try {
+    let { model } = rflow.getNode(params.source).data;
+
+    if (!model) throw new Error("Check if the model is built successfully");
+
+    const tempNodes = rflow.getNodes().map((val) => {
+      if (val.id === params.target)
+        return {
+          ...val,
+          data: {
+            ...val.data,
+            ...model,
+            filtered_column: Object.keys(model.metrics_table),
+          },
+        };
+      return val;
+    });
+    rflow.setNodes(tempNodes);
+    return true;
+  } catch (error) {
+    raiseErrorToast(rflow, params, error.message);
+    return false;
+  }
+};
+
+export const handleModelEvaluation = async (rflow, params, type) => {
+  // console.log("s");
+  try {
+    let model = rflow.getNode(params.source).data;
+
+    if (!model) throw new Error("Check if the model is built successfully");
+
+    // console.log(model);
+
+    const table = model.filtered_column.map((val) => {
+      return {
+        "Column Name": val,
+        Value: model.metrics_table[val],
+      };
+    });
+
+    const file = [{ ...model.metrics_table, name: model.name }];
+
+    let data;
+
+    if (type === "graph") {
+      const res = await fetch("http://127.0.0.1:8000/api/model_evaluation/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          file,
+          "Display Type": "Graph",
+          "Display Result": model.display_result || "All",
+          "Select Orientation": model.orientation || "Vertical",
+          Columns:
+            model.display_result === "Custom"
+              ? model.filtered_column
+              : undefined,
+        }),
+      });
+      data = await res.json();
+      data = JSON.parse(data);
+    }
+
+    const tempNodes = rflow.getNodes().map((val) => {
+      if (val.id === params.target)
+        return {
+          ...val,
+          data: {
+            [type === "table" ? "table" : "graph"]:
+              type === "table" ? table : data,
+          },
+        };
+      return val;
+    });
+    rflow.setNodes(tempNodes);
+    return true;
+  } catch (error) {
+    raiseErrorToast(rflow, params, error.message);
+    return false;
+  }
+};

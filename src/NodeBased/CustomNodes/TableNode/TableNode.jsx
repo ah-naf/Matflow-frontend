@@ -7,6 +7,7 @@ import { Handle, Position } from "reactflow";
 import AgGridComponent from "../../../FunctionBased/Components/AgGridComponent/AgGridComponent";
 
 function TableNode({ id, data }) {
+  // console.log(data)
   const [colDefs, setColDefs] = useState(null);
   const [visible, setVisible] = useState(false);
   const handler = () => setVisible(true);

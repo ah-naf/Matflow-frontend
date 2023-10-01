@@ -24,6 +24,7 @@ import DropRowsColumnNode from "../NodeBased/CustomNodes/DropRowsColumnNode/Drop
 import DuplicateNode from "../NodeBased/CustomNodes/DuplicateNode/DuplicateNode";
 import EDANode from "../NodeBased/CustomNodes/EDANode/EDANode";
 import EncodingNode from "../NodeBased/CustomNodes/EncodingNode/EncodingNode";
+import FeatureSelectionNode from "../NodeBased/CustomNodes/FeatureSelectionNode/FeatureSelectionNode";
 import GroupNode from "../NodeBased/CustomNodes/GroupNode/GroupNode";
 import HyperParameterNode from "../NodeBased/CustomNodes/HyperparameterNode/HyperParameterNode";
 import ImputationNode from "../NodeBased/CustomNodes/ImputationNode/ImputationNode";
@@ -57,6 +58,7 @@ import {
   handleDatasetStatistics,
   handleDropRowColumn,
   handleEncoding,
+  handleFeatureSelection,
   handleFileForMergeDataset,
   handleHyperParameter,
   handleImputation,
@@ -112,6 +114,7 @@ const nodeTypes = {
   Text: TextNode,
   "Model Evaluation": ModelEvaluationNode,
   "Model Prediction": ModelPredictionNode,
+  "Feature Selection": FeatureSelectionNode,
 };
 
 const initialNodes = [
@@ -264,7 +267,8 @@ function EditorPage() {
           typeTarget === "Corelation" ||
           typeTarget === "Group" ||
           typeTarget === "Duplicate" ||
-          typeTarget === "Split Dataset")
+          typeTarget === "Split Dataset" ||
+          typeTarget === "Feature Selection")
       ) {
         ok = await handleOutputTable(rflow, params);
       }
@@ -438,6 +442,13 @@ function EditorPage() {
 
       if (typeSource === "Model Prediction" && typeTarget === "Text") {
         ok = await handleModelPredictionText(rflow, params);
+      }
+
+      if (
+        typeSource === "Feature Selection" &&
+        (typeTarget === "Table" || typeTarget === "Graph")
+      ) {
+        ok = await handleFeatureSelection(rflow, params);
       }
 
       if (!ok) return;

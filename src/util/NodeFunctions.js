@@ -1764,3 +1764,144 @@ export const handleModelPredictionText = async (rflow, params) => {
     return false;
   }
 };
+
+export const handleFeatureSelection = async (rflow, params) => {
+  // console.log("s");
+  try {
+    let { feature_selection } = rflow.getNode(params.source).data;
+
+    if (!feature_selection) throw new Error("Check Feature Selection Node");
+
+    const res = await fetch("http://127.0.0.1:8000/api/feature_selection/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        method: feature_selection.method,
+        k_fold: parseInt(feature_selection.k_fold),
+        target_var: feature_selection.target_var,
+        dataset: feature_selection.csvData,
+        score_func: feature_selection.score_func,
+        best_Kfeature: parseInt(feature_selection.best_Kfeature),
+      }),
+    });
+
+    const Data = await res.json();
+    console.log(Data);
+
+    let graphs = [],
+      tables = [];
+    if (feature_selection.method === "Best Overall Features") {
+      let selectedFeatureData =
+        Data.selected_features.custom_feature_data.group.selected_features_data;
+      let tempResult1 = [];
+      selectedFeatureData.rows.forEach((row) => {
+        let tmp = {};
+        row.forEach((val, ind) => {
+          tmp = { ...tmp, [selectedFeatureData.headers[ind]]: val };
+        });
+        tempResult1.push(tmp);
+      });
+
+      let tempResult = [];
+      let droppedFeature =
+        Data.selected_features.custom_feature_data.group.dropped_features_data;
+      droppedFeature.rows.forEach((row) => {
+        let tmp = {};
+        row.forEach((val, ind) => {
+          tmp = { ...tmp, [droppedFeature.headers[ind]]: val };
+        });
+        tempResult.push(tmp);
+      });
+
+      // For Single Data
+      selectedFeatureData =
+        Data.selected_features.custom_feature_data.single
+          .selected_features_data;
+      let tempResult3 = [];
+      selectedFeatureData.rows.forEach((row) => {
+        let tmp = {};
+        row.forEach((val, ind) => {
+          tmp = { ...tmp, [selectedFeatureData.headers[ind]]: val };
+        });
+        tempResult3.push(tmp);
+      });
+
+      let tempResult4 = [];
+      droppedFeature =
+        Data.selected_features.custom_feature_data.single.dropped_features_data;
+      droppedFeature.rows.forEach((row) => {
+        let tmp = {};
+        row.forEach((val, ind) => {
+          tmp = { ...tmp, [droppedFeature.headers[ind]]: val };
+        });
+        tempResult4.push(tmp);
+      });
+
+      tables = [
+        { heading: "Selected Features: ", table: tempResult1 },
+        { heading: "Dropped Features: ", table: tempResult },
+        { heading: "Selected Features: ", table: tempResult3 },
+        { heading: "Dropped Features: ", table: tempResult4 },
+      ];
+
+      let data = Data.selected_features.graph_data;
+      if (data) {
+        if (data.bar_plot) {
+          graphs.push(JSON.parse(data.bar_plot));
+        }
+        if (data.scatter_plot) {
+          graphs.push(JSON.parse(data.scatter_plot));
+        }
+      }
+      data = Data.selected_features.custom_feature_data.single.graph_data;
+      graphs.push(data);
+    } else if (feature_selection.method === "SelectKBest") {
+      let data = Data.selected_features;
+
+      tables.push({
+        heading: "Selected Features and Scores: ",
+        table: data.selected_features,
+      });
+      if (data.graph_data && data.graph_data.bar_plot) {
+        graphs.push(JSON.parse(data.graph_data.bar_plot));
+      }
+      if (data.graph_data && data.graph_data.scatter_plot) {
+        graphs.push(JSON.parse(data.graph_data.scatter_plot));
+      }
+    } else if (feature_selection.method === "Mutual Information") {
+      let data = Data.selected_features;
+      tables.push({
+        heading: "Selected Features and Scores:",
+        table: data.selected_features,
+      });
+      if (data.graph_data && data.graph_data.bar_plot) {
+        graphs.push(JSON.parse(data.graph_data.bar_plot));
+      }
+      if (data.graph_data && data.graph_data.scatter_plot) {
+        graphs.push(JSON.parse(data.graph_data.scatter_plot));
+      }
+    }
+    // console.log({ tables, graphs });
+
+    const tempNodes = rflow.getNodes().map((val) => {
+      if (val.id === params.target)
+        return {
+          ...val,
+          data: {
+            method: "Feature Selection",
+            tables,
+            graphs,
+          },
+        };
+      return val;
+    });
+    rflow.setNodes(tempNodes);
+
+    return true;
+  } catch (error) {
+    raiseErrorToast(rflow, params, error.message);
+    return false;
+  }
+};

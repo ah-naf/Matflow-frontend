@@ -267,7 +267,7 @@ function ModelEvaluation() {
           <Plot
             data={graphData?.data}
             layout={{ ...graphData.layout, showlegend: true }}
-            config={{ scrollZoom: true, editable: true, responsive: true }}
+            config={{ editable: true, responsive: true }}
           />
         </div>
       )}

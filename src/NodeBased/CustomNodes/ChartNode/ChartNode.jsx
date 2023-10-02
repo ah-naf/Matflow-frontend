@@ -7,6 +7,7 @@ import Plot from "react-plotly.js";
 import { Handle, Position } from "reactflow";
 
 function ChartNode({ id, data }) {
+  console.log(data)
   const [visible, setVisible] = useState(false);
   const handler = () => setVisible(true);
   const [isFullScreen, setIsFullScreen] = useState(true);
@@ -73,7 +74,7 @@ function ChartNode({ id, data }) {
                   data.graphs.map((graph, ind) => (
                     <div key={ind} className="flex justify-center my-4">
                       <Plot
-                        data={graph?.data}
+                        data={graph.data}
                         layout={{ ...graph.layout, showlegend: true }}
                         config={{
                           editable: true,

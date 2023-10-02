@@ -1,11 +1,28 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Handle, Position, useReactFlow } from "reactflow";
+import { handleFeatureSelection } from "../../../util/NodeFunctions";
 import UpdateFeatureSelectionNode from "../../UpdateNodes/UpdateFeatureSelectionNode/UpdateFeatureSelectionNode";
 
 function FeatureSelectionNode({ id, data }) {
   console.log(data);
   const [visible, setVisible] = useState(false);
   const rflow = useReactFlow();
+
+  useEffect(() => {
+    (async function () {
+      const temp = rflow
+        .getEdges()
+        .filter(
+          (edge) =>
+            edge.source === id &&
+            (rflow.getNode(edge.target).type === "Table" ||
+              rflow.getNode(edge.target).type === "Graph")
+        );
+      temp.forEach(async (val) => {
+        await handleFeatureSelection(rflow, val);
+      });
+    })();
+  }, [data]);
 
   return (
     <>

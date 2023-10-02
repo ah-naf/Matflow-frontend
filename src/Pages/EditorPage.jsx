@@ -230,9 +230,23 @@ function EditorPage() {
 
   const onConnect = useCallback(
     async (params) => {
+      const source = rflow.getNode(params.source);
+      const target = rflow.getNode(params.target);
       const typeSource = rflow.getNode(params.source).type;
       const typeTarget = rflow.getNode(params.target).type;
       let ok = false;
+
+      setEdges((eds) => {
+        const temp = {
+          ...params,
+          style: { strokeWidth: 1, stroke: "grey" },
+          animated: true,
+        };
+        const allEdges = addEdge(temp, eds);
+        console.log(allEdges)
+        return allEdges;
+      });
+
       if (typeTarget !== "Merge Dataset" && typeTarget !== "Append Dataset") {
         const temp = edgeList.filter((val) => val.target === params.target);
         if (temp && temp.length > 0) {
@@ -451,20 +465,32 @@ function EditorPage() {
         ok = await handleFeatureSelection(rflow, params);
       }
 
-      if (!ok) return;
-      setEdges((eds) => {
-        const temp = {
-          ...params,
-          markerEnd: {
-            type: MarkerType.ArrowClosed,
-            width: 15,
-            height: 15,
-            color: "#000",
-          },
-          style: { strokeWidth: 2, stroke: "#000" },
-        };
-        return addEdge(temp, eds);
+      
+
+      let tempEdge = rflow.getEdges().map((val) => {
+        if (val.source === source.id && val.target === target.id) {
+          return {
+            ...val,
+            animated: false,
+            markerEnd: {
+              type: MarkerType.ArrowClosed,
+              width: 15,
+              height: 15,
+              color: "#000",
+            },
+            style: { strokeWidth: 2, stroke: "#000" },
+          };
+        }
+        return val;
       });
+
+      if (!ok) {
+        tempEdge = tempEdge.filter(
+          (val) => !(val.source === source.id && val.target === target.id)
+        );
+      }
+
+      rflow.setEdges(tempEdge);
     },
 
     [nodes, rflow, edgeList]

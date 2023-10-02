@@ -1766,7 +1766,6 @@ export const handleModelPredictionText = async (rflow, params) => {
 };
 
 export const handleFeatureSelection = async (rflow, params) => {
-  // console.log("s");
   try {
     let { feature_selection } = rflow.getNode(params.source).data;
 

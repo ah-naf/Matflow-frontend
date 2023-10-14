@@ -500,7 +500,10 @@ function EditorPage() {
   );
 
   return (
-    <div className=" flex flex-col md:flex-row flex-1 h-screen bg-slate-200">
+    <div className="flex flex-col md:flex-row flex-1 h-screen bg-slate-200">
+      <Sidebar />
+
+      <EditorTopbar reactFlowInstance={reactFlowInstance} />
       <div
         className="reactflow-wrapper h-full flex-grow"
         ref={reactFlowWrapper}
@@ -518,25 +521,23 @@ function EditorPage() {
           // fitView
           onNodesDelete={onNodesDelete}
           onEdgesDelete={onEdgesDelete}
-          
+          // className="relative"
         >
-          <EditorTopbar />
-          <Sidebar />
           <Background
             color="grey"
             variant={"dots"}
             gap={15}
             className="bg-slate-100"
           />
-          <Panel position="top-right">
+          {/* <Panel position="top-right">
             <button
               className="bg-white p-3 px-6 tracking-wider font-medium shadow-lg rounded border-2 border-black"
               onClick={onSave}
             >
               Save
             </button>
-          </Panel>
-          <Panel position="top-left">
+          </Panel> */}
+          <Panel position="bottom-left">
             <Controls />
           </Panel>
         </ReactFlow>

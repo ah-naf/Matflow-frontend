@@ -9,7 +9,7 @@ function Controls() {
 
   useEffect(() => {
     // console.log(zoom);
-  }, [zoom]);
+  }, [zoom]); 
 
   return (
     <div className="bg-gray-300/30 rounded-lg px-2 py-1 flex items-center text-gray-700/80 group shadow">

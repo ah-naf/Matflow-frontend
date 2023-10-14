@@ -7,7 +7,10 @@ import RemoveCircleOutlineOutlinedIcon from "@mui/icons-material/RemoveCircleOut
 import SplitscreenIcon from "@mui/icons-material/Splitscreen";
 import TextFieldsOutlinedIcon from "@mui/icons-material/TextFieldsOutlined";
 import { Collapse } from "@nextui-org/react";
+import { useState } from "react";
 import {
+  AiOutlineDoubleLeft,
+  AiOutlineDoubleRight,
   AiOutlineGroup,
   AiOutlineLineChart,
   AiOutlineMergeCells,
@@ -15,12 +18,8 @@ import {
 import { BiStats, BiText } from "react-icons/bi";
 import { BsTable } from "react-icons/bs";
 import { GrTableAdd } from "react-icons/gr";
-import {
-  HiOutlineDocumentDuplicate,
-  HiOutlineDocumentReport,
-  HiOutlinePuzzle,
-} from "react-icons/hi";
-import { RiFileEditLine, RiFlowChart } from "react-icons/ri";
+import { HiOutlineDocumentDuplicate, HiOutlinePuzzle } from "react-icons/hi";
+import { RiFileEditLine } from "react-icons/ri";
 import { RxRocket } from "react-icons/rx";
 import { TbCirclesRelation } from "react-icons/tb";
 
@@ -144,23 +143,23 @@ const FUNCTION_NODES = [
     children: [],
   },
 
-  {
-    key: "3",
-    label: "Final Dataset",
-    icon: (
-      <HiOutlineDocumentReport
-        className="text-[rgba(0,0,0,0.54)]"
-        size={"20"}
-      />
-    ),
-    children: [],
-  },
-  {
-    key: "4",
-    label: "Pipeline",
-    icon: <RiFlowChart className="text-[rgba(0,0,0,0.54)]" size={"20"} />,
-    children: [],
-  },
+  // {
+  //   key: "3",
+  //   label: "Final Dataset",
+  //   icon: (
+  //     <HiOutlineDocumentReport
+  //       className="text-[rgba(0,0,0,0.54)]"
+  //       size={"20"}
+  //     />
+  //   ),
+  //   children: [],
+  // },
+  // {
+  //   key: "4",
+  //   label: "Pipeline",
+  //   icon: <RiFlowChart className="text-[rgba(0,0,0,0.54)]" size={"20"} />,
+  //   children: [],
+  // },
   {
     key: "6",
     label: "Model Deployment",
@@ -220,74 +219,47 @@ const Sidebar = () => {
     event.dataTransfer.effectAllowed = "move";
   };
 
+  const [showSidebar, setShowSidebar] = useState(true);
+
   return (
-    <div className="h-screen overflow-y-auto grid place-items-center w-96">
-      <aside className="bg-white h-full w-full p-4 border-l-2 shadow-2xl ">
-        <h3 className="font-bold  text-3xl mb-2">Node Packet</h3>
-        <p className=" mb-4">Drag and Drop nodes onto your editor.</p>
-        <div className="grid gap-4">
-          {/* Input-Output Nodes */}
-          <Collapse.Group bordered>
-            <Collapse
-              title={
-                <h1 className="font-medium tracking-wider">
-                  Input-Output Nodes
-                </h1>
-              }
-            >
-              <div className="grid grid-cols-3 gap-4">
-                {IO_NODES.map((node) => {
-                  return (
-                    <button
-                      key={node.key}
-                      className="grid gap-1 place-items-center border-2 px-2 py-3 rounded-md shadow text-sm "
-                      onDragStart={(event) => onDragStart(event, node.label)}
-                      draggable
-                    >
-                      {node.icon && <span>{node.icon}</span>}
-                      <span className="text-xs">{node.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </Collapse>
-          </Collapse.Group>
-
-          {/* Dataset Nodes */}
-          <Collapse.Group bordered>
-            <Collapse
-              title={
-                <h1 className="font-medium tracking-wider">Dataset Nodes</h1>
-              }
-            >
-              <div className="grid grid-cols-3 gap-4">
-                {DATASET_NODES.map((node) => {
-                  return (
-                    <button
-                      key={node.key}
-                      className="grid gap-1 place-items-center border-2 px-2 py-3 rounded-md shadow text-sm "
-                      onDragStart={(event) => onDragStart(event, node.label)}
-                      draggable
-                    >
-                      {node.icon && <span>{node.icon}</span>}
-                      <span className="text-xs">{node.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </Collapse>
-          </Collapse.Group>
-
-          {/* Function Nodes */}
-          <Collapse.Group bordered>
-            <Collapse
-              title={
-                <h1 className="font-medium tracking-wider">Function Nodes</h1>
-              }
-            >
-              <div className="grid grid-cols-3 gap-4">
-                {FUNCTION_NODES.map((node) => {
-                  if (node.children.length === 0) {
+    <div className="absolute w-96 h-full z-[999] top-[60px]">
+      {!showSidebar && (
+        <button
+          className="absolute top-1/2 -translate-y-1/2 z-[9999] translate-x-1/2 border p-1.5 bg-white shadow-xl rounded"
+          onClick={() => setShowSidebar(!showSidebar)}
+        >
+          <AiOutlineDoubleRight />
+        </button>
+      )}
+      <div
+        className={` relative overflow-y-auto grid place-items-center w-96 ${
+          !showSidebar ? "w-0" : ""
+        } transition-[width]`}
+        style={{ height: "calc(100vh - 60px)" }}
+      >
+        {showSidebar && (
+          <button
+            onClick={() => setShowSidebar(!showSidebar)}
+            className="absolute z-[50] right-0 top-0 translate-y-1/2 -translate-x-1/2 border p-1 px-1.5 border-gray-400/70 rounded text-gray-700 "
+          >
+            <AiOutlineDoubleLeft size="15" />
+          </button>
+        )}
+        <aside className="bg-white h-full w-full p-4 border-l-2 shadow-2xl ">
+          <h3 className="font-bold  text-3xl mb-2">Node Packet</h3>
+          <p className=" mb-4">Drag and Drop nodes onto your editor.</p>
+          <div className="grid gap-4">
+            {/* Input-Output Nodes */}
+            <Collapse.Group bordered>
+              <Collapse
+                title={
+                  <h1 className="font-medium tracking-wider">
+                    Input-Output Nodes
+                  </h1>
+                }
+              >
+                <div className="grid grid-cols-3 gap-4">
+                  {IO_NODES.map((node) => {
                     return (
                       <button
                         key={node.key}
@@ -299,63 +271,117 @@ const Sidebar = () => {
                         <span className="text-xs">{node.label}</span>
                       </button>
                     );
-                  }
-                })}
-              </div>
-            </Collapse>
-          </Collapse.Group>
+                  })}
+                </div>
+              </Collapse>
+            </Collapse.Group>
 
-          {/* Feature Engineering Nodes */}
-          <Collapse.Group bordered>
-            <Collapse
-              title={
-                <h1 className="font-medium tracking-wider">
-                  Feature Engineering
-                </h1>
-              }
-            >
-              <div className="grid grid-cols-3 gap-4">
-                {FEATURE_ENGINEERING.map((node) => (
-                  <button
-                    className="grid gap-1 place-items-center border-2 px-2 py-3 rounded-md shadow text-sm "
-                    onDragStart={(event) => onDragStart(event, node.label)}
-                    draggable
-                    key={node.key}
-                  >
-                    {node.icon && <span>{node.icon}</span>}
-                    <span className="text-xs">{node.label}</span>
-                  </button>
-                ))}
-              </div>
-            </Collapse>
-          </Collapse.Group>
+            {/* Dataset Nodes */}
+            <Collapse.Group bordered>
+              <Collapse
+                title={
+                  <h1 className="font-medium tracking-wider">Dataset Nodes</h1>
+                }
+              >
+                <div className="grid grid-cols-3 gap-4">
+                  {DATASET_NODES.map((node) => {
+                    return (
+                      <button
+                        key={node.key}
+                        className="grid gap-1 place-items-center border-2 px-2 py-3 rounded-md shadow text-sm "
+                        onDragStart={(event) => onDragStart(event, node.label)}
+                        draggable
+                      >
+                        {node.icon && <span>{node.icon}</span>}
+                        <span className="text-xs">{node.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </Collapse>
+            </Collapse.Group>
 
-          {/* Model Building Nodes */}
-          <Collapse.Group bordered>
-            <Collapse
-              title={
-                <h1 className="font-medium tracking-wider">
-                  Model Building Nodes
-                </h1>
-              }
-            >
-              <div className="grid grid-cols-3 gap-4">
-                {MODEL_BUILDING.map((node) => (
-                  <button
-                    className="grid gap-1 place-items-center border-2 px-2 py-3 rounded-md shadow text-sm "
-                    onDragStart={(event) => onDragStart(event, node.label)}
-                    draggable
-                    key={node.key}
-                  >
-                    {node.icon && <span>{node.icon}</span>}
-                    <span className="text-xs">{node.label}</span>
-                  </button>
-                ))}
-              </div>
-            </Collapse>
-          </Collapse.Group>
-        </div>
-      </aside>
+            {/* Function Nodes */}
+            <Collapse.Group bordered>
+              <Collapse
+                title={
+                  <h1 className="font-medium tracking-wider">Function Nodes</h1>
+                }
+              >
+                <div className="grid grid-cols-3 gap-4">
+                  {FUNCTION_NODES.map((node) => {
+                    if (node.children.length === 0) {
+                      return (
+                        <button
+                          key={node.key}
+                          className="grid gap-1 place-items-center border-2 px-2 py-3 rounded-md shadow text-sm "
+                          onDragStart={(event) =>
+                            onDragStart(event, node.label)
+                          }
+                          draggable
+                        >
+                          {node.icon && <span>{node.icon}</span>}
+                          <span className="text-xs">{node.label}</span>
+                        </button>
+                      );
+                    }
+                  })}
+                </div>
+              </Collapse>
+            </Collapse.Group>
+
+            {/* Feature Engineering Nodes */}
+            <Collapse.Group bordered>
+              <Collapse
+                title={
+                  <h1 className="font-medium tracking-wider">
+                    Feature Engineering
+                  </h1>
+                }
+              >
+                <div className="grid grid-cols-3 gap-4">
+                  {FEATURE_ENGINEERING.map((node) => (
+                    <button
+                      className="grid gap-1 place-items-center border-2 px-2 py-3 rounded-md shadow text-sm "
+                      onDragStart={(event) => onDragStart(event, node.label)}
+                      draggable
+                      key={node.key}
+                    >
+                      {node.icon && <span>{node.icon}</span>}
+                      <span className="text-xs">{node.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </Collapse>
+            </Collapse.Group>
+
+            {/* Model Building Nodes */}
+            <Collapse.Group bordered>
+              <Collapse
+                title={
+                  <h1 className="font-medium tracking-wider">
+                    Model Building Nodes
+                  </h1>
+                }
+              >
+                <div className="grid grid-cols-3 gap-4">
+                  {MODEL_BUILDING.map((node) => (
+                    <button
+                      className="grid gap-1 place-items-center border-2 px-2 py-3 rounded-md shadow text-sm "
+                      onDragStart={(event) => onDragStart(event, node.label)}
+                      draggable
+                      key={node.key}
+                    >
+                      {node.icon && <span>{node.icon}</span>}
+                      <span className="text-xs">{node.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </Collapse>
+            </Collapse.Group>
+          </div>
+        </aside>
+      </div>
     </div>
   );
 };

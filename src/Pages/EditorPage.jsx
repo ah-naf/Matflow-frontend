@@ -44,6 +44,7 @@ import TextNode from "../NodeBased/CustomNodes/TextNode/TextNode";
 import TimeSeriesNode from "../NodeBased/CustomNodes/TimeSeiresNode/TimeSeriesNode";
 import UploadFile from "../NodeBased/CustomNodes/UploadFile/UploadFile";
 import Controls from "../NodeBased/components/Controls/Controls";
+import EditorTopbar from "../NodeBased/components/EditorTopbar/EditorTopbar";
 import Sidebar from "../NodeBased/components/Sidebar/Sidebar";
 import {
   handleAddModify,
@@ -236,17 +237,6 @@ function EditorPage() {
       const typeTarget = rflow.getNode(params.target).type;
       let ok = false;
 
-      setEdges((eds) => {
-        const temp = {
-          ...params,
-          style: { strokeWidth: 1, stroke: "grey" },
-          animated: true,
-        };
-        const allEdges = addEdge(temp, eds);
-        console.log(allEdges)
-        return allEdges;
-      });
-
       if (typeTarget !== "Merge Dataset" && typeTarget !== "Append Dataset") {
         const temp = edgeList.filter((val) => val.target === params.target);
         if (temp && temp.length > 0) {
@@ -263,6 +253,17 @@ function EditorPage() {
           return;
         }
       }
+
+      setEdges((eds) => {
+        const temp = {
+          ...params,
+          style: { strokeWidth: 1, stroke: "grey" },
+          animated: true,
+        };
+        const allEdges = addEdge(temp, eds);
+        // console.log(allEdges)
+        return allEdges;
+      });
 
       if (
         typeSource === "Upload File" &&
@@ -465,32 +466,34 @@ function EditorPage() {
         ok = await handleFeatureSelection(rflow, params);
       }
 
-      
+      if (!ok) return;
 
-      let tempEdge = rflow.getEdges().map((val) => {
-        if (val.source === source.id && val.target === target.id) {
-          return {
-            ...val,
-            animated: false,
-            markerEnd: {
-              type: MarkerType.ArrowClosed,
-              width: 15,
-              height: 15,
-              color: "#000",
-            },
-            style: { strokeWidth: 2, stroke: "#000" },
-          };
+      setTimeout(() => {
+        let tempEdge = rflow.getEdges().map((val) => {
+          if (val.source === source.id && val.target === target.id) {
+            return {
+              ...val,
+              animated: false,
+              markerEnd: {
+                type: MarkerType.ArrowClosed,
+                width: 15,
+                height: 15,
+                color: "#000",
+              },
+              style: { strokeWidth: 2, stroke: "#000" },
+            };
+          }
+          return val;
+        });
+
+        if (!ok) {
+          tempEdge = tempEdge.filter(
+            (val) => !(val.source === source.id && val.target === target.id)
+          );
         }
-        return val;
-      });
 
-      if (!ok) {
-        tempEdge = tempEdge.filter(
-          (val) => !(val.source === source.id && val.target === target.id)
-        );
-      }
-
-      rflow.setEdges(tempEdge);
+        rflow.setEdges(tempEdge);
+      }, 0);
     },
 
     [nodes, rflow, edgeList]
@@ -498,7 +501,6 @@ function EditorPage() {
 
   return (
     <div className=" flex flex-col md:flex-row flex-1 h-screen bg-slate-200">
-      <Sidebar />
       <div
         className="reactflow-wrapper h-full flex-grow"
         ref={reactFlowWrapper}
@@ -516,7 +518,10 @@ function EditorPage() {
           // fitView
           onNodesDelete={onNodesDelete}
           onEdgesDelete={onEdgesDelete}
+          
         >
+          <EditorTopbar />
+          <Sidebar />
           <Background
             color="grey"
             variant={"dots"}

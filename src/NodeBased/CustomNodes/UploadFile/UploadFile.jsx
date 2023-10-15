@@ -3,6 +3,7 @@ import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutl
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Handle, Position, useReactFlow } from "reactflow";
+import { setRightSidebarData } from "../../../Slices/SideBarSlice";
 import { parseCsv } from "../../../util/indexDB";
 
 function UploadFile({ id, data }) {
@@ -12,9 +13,12 @@ function UploadFile({ id, data }) {
 
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    dispatch(setRightSidebarData(data));
+  });
+
   const changeHandler = (event) => {
     event.preventDefault();
-
     setFile(event.target.files[0]);
   };
 

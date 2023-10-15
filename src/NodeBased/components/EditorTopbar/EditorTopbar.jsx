@@ -14,7 +14,7 @@ function EditorTopbar({ reactFlowInstance }) {
   }, [reactFlowInstance]);
 
   return (
-    <div className="absolute top-0 w-screen right-0 flex items-center justify-between p-4 bg-white border-l-2 shadow border-b z-[101]">
+    <div className="absolute top-0 w-screen right-0 flex items-center justify-between p-4 bg-white border-l-2 shadow border-b z-[5555555]">
       <div className="flex items-center gap-2">
         {!showLeftSidebar && (
           <button

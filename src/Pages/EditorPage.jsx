@@ -1,4 +1,11 @@
+import ExpandIcon from "@mui/icons-material/Expand";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
+import {
+  Panel as Pan,
+  PanelGroup,
+  PanelResizeHandle,
+} from "react-resizable-panels";
 import { toast } from "react-toastify";
 import uuid from "react-uuid";
 import ReactFlow, {
@@ -46,6 +53,7 @@ import TimeSeriesNode from "../NodeBased/CustomNodes/TimeSeiresNode/TimeSeriesNo
 import UploadFile from "../NodeBased/CustomNodes/UploadFile/UploadFile";
 import Controls from "../NodeBased/components/Controls/Controls";
 import EditorTopbar from "../NodeBased/components/EditorTopbar/EditorTopbar";
+import OutputPanel from "../NodeBased/components/OutputPanel/OutputPanel";
 import Sidebar from "../NodeBased/components/Sidebar/Sidebar";
 import {
   handleAddModify,
@@ -138,6 +146,17 @@ function EditorPage() {
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
   const rflow = useReactFlow();
   const edgeList = useEdges();
+  const showRightSidebar = useSelector(
+    (state) => state.sideBar.showRightSideBar
+  );
+  const [sidebarWidth, setSidebarWidth] = useState(0);
+  const ref = useRef();
+
+  useEffect(() => {
+    if (ref.current && !showRightSidebar) {
+      ref.current.collapse();
+    }
+  }, [showRightSidebar]);
 
   const onDragOver = useCallback((event) => {
     event.preventDefault();
@@ -500,36 +519,38 @@ function EditorPage() {
   );
 
   return (
-    <div className="flex flex-col md:flex-row flex-1 h-screen bg-slate-200">
-      <Sidebar />
-
+    <div className="flex  flex-col md:flex-row flex-1 h-screen bg-slate-200">
+      <Sidebar onValueChange={setSidebarWidth} />
       <EditorTopbar reactFlowInstance={reactFlowInstance} />
-      <div
-        className="reactflow-wrapper h-full flex-grow"
-        ref={reactFlowWrapper}
-      >
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          onInit={setReactFlowInstance}
-          onDrop={onDrop}
-          onDragOver={onDragOver}
-          nodeTypes={nodeTypes}
-          // fitView
-          onNodesDelete={onNodesDelete}
-          onEdgesDelete={onEdgesDelete}
-          // className="relative"
-        >
-          <Background
-            color="grey"
-            variant={"dots"}
-            gap={15}
-            className="bg-slate-100"
-          />
-          {/* <Panel position="top-right">
+
+      <PanelGroup direction="horizontal">
+        <Pan defaultSize={75} minSize={50}>
+          <div
+            className="reactflow-wrapper h-full flex-grow"
+            ref={reactFlowWrapper}
+          >
+            <ReactFlow
+              nodes={nodes}
+              edges={edges}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
+              onConnect={onConnect}
+              onInit={setReactFlowInstance}
+              onDrop={onDrop}
+              onDragOver={onDragOver}
+              nodeTypes={nodeTypes}
+              // fitView
+              onNodesDelete={onNodesDelete}
+              onEdgesDelete={onEdgesDelete}
+              // className="relative"
+            >
+              <Background
+                color="grey"
+                variant={"dots"}
+                gap={15}
+                className="bg-slate-100"
+              />
+              {/* <Panel position="top-right">
             <button
               className="bg-white p-3 px-6 tracking-wider font-medium shadow-lg rounded border-2 border-black"
               onClick={onSave}
@@ -537,11 +558,30 @@ function EditorPage() {
               Save
             </button>
           </Panel> */}
-          <Panel position="bottom-left">
-            <Controls />
-          </Panel>
-        </ReactFlow>
-      </div>
+              <Panel position="bottom-left">
+                <Controls />
+              </Panel>
+            </ReactFlow>
+          </div>
+        </Pan>
+        <PanelResizeHandle
+          style={{ zIndex: "1000000", width: "4px" }}
+          className="grid place-items-center hover:bg-gray-400 bg-[whitesmoke]"
+        >
+          {/* <div className=" rotate-90 left-0.5 relative border -translate-x-1/2">
+            <ExpandIcon className="!w-5 text-gray-600/70" />
+          </div> */}
+        </PanelResizeHandle>
+        <Pan
+          collapsedSize={0}
+          collapsible={true}
+          defaultSize={25}
+          ref={ref}
+          minSize={5}
+        >
+          <OutputPanel />
+        </Pan>
+      </PanelGroup>
     </div>
   );
 }

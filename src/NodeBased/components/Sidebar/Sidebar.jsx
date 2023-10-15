@@ -7,6 +7,7 @@ import RemoveCircleOutlineOutlinedIcon from "@mui/icons-material/RemoveCircleOut
 import SplitscreenIcon from "@mui/icons-material/Splitscreen";
 import TextFieldsOutlinedIcon from "@mui/icons-material/TextFieldsOutlined";
 import { Collapse } from "@nextui-org/react";
+import { useEffect, useRef } from "react";
 import {
   AiOutlineDoubleLeft,
   AiOutlineFile,
@@ -219,19 +220,27 @@ const IO_NODES = [
   },
 ];
 
-const Sidebar = () => {
+const Sidebar = ({ onValueChange }) => {
   const onDragStart = (event, nodeType) => {
     event.dataTransfer.setData("application/reactflow", nodeType);
     event.dataTransfer.effectAllowed = "move";
   };
   const dispatch = useDispatch();
   const showLeftSidebar = useSelector((state) => state.sideBar.showLeftSideBar);
+  const ref = useRef();
+
+  useEffect(() => {
+    if (ref.current) {
+      onValueChange(ref.current.offsetWidth);
+    }
+  }, [ref.current]);
 
   return (
     <div
       className={`relative top-[70px] z-50 overflow-y-auto grid place-items-center ${
         !showLeftSidebar ? "w-0" : "w-96"
       } transition-[width] border-r shadow `}
+      ref={ref}
       style={{ height: "calc(100vh - 70px)" }}
     >
       {showLeftSidebar && (

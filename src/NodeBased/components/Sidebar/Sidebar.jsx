@@ -9,6 +9,7 @@ import TextFieldsOutlinedIcon from "@mui/icons-material/TextFieldsOutlined";
 import { Collapse } from "@nextui-org/react";
 import {
   AiOutlineDoubleLeft,
+  AiOutlineFile,
   AiOutlineGroup,
   AiOutlineLineChart,
   AiOutlineMergeCells,
@@ -211,6 +212,11 @@ const IO_NODES = [
     label: "Text",
     icon: <BiText className="text-[rgba(0,0,0,0.54)]" size={20} />,
   },
+  {
+    key: "0-0-7",
+    label: "File",
+    icon: <AiOutlineFile className="text-[rgba(0,0,0,0.54)]" size={20} />,
+  },
 ];
 
 const Sidebar = () => {
@@ -223,8 +229,8 @@ const Sidebar = () => {
 
   return (
     <div
-      className={`relative top-[70px] z-50 overflow-y-auto grid place-items-center w-96 ${
-        !showLeftSidebar ? "w-0" : ""
+      className={`relative top-[70px] z-50 overflow-y-auto grid place-items-center ${
+        !showLeftSidebar ? "w-0" : "w-96"
       } transition-[width] border-r shadow `}
       style={{ height: "calc(100vh - 70px)" }}
     >

@@ -25,6 +25,7 @@ import DuplicateNode from "../NodeBased/CustomNodes/DuplicateNode/DuplicateNode"
 import EDANode from "../NodeBased/CustomNodes/EDANode/EDANode";
 import EncodingNode from "../NodeBased/CustomNodes/EncodingNode/EncodingNode";
 import FeatureSelectionNode from "../NodeBased/CustomNodes/FeatureSelectionNode/FeatureSelectionNode";
+import FileNode from "../NodeBased/CustomNodes/FileNode/FileNode";
 import GroupNode from "../NodeBased/CustomNodes/GroupNode/GroupNode";
 import HyperParameterNode from "../NodeBased/CustomNodes/HyperparameterNode/HyperParameterNode";
 import ImputationNode from "../NodeBased/CustomNodes/ImputationNode/ImputationNode";
@@ -116,6 +117,7 @@ const nodeTypes = {
   "Model Evaluation": ModelEvaluationNode,
   "Model Prediction": ModelPredictionNode,
   "Feature Selection": FeatureSelectionNode,
+  File: FileNode,
 };
 
 const initialNodes = [
@@ -222,13 +224,6 @@ function EditorPage() {
     onRestore();
   }, []);
 
-  const onSave = useCallback(() => {
-    if (reactFlowInstance) {
-      const flow = reactFlowInstance.toObject();
-      localStorage.setItem("flow", JSON.stringify(flow));
-    }
-  }, [reactFlowInstance]);
-
   const onConnect = useCallback(
     async (params) => {
       const source = rflow.getNode(params.source);
@@ -266,7 +261,7 @@ function EditorPage() {
       });
 
       if (
-        typeSource === "Upload File" &&
+        (typeSource === "Upload File" || typeSource === "File") &&
         (typeTarget === "Table" ||
           typeTarget === "EDA" ||
           typeTarget === "ReverseML" ||
@@ -289,7 +284,9 @@ function EditorPage() {
       }
 
       if (
-        (typeSource === "EDA" || typeSource === "Upload File") &&
+        (typeSource === "EDA" ||
+          typeSource === "Upload File" ||
+          typeSource === "File") &&
         typeTarget === "Graph"
       ) {
         // console.log(rflow);
@@ -301,7 +298,7 @@ function EditorPage() {
       }
 
       if (
-        typeSource === "Upload File" &&
+        (typeSource === "Upload File" || typeSource === "File") &&
         typeTarget === "Time Series Analysis"
       ) {
         ok = await isItTimeSeriesFile(rflow, params);
@@ -312,37 +309,37 @@ function EditorPage() {
       }
 
       if (
-        typeSource === "Upload File" &&
+        (typeSource === "Upload File" || typeSource === "File") &&
         (typeTarget === "Merge Dataset" || typeTarget === "Append Dataset")
       ) {
         ok = await handleFileForMergeDataset(rflow, params);
       }
 
-      if (typeSource === "Merge Dataset" && typeTarget === "Upload File") {
+      if (typeSource === "Merge Dataset" && typeTarget === "File") {
         ok = await handleMergeDataset(rflow, params);
       }
 
-      if (typeSource === "Add/Modify" && typeTarget === "Upload File") {
+      if (typeSource === "Add/Modify" && typeTarget === "File") {
         ok = await handleAddModify(rflow, params);
       }
 
-      if (typeSource === "Change Dtype" && typeTarget === "Upload File") {
+      if (typeSource === "Change Dtype" && typeTarget === "File") {
         ok = await handleChangeDtype(rflow, params);
       }
 
-      if (typeSource === "Alter Field Name" && typeTarget === "Upload File") {
+      if (typeSource === "Alter Field Name" && typeTarget === "File") {
         ok = await handleAlterFieldName(rflow, params);
       }
 
-      if (typeSource === "Drop Column/Rows" && typeTarget === "Upload File") {
+      if (typeSource === "Drop Column/Rows" && typeTarget === "File") {
         ok = await handleDropRowColumn(rflow, params);
       }
 
-      if (typeSource === "Scaling" && typeTarget === "Upload File") {
+      if (typeSource === "Scaling" && typeTarget === "File") {
         ok = await handleScaling(rflow, params);
       }
 
-      if (typeSource === "Encoding" && typeTarget === "Upload File") {
+      if (typeSource === "Encoding" && typeTarget === "File") {
         ok = await handleEncoding(rflow, params);
       }
 
@@ -354,7 +351,7 @@ function EditorPage() {
         ok = await handleCluster(rflow, params, "graph");
       }
 
-      if (typeSource === "Append Dataset" && typeTarget === "Upload File") {
+      if (typeSource === "Append Dataset" && typeTarget === "File") {
         ok = await handleAppendDataset(rflow, params);
       }
 
@@ -382,11 +379,14 @@ function EditorPage() {
         ok = await handleDatasetDuplicate(rflow, params);
       }
 
-      if (typeSource === "Upload File" && typeTarget === "Imputation") {
+      if (
+        (typeSource === "Upload File" || typeSource === "File") &&
+        typeTarget === "Imputation"
+      ) {
         ok = await handleImputationInit(rflow, params);
       }
 
-      if (typeSource === "Imputation" && typeTarget === "Upload File") {
+      if (typeSource === "Imputation" && typeTarget === "File") {
         ok = await handleImputation(rflow, params);
       }
 
@@ -405,7 +405,7 @@ function EditorPage() {
         ok = await handleTestTrainDataset(rflow, params);
       }
 
-      if (typeSource === "Test-Train Dataset" && typeTarget === "Upload File") {
+      if (typeSource === "Test-Train Dataset" && typeTarget === "File") {
         ok = await handleTestTrainPrint(rflow, params);
       }
 

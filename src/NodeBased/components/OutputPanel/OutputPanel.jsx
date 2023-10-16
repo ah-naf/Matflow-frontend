@@ -5,15 +5,13 @@ import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { NODES } from "../../../util/util";
 import Output from "../Output/Output";
 
-
-
 function OutputPanel() {
   const data = useSelector((state) => state.sideBar.data);
   const nodeType = useSelector((state) => state.sideBar.nodeType);
   const [showData, setShowData] = useState(false);
   const [showConnect, setShowConnect] = useState(true);
 
-  console.log(data)
+  console.log(data);
 
   return (
     <div
@@ -28,11 +26,11 @@ function OutputPanel() {
           minSize={20}
         >
           <div className="py-2">
-            <h3 className="text-lg font-medium tracking-wide">Output</h3>
+            <h3 className="text-lg font-semibold tracking-wide">Output</h3>
             <Output />
           </div>
         </Panel>
-        <PanelResizeHandle className="h-1"></PanelResizeHandle>
+        <PanelResizeHandle className="h-1.5 w-[80%] mx-auto rounded-full bg-gray-500/20"></PanelResizeHandle>
         <Panel
           collapsible={true}
           defaultSize={15}
@@ -43,39 +41,38 @@ function OutputPanel() {
           }}
         >
           <div
-            className={`border-t-2 h-full py-2 mb-2 ${showConnect && "overflow-y-auto"}`}
+            className={`relative  h-full pb-2 mb-2 ${
+              showConnect && "overflow-y-auto"
+            }`}
           >
-            <h3 className="text-lg font-medium tracking-wide">
+            <h3 className="text-lg bg-white font-semibold tracking-wide py-2  sticky top-0 z-[50]">
               Can Connect With
             </h3>
-            {showConnect && nodeType ? (
+            {showConnect && (
               <div
                 className="h-full w-full mt-1"
                 dangerouslySetInnerHTML={{
-                  __html: jsontohtml(NODES[nodeType], {
-                    colors: {
-                      background: "whitesmoke",
-                      keys: "red",
-                      values: {
-                        string: "green",
-                        number: "#FFA500",
-                        comma_colon_quotes: "#9c9c9c",
+                  __html: jsontohtml(
+                    nodeType ? NODES[nodeType] : { msg: "Select a node" },
+                    {
+                      colors: {
+                        background: "whitesmoke",
+                        keys: "red",
+                        values: {
+                          string: "green",
+                          number: "#FFA500",
+                          comma_colon_quotes: "#9c9c9c",
+                        },
                       },
-                    },
-                    bracket_pair_lines: { color: "#bcbcbc" },
-                  }),
+                      bracket_pair_lines: { color: "#bcbcbc" },
+                    }
+                  ),
                 }}
               ></div>
-            ) : (
-              <>
-                {showConnect && (
-                  <p>Select a node to see which node can be connected</p>
-                )}
-              </>
             )}
           </div>
         </Panel>
-        <PanelResizeHandle className="h-1" />
+        <PanelResizeHandle className="h-1.5 w-[80%] mx-auto rounded-full bg-gray-500/20"></PanelResizeHandle>
         <Panel
           onCollapse={(e) => {
             if (e) setShowData(false);
@@ -87,29 +84,32 @@ function OutputPanel() {
           minSize={10}
         >
           <div
-            className={`border-t-2 h-full py-2 ${showData && "overflow-auto"}`}
+            className={` h-full relative pb-2 ${showData && "overflow-auto"}`}
           >
-            <h3 className="text-lg font-medium tracking-wide">Data</h3>
-            {showData && data ? (
+            <h3 className="text-lg bg-white font-semibold tracking-wide py-2  sticky top-0 z-[50]">
+              Data
+            </h3>
+            {showData && (
               <div
                 className="h-full w-full mt-1"
                 dangerouslySetInnerHTML={{
-                  __html: jsontohtml(data, {
-                    colors: {
-                      background: "whitesmoke",
-                      keys: "red",
-                      values: {
-                        string: "green",
-                        number: "#FFA500",
-                        comma_colon_quotes: "#9c9c9c",
+                  __html: jsontohtml(
+                    Object.keys(data).length ? data : { msg: "Select a node" },
+                    {
+                      colors: {
+                        background: "whitesmoke",
+                        keys: "red",
+                        values: {
+                          string: "green",
+                          number: "#FFA500",
+                          comma_colon_quotes: "#9c9c9c",
+                        },
                       },
-                    },
-                    bracket_pair_lines: { color: "#bcbcbc" },
-                  }),
+                      bracket_pair_lines: { color: "#bcbcbc" },
+                    }
+                  ),
                 }}
               ></div>
-            ) : (
-              <>{showData && <p>Select a node to see the data</p>}</>
             )}
           </div>
         </Panel>

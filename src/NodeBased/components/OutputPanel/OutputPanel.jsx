@@ -18,7 +18,7 @@ function OutputPanel() {
       className={`relative top-[70px] z-50 overflow-y-auto w-full transition-[width] border-r shadow-xl bg-white px-3 pb-3`}
       style={{ height: "calc(100vh - 70px)" }}
     >
-      <PanelGroup direction="vertical">
+      <PanelGroup autoSaveId="rightsidebar" direction="vertical">
         <Panel
           collapsible={true}
           defaultSize={60}

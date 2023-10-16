@@ -522,7 +522,7 @@ function EditorPage() {
       <Sidebar onValueChange={setSidebarWidth} />
       <EditorTopbar reactFlowInstance={reactFlowInstance} />
 
-      <PanelGroup direction="horizontal">
+      <PanelGroup autoSaveId="editor" direction="horizontal">
         <Pan defaultSize={75} minSize={50}>
           <div
             className="reactflow-wrapper h-full flex-grow"
@@ -566,11 +566,7 @@ function EditorPage() {
         <PanelResizeHandle
           style={{ zIndex: "70", width: "4px" }}
           className="grid place-items-center hover:bg-gray-400 bg-[whitesmoke]"
-        >
-          {/* <div className=" rotate-90 left-0.5 relative border -translate-x-1/2">
-            <ExpandIcon className="!w-5 text-gray-600/70" />
-          </div> */}
-        </PanelResizeHandle>
+        ></PanelResizeHandle>
         <Pan
           collapsedSize={0}
           collapsible={true}

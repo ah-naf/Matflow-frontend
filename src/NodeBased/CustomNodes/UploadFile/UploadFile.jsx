@@ -3,19 +3,17 @@ import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutl
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Handle, Position, useReactFlow } from "reactflow";
-import { setRightSidebarData } from "../../../Slices/SideBarSlice";
+import { setNodeType, setRightSidebarData } from "../../../Slices/SideBarSlice";
 import { parseCsv } from "../../../util/indexDB";
 
 function UploadFile({ id, data }) {
   const [file, setFile] = useState(null);
   const rflow = useReactFlow();
+  const type = rflow.getNode(id).type;
+  const dispatch = useDispatch();
   const inputRef = useRef(null);
 
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(setRightSidebarData(data));
-  });
+  
 
   const changeHandler = (event) => {
     event.preventDefault();
@@ -76,6 +74,10 @@ function UploadFile({ id, data }) {
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
+      onClick={() => {
+        dispatch(setRightSidebarData(data));
+        dispatch(setNodeType(type));
+      }}
     >
       <Handle type="source" position={Position.Right}></Handle>
       <Handle type="target" position={Position.Left}></Handle>

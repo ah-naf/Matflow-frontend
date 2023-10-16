@@ -2,11 +2,15 @@ import { useEffect, useState } from "react";
 import { Handle, Position, useReactFlow } from "reactflow";
 import { handleModelEvaluation } from "../../../util/NodeFunctions";
 import UpdateModelEvaluationNode from "../../UpdateNodes/UpdateModelEvaluationNode/UpdateModelEvaluationNode";
+import { useDispatch } from "react-redux";
+import { setNodeType, setRightSidebarData } from "../../../Slices/SideBarSlice";
 
 function ModelEvaluationNode({ id, data }) {
   // console.log(data);
   const [visible, setVisible] = useState(false);
   const rflow = useReactFlow();
+  const type = rflow.getNode(id).type;
+  const dispatch = useDispatch();
 
   useEffect(() => {
     (async function () {
@@ -42,6 +46,10 @@ function ModelEvaluationNode({ id, data }) {
         className="flex bg-white border-2 border-black shadow-[6px_6px_0_1px_rgba(0,0,0,0.7)]"
         onDoubleClick={() => {
           setVisible(!visible);
+        }}
+        onClick={() => {
+          dispatch(setRightSidebarData(data));
+          dispatch(setNodeType(type));
         }}
       >
         <Handle type="source" position={Position.Right}></Handle>

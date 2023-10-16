@@ -5,17 +5,20 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { Input } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
 import { GrTableAdd } from "react-icons/gr";
+import { useDispatch } from "react-redux";
 import { Handle, Position, useReactFlow } from "reactflow";
+import { setNodeType, setRightSidebarData } from "../../../Slices/SideBarSlice";
 import { handleAppendDataset } from "../../../util/NodeFunctions";
 
 function AppendDatasetNode({ id, data }) {
-  console.log(data);
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const [visible, setVisible] = useState(false);
   const rflow = useReactFlow();
   const nodeDetails = rflow.getNode(id);
   const [dataset_name, setDatasetName] = useState("");
+  const type = nodeDetails.type;
+  const dispatch = useDispatch();
 
   useEffect(() => {
     (async function () {
@@ -66,6 +69,10 @@ function AppendDatasetNode({ id, data }) {
         className="flex bg-white border-2 border-black shadow-[6px_6px_0_1px_rgba(0,0,0,0.7)]"
         onDoubleClick={() => {
           setVisible(!visible);
+        }}
+        onClick={() => {
+          dispatch(setRightSidebarData(data));
+          dispatch(setNodeType(type));
         }}
       >
         <Handle type="source" position={Position.Right}></Handle>

@@ -3,9 +3,11 @@ import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
 import { Modal } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
 import { BsTable } from "react-icons/bs";
-import { Handle, Position } from "reactflow";
+import { useDispatch } from "react-redux";
+import { Handle, Position, useReactFlow } from "reactflow";
 import AgGridAutoDataComponent from "../../../FunctionBased/Components/AgGridComponent/AgGridAutoDataComponent";
 import AgGridComponent from "../../../FunctionBased/Components/AgGridComponent/AgGridComponent";
+import { setNodeType, setRightSidebarData } from "../../../Slices/SideBarSlice";
 
 function TableNode({ id, data }) {
   // console.log(data)
@@ -13,6 +15,9 @@ function TableNode({ id, data }) {
   const [visible, setVisible] = useState(false);
   const handler = () => setVisible(true);
   const [isFullScreen, setIsFullScreen] = useState(true);
+  const rflow = useReactFlow();
+  const type = rflow.getNode(id).type;
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (data && data.table) {
@@ -45,6 +50,10 @@ function TableNode({ id, data }) {
       <div
         className="flex bg-white border-2 border-black shadow-[6px_6px_0_1px_rgba(0,0,0,0.7)]"
         onDoubleClick={handler}
+        onClick={() => {
+          dispatch(setRightSidebarData(data));
+          dispatch(setNodeType(type));
+        }}
       >
         {/* <Handle type="source" position={Position.Right}></Handle> */}
         <Handle type="target" position={Position.Left}></Handle>

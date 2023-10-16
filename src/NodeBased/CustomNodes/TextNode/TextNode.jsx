@@ -5,6 +5,8 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import React, { useEffect, useState } from "react";
 import { BiText } from "react-icons/bi";
 import { Handle, Position, useReactFlow } from "reactflow";
+import { setNodeType, setRightSidebarData } from "../../../Slices/SideBarSlice";
+import { useDispatch } from "react-redux";
 
 function TextNode({ id, data }) {
   // console.log(data);
@@ -13,6 +15,8 @@ function TextNode({ id, data }) {
   const theme = useTheme();
   const [result, setResult] = useState("");
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  const type = rflow.getNode(id).type;
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (data && data.type === "Classification Report") {
@@ -27,6 +31,10 @@ function TextNode({ id, data }) {
         className="flex bg-white border-2 border-black shadow-[6px_6px_0_1px_rgba(0,0,0,0.7)]"
         onDoubleClick={() => {
           setVisible(!visible);
+        }}
+        onClick={() => {
+          dispatch(setRightSidebarData(data));
+          dispatch(setNodeType(type));
         }}
       >
         <Handle type="target" position={Position.Left}></Handle>

@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { TbCirclesRelation } from "react-icons/tb";
+import { useDispatch } from "react-redux";
 import { Handle, Position, useReactFlow } from "reactflow";
 import { handleDatasetCorrelation } from "../../../util/NodeFunctions";
 import UpdateCorelationNode from "../../UpdateNodes/UpdateCorelationNode/UpdateCorelationNode";
+import { setNodeType, setRightSidebarData } from "../../../Slices/SideBarSlice";
 
 function CorelationNode({ id, data }) {
-  console.log(data);
   const [visible, setVisible] = useState(false);
   const rflow = useReactFlow();
+  const type = rflow.getNode(id).type;
+  const dispatch = useDispatch();
 
   useEffect(() => {
     (async function () {
@@ -41,6 +44,10 @@ function CorelationNode({ id, data }) {
         className="flex bg-white border-2 border-black shadow-[6px_6px_0_1px_rgba(0,0,0,0.7)]"
         onDoubleClick={() => {
           setVisible(!visible);
+        }}
+        onClick={() => {
+          dispatch(setRightSidebarData(data));
+          dispatch(setNodeType(type));
         }}
       >
         <Handle type="source" position={Position.Right}></Handle>

@@ -4,10 +4,14 @@ import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
 import { Modal } from "@nextui-org/react";
 import React, { useState } from "react";
 import Plot from "react-plotly.js";
-import { Handle, Position } from "reactflow";
+import { useDispatch } from "react-redux";
+import { Handle, Position, useReactFlow } from "reactflow";
+import { setNodeType, setRightSidebarData } from "../../../Slices/SideBarSlice";
 
 function ChartNode({ id, data }) {
-  console.log(data)
+  const rflow = useReactFlow();
+  const type = rflow.getNode(id).type;
+  const dispatch = useDispatch();
   const [visible, setVisible] = useState(false);
   const handler = () => setVisible(true);
   const [isFullScreen, setIsFullScreen] = useState(true);
@@ -21,6 +25,10 @@ function ChartNode({ id, data }) {
       <div
         className="flex bg-white border-2 border-black shadow-[6px_6px_0_1px_rgba(0,0,0,0.7)]"
         onDoubleClick={handler}
+        onClick={() => {
+          dispatch(setRightSidebarData(data));
+          dispatch(setNodeType(type));
+        }}
       >
         {/* <Handle type="source" position={Position.Right}></Handle> */}
         <Handle type="target" position={Position.Left}></Handle>

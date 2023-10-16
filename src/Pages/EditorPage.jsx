@@ -1,4 +1,3 @@
-import ExpandIcon from "@mui/icons-material/Expand";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import {
@@ -565,7 +564,7 @@ function EditorPage() {
           </div>
         </Pan>
         <PanelResizeHandle
-          style={{ zIndex: "1000000", width: "4px" }}
+          style={{ zIndex: "70", width: "4px" }}
           className="grid place-items-center hover:bg-gray-400 bg-[whitesmoke]"
         >
           {/* <div className=" rotate-90 left-0.5 relative border -translate-x-1/2">

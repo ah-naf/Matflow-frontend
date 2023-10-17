@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Panel as Pan,
   PanelGroup,
@@ -54,6 +54,7 @@ import Controls from "../NodeBased/components/Controls/Controls";
 import EditorTopbar from "../NodeBased/components/EditorTopbar/EditorTopbar";
 import OutputPanel from "../NodeBased/components/OutputPanel/OutputPanel";
 import Sidebar from "../NodeBased/components/Sidebar/Sidebar";
+import { setNodeType, setRightSidebarData } from "../Slices/SideBarSlice";
 import {
   handleAddModify,
   handleAlterFieldName,
@@ -150,6 +151,7 @@ function EditorPage() {
   );
   const [sidebarWidth, setSidebarWidth] = useState(0);
   const ref = useRef();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (ref.current && !showRightSidebar) {
@@ -196,24 +198,25 @@ function EditorPage() {
   const onEdgesDelete = (e) => {
     const sourceNode = rflow.getNode(e[0].source);
     const targetNode = rflow.getNode(e[0].target);
-
-    if (
-      sourceNode.type === "Upload File" &&
-      targetNode.type === "Merge Dataset"
-    ) {
-      const tempNodes = rflow.getNodes().map((val) => {
-        if (val.id === targetNode.id) {
-          delete val.data[sourceNode.data.file_name];
-          if (val.data.merge && Object.keys(val.data).length <= 2) {
-            delete val.data.merge;
-          }
-        }
-        return val;
-      });
-      console.log(tempNodes);
-      rflow.setNodes(tempNodes);
-      return;
-    }
+    dispatch(setRightSidebarData(undefined));
+    dispatch(setNodeType(""));
+    // if (
+    //   sourceNode.type === "Upload File" &&
+    //   targetNode.type === "Merge Dataset"
+    // ) {
+    //   const tempNodes = rflow.getNodes().map((val) => {
+    //     if (val.id === targetNode.id) {
+    //       delete val.data[sourceNode.data.file_name];
+    //       if (val.data.merge && Object.keys(val.data).length <= 2) {
+    //         delete val.data.merge;
+    //       }
+    //     }
+    //     return val;
+    //   });
+    //   console.log(tempNodes);
+    //   rflow.setNodes(tempNodes);
+    //   return;
+    // }
 
     const tempNodes = rflow.getNodes().map((val) => {
       if (val.id === e[0].target) return { ...val, data: undefined };

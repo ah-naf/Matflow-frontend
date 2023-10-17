@@ -10,8 +10,7 @@ function OutputPanel() {
   const nodeType = useSelector((state) => state.sideBar.nodeType);
   const [showData, setShowData] = useState(false);
   const [showConnect, setShowConnect] = useState(true);
-
-  console.log(data);
+  const [showOutput, setShowOutput] = useState(true);
 
   return (
     <div
@@ -22,12 +21,22 @@ function OutputPanel() {
         <Panel
           collapsible={true}
           defaultSize={60}
-          collapsedSize={4}
+          collapsedSize={5}
           minSize={20}
+          onCollapse={(e) => {
+            if (e) setShowOutput(false);
+            else setShowOutput(true);
+          }}
         >
-          <div className="py-2">
-            <h3 className="text-lg font-semibold tracking-wide">Output</h3>
-            <Output />
+          <div
+            className={`relative  h-full pb-2 mb-2 ${
+              showOutput && "overflow-y-auto"
+            }`}
+          >
+            <h3 className="text-lg bg-white font-semibold tracking-wide py-2  sticky top-0 z-[50]">
+              Output
+            </h3>
+            {showOutput && <Output outputData={{ type: nodeType, data }} />}
           </div>
         </Panel>
         <PanelResizeHandle className="h-1.5 w-[80%] mx-auto rounded-full bg-gray-500/20"></PanelResizeHandle>

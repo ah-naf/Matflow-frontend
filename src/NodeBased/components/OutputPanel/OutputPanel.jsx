@@ -103,7 +103,9 @@ function OutputPanel() {
                 className="h-full w-full mt-1"
                 dangerouslySetInnerHTML={{
                   __html: jsontohtml(
-                    Object.keys(data).length ? data : { msg: "Select a node" },
+                    data && Object.keys(data).length
+                      ? data
+                      : { msg: "Select a node" },
                     {
                       colors: {
                         background: "whitesmoke",

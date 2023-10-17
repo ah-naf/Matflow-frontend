@@ -22,8 +22,11 @@ const TABLE = [
 function Output({ outputData: { data, type } }) {
   console.log({ data, type });
 
-  if (!data || !type)
+  if (!type)
     return <h1 className="text-lg mt-1">Select a node to see the output</h1>;
+
+  if (!data)
+    return <h1 className="text-lg mt-1">No data found.</h1>;
 
   if (TABLE.includes(type))
     return (

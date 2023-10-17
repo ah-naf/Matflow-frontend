@@ -5,9 +5,9 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { Input } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
 import { GrTableAdd } from "react-icons/gr";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Handle, Position, useReactFlow } from "reactflow";
-import { setNodeType, setRightSidebarData } from "../../../Slices/SideBarSlice";
+import { setActiveID, setNodeType, setRightSidebarData } from "../../../Slices/SideBarSlice";
 import { handleAppendDataset } from "../../../util/NodeFunctions";
 
 function AppendDatasetNode({ id, data }) {
@@ -19,6 +19,7 @@ function AppendDatasetNode({ id, data }) {
   const [dataset_name, setDatasetName] = useState("");
   const type = nodeDetails.type;
   const dispatch = useDispatch();
+  const activeID = useSelector((state) => state.sideBar.active_id);
 
   useEffect(() => {
     (async function () {
@@ -66,13 +67,14 @@ function AppendDatasetNode({ id, data }) {
   return (
     <>
       <div
-        className="flex bg-white border-2 border-black shadow-[6px_6px_0_1px_rgba(0,0,0,0.7)]"
+        className="relative flex bg-white border-2 border-black shadow-[6px_6px_0_1px_rgba(0,0,0,0.7)]"
         onDoubleClick={() => {
           setVisible(!visible);
         }}
         onClick={() => {
           dispatch(setRightSidebarData(data));
           dispatch(setNodeType(type));
+          dispatch(setActiveID(id));
         }}
       >
         <Handle type="source" position={Position.Right}></Handle>
@@ -88,6 +90,9 @@ function AppendDatasetNode({ id, data }) {
           className="top-16"
           position={Position.Left}
         ></Handle>
+        {activeID === id && (
+          <div className="absolute w-2.5 h-2.5 rounded-full top-0 left-0 translate-x-1/2 translate-y-1/2 bg-green-700"></div>
+        )}
         <div className="grid place-items-center gap-1 p-2 py-3 min-w-[80px]">
           <GrTableAdd size={"20"} />
           <span>Append Dataset</span>

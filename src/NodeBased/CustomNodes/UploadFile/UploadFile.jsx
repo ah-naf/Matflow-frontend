@@ -84,7 +84,7 @@ function UploadFile({ id, data }) {
       <Handle type="source" position={Position.Right}></Handle>
       <Handle type="target" position={Position.Left}></Handle>
       {activeID === id && (
-        <div className="absolute w-2.5 h-2.5 rounded-full top-0 left-0 translate-x-1/2 translate-y-1/2 bg-green-600"></div>
+        <div className="absolute w-2.5 h-2.5 rounded-full top-0 left-0 translate-x-1/2 translate-y-1/2 bg-green-700"></div>
       )}
       {!data || !data.file_name ? (
         <div className="grid place-items-center p-2">

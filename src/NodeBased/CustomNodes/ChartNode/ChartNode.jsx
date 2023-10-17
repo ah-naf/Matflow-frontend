@@ -4,9 +4,13 @@ import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
 import { Modal } from "@nextui-org/react";
 import React, { useState } from "react";
 import Plot from "react-plotly.js";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Handle, Position, useReactFlow } from "reactflow";
-import { setNodeType, setRightSidebarData } from "../../../Slices/SideBarSlice";
+import {
+  setActiveID,
+  setNodeType,
+  setRightSidebarData,
+} from "../../../Slices/SideBarSlice";
 
 function ChartNode({ id, data }) {
   const rflow = useReactFlow();
@@ -15,6 +19,7 @@ function ChartNode({ id, data }) {
   const [visible, setVisible] = useState(false);
   const handler = () => setVisible(true);
   const [isFullScreen, setIsFullScreen] = useState(true);
+  const activeID = useSelector((state) => state.sideBar.active_id);
 
   const closeHandler = () => {
     setVisible(false);
@@ -23,15 +28,19 @@ function ChartNode({ id, data }) {
   return (
     <>
       <div
-        className="flex bg-white border-2 border-black shadow-[6px_6px_0_1px_rgba(0,0,0,0.7)]"
+        className="relative flex bg-white border-2 border-black shadow-[6px_6px_0_1px_rgba(0,0,0,0.7)]"
         onDoubleClick={handler}
         onClick={() => {
           dispatch(setRightSidebarData(data));
           dispatch(setNodeType(type));
+          dispatch(setActiveID(id));
         }}
       >
         {/* <Handle type="source" position={Position.Right}></Handle> */}
         <Handle type="target" position={Position.Left}></Handle>
+        {activeID === id && (
+          <div className="absolute w-2.5 h-2.5 rounded-full top-0 left-0 translate-x-1/2 translate-y-1/2 bg-green-700"></div>
+        )}
         <div className="grid place-items-center p-2 py-3 min-w-[80px]">
           <AutoGraphOutlinedIcon />
           <span>Graph</span>

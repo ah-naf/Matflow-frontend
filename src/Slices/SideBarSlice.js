@@ -7,7 +7,8 @@ export const SideBarSlice = createSlice({
     showRightSideBar: true,
     activeFunction: "Display",
     data: {},
-    nodeType: ''
+    nodeType: '',
+    active_id: ''
   },
   reducers: {
     setShowLeftSideBar: (state, { payload }) => {
@@ -24,12 +25,15 @@ export const SideBarSlice = createSlice({
     },
     setNodeType: (state, {payload}) => {
       state.nodeType = payload;
+    },
+    setActiveID: (state, {payload}) => {
+      state.active_id = payload
     }
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { setShowLeftSideBar, setActiveFunction, setShowRightSideBar, setRightSidebarData, setNodeType } =
+export const { setShowLeftSideBar, setActiveFunction, setShowRightSideBar, setRightSidebarData, setNodeType, setActiveID } =
   SideBarSlice.actions;
 
 export default SideBarSlice.reducer;

@@ -14,7 +14,9 @@ const TABLE = [
   "Feature Selection",
   "Cluster",
   "Add/Modify",
-  "Upload File"
+  "Upload File",
+  "ReverseML",
+  "Time Series Analysis",
 ];
 
 function Output({ outputData: { data, type } }) {

@@ -1,4 +1,5 @@
 import { Collapse } from "@nextui-org/react";
+import { jsontohtml } from "jsontohtml-render";
 import React from "react";
 import AgGridAutoDataComponent from "../../../FunctionBased/Components/AgGridComponent/AgGridAutoDataComponent";
 
@@ -21,12 +22,48 @@ const TABLE = [
 ];
 
 function Output({ outputData: { data, type } }) {
-  console.log({ data, type });
+  let model_setting;
+
+  if (type === "Build Model") {
+    model_setting = data.model_setting;
+    data = data.testTrain;
+  }
 
   if (!type)
     return <h1 className="text-lg mt-1">Select a node to see the output</h1>;
 
   if (!data) return <h1 className="text-lg mt-1">No data found.</h1>;
+
+  const renderModelSetting = () => {
+    return (
+      <Collapse.Group bordered className="mt-2">
+        <Collapse
+          title={<h1 className="font-medium tracking-wider">Model Setting</h1>}
+        >
+          <div
+            className="h-full w-full mt-1"
+            dangerouslySetInnerHTML={{
+              __html: jsontohtml(
+                model_setting ? model_setting : { msg: "No data found" },
+                {
+                  colors: {
+                    background: "whitesmoke",
+                    keys: "red",
+                    values: {
+                      string: "green",
+                      number: "#FFA500",
+                      comma_colon_quotes: "#9c9c9c",
+                    },
+                  },
+                  bracket_pair_lines: { color: "#bcbcbc" },
+                }
+              ),
+            }}
+          ></div>
+        </Collapse>
+      </Collapse.Group>
+    );
+  };
 
   if (TABLE.includes(type))
     return (
@@ -82,7 +119,7 @@ function Output({ outputData: { data, type } }) {
       </>
     );
 
-  if (type === "Test-Train Dataset")
+  if (type === "Test-Train Dataset" || type === "Build Model")
     return (
       <>
         {["table", "test", "train"].map((val, ind) => (
@@ -127,6 +164,7 @@ function Output({ outputData: { data, type } }) {
             </Collapse>
           </Collapse.Group>
         ))}
+        {type === "Build Model" && renderModelSetting()}
       </>
     );
 }

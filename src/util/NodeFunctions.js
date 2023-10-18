@@ -100,8 +100,6 @@ const raiseErrorToast = (rflow, params, error) => {
   });
 };
 
-
-
 export const handleOutputTable = async (rflow, params) => {
   try {
     const csvFile = rflow.getNode(params.source).data;
@@ -1448,6 +1446,7 @@ export const handleModelDeploymentInit = async (rflow, params) => {
           data: {
             ...val.data,
             table: data.dataframe,
+            table_init: data.dataframe,
             result_init: data.result,
             result: data.result,
             model,

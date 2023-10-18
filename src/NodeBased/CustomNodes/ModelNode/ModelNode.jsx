@@ -5,6 +5,7 @@ import { Handle, Position, useReactFlow } from "reactflow";
 import { setActiveID, setNodeType, setRightSidebarData } from "../../../Slices/SideBarSlice";
 
 function ModelNode({ id, data }) {
+  // console.log(data)
   const rflow = useReactFlow();
   const type = rflow.getNode(id).type;
   const dispatch = useDispatch();

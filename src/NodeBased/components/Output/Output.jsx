@@ -23,9 +23,15 @@ const TABLE = [
 
 function Output({ outputData: { data, type } }) {
   let model_setting;
+  let hyper;
 
-  if (type === "Build Model") {
+  if (
+    type === "Build Model" ||
+    type === "Model" ||
+    type === "Hyper-parameter Optimization"
+  ) {
     model_setting = data.model_setting;
+    hyper = data.hyper;
     data = data.testTrain;
   }
 
@@ -34,30 +40,31 @@ function Output({ outputData: { data, type } }) {
 
   if (!data) return <h1 className="text-lg mt-1">No data found.</h1>;
 
-  const renderModelSetting = () => {
+  const renderModelSetting = (hyperEnabled = false) => {
     return (
       <Collapse.Group bordered className="mt-2">
         <Collapse
-          title={<h1 className="font-medium tracking-wider">Model Setting</h1>}
+          title={
+            <h1 className="font-medium tracking-wider">
+              {hyperEnabled ? "Hyperparameter" : "Model"} Setting
+            </h1>
+          }
         >
           <div
-            className="h-full w-full mt-1"
+            className="h-full w-full mt-1 overflow-auto"
             dangerouslySetInnerHTML={{
-              __html: jsontohtml(
-                model_setting ? model_setting : { msg: "No data found" },
-                {
-                  colors: {
-                    background: "whitesmoke",
-                    keys: "red",
-                    values: {
-                      string: "green",
-                      number: "#FFA500",
-                      comma_colon_quotes: "#9c9c9c",
-                    },
+              __html: jsontohtml(hyperEnabled ? hyper : model_setting, {
+                colors: {
+                  background: "whitesmoke",
+                  keys: "red",
+                  values: {
+                    string: "green",
+                    number: "#FFA500",
+                    comma_colon_quotes: "#9c9c9c",
                   },
-                  bracket_pair_lines: { color: "#bcbcbc" },
-                }
-              ),
+                },
+                bracket_pair_lines: { color: "#bcbcbc" },
+              }),
             }}
           ></div>
         </Collapse>
@@ -119,7 +126,12 @@ function Output({ outputData: { data, type } }) {
       </>
     );
 
-  if (type === "Test-Train Dataset" || type === "Build Model")
+  if (
+    type === "Test-Train Dataset" ||
+    type === "Build Model" ||
+    type === "Model" ||
+    type === "Hyper-parameter Optimization"
+  )
     return (
       <>
         {["table", "test", "train"].map((val, ind) => (
@@ -165,7 +177,32 @@ function Output({ outputData: { data, type } }) {
           </Collapse.Group>
         ))}
         {type === "Build Model" && renderModelSetting()}
+        {type === "Hyper-parameter Optimization" && renderModelSetting(true)}
       </>
+    );
+
+  if (type === "Model Deployment")
+    return (
+      <Collapse.Group bordered className="mt-2">
+        <Collapse
+          title={
+            <h1 className="font-medium tracking-wider">
+              Features
+            </h1>
+          }
+        >
+          <div className=" w-full h-full overflow-auto">
+            <AgGridAutoDataComponent
+              rowData={data.table}
+              download
+              height="500px"
+              rowHeight={40}
+              headerHeight={40}
+              paginationPageSize={10}
+            />
+          </div>
+        </Collapse>
+      </Collapse.Group>
     );
 }
 

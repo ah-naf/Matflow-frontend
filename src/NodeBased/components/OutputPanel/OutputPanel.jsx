@@ -12,6 +12,8 @@ function OutputPanel() {
   const [showConnect, setShowConnect] = useState(true);
   const [showOutput, setShowOutput] = useState(true);
 
+  console.log({ data, nodeType });
+
   return (
     <div
       className={`relative top-[70px] z-50 overflow-y-auto w-full transition-[width] border-r shadow-xl bg-white px-3 pb-3`}

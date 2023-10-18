@@ -1,6 +1,7 @@
 import { Collapse } from "@nextui-org/react";
 import { jsontohtml } from "jsontohtml-render";
 import React from "react";
+import Plot from "react-plotly.js";
 import AgGridAutoDataComponent from "../../../FunctionBased/Components/AgGridComponent/AgGridAutoDataComponent";
 
 const TABLE = [
@@ -24,6 +25,19 @@ const TABLE = [
 function Output({ outputData: { data, type } }) {
   let model_setting;
   let hyper;
+  let graphs;
+  let tables;
+
+  if (data.method && data.method === "Feature Selection") {
+    tables = data.tables;
+  }
+
+  if (type === "Graph") {
+    const tmp = JSON.parse(data);
+    if (tmp.method) graphs = tmp.graphs;
+    else if (tmp.graph) graphs = [tmp.graph];
+    console.log(graphs);
+  }
 
   if (
     type === "Build Model" ||
@@ -72,7 +86,7 @@ function Output({ outputData: { data, type } }) {
     );
   };
 
-  if (TABLE.includes(type))
+  if (TABLE.includes(type) && type === "Table" && !tables && data.table)
     return (
       <Collapse.Group bordered className="mt-2">
         <Collapse title={<h1 className="font-medium tracking-wider">Table</h1>}>
@@ -185,11 +199,7 @@ function Output({ outputData: { data, type } }) {
     return (
       <Collapse.Group bordered className="mt-2">
         <Collapse
-          title={
-            <h1 className="font-medium tracking-wider">
-              Features
-            </h1>
-          }
+          title={<h1 className="font-medium tracking-wider">Features</h1>}
         >
           <div className=" w-full h-full overflow-auto">
             <AgGridAutoDataComponent
@@ -204,6 +214,72 @@ function Output({ outputData: { data, type } }) {
         </Collapse>
       </Collapse.Group>
     );
+
+  if (type === "Graph" && graphs)
+    return (
+      <>
+        {graphs.map((val, ind) => (
+          <Collapse.Group bordered key={ind} className="mt-2">
+            <Collapse
+              title={
+                <h1 className="font-medium tracking-wider">Graph {ind + 1}</h1>
+              }
+            >
+              <div
+                key={ind}
+                className="flex justify-center my-4 overflow-auto w-full h-full"
+              >
+                <Plot
+                  data={val.data}
+                  layout={{
+                    ...val.layout,
+                    showlegend: true,
+                    width: 600,
+                    height: 500,
+                  }}
+                  config={{
+                    editable: true,
+                    responsive: true,
+                    autosizable: true,
+                  }}
+                />
+              </div>
+            </Collapse>
+          </Collapse.Group>
+        ))}
+      </>
+    );
+
+  if (tables) {
+    return (
+      <>
+        {tables.map((val, ind) => (
+          <Collapse.Group bordered key={ind} className="mt-2">
+            <Collapse
+              title={
+                <h1 className="font-medium tracking-wider capitalize">
+                  {val.heading}
+                </h1>
+              }
+            >
+              <div className=" w-full h-full overflow-auto">
+                <AgGridAutoDataComponent
+                  rowData={val.table}
+                  download
+                  height="500px"
+                  rowHeight={40}
+                  headerHeight={40}
+                  paginationPageSize={10}
+                />
+              </div>
+            </Collapse>
+          </Collapse.Group>
+        ))}
+      </>
+    );
+  }
+
+  return <h3>There are no specific output in this node</h3>
 }
 
 export default Output;

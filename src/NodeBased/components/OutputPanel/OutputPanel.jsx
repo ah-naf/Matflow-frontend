@@ -12,7 +12,7 @@ function OutputPanel() {
   const [showConnect, setShowConnect] = useState(true);
   const [showOutput, setShowOutput] = useState(true);
 
-  console.log({ data, nodeType });
+  // console.log({ data, nodeType });
 
   return (
     <div
@@ -38,7 +38,9 @@ function OutputPanel() {
             <h3 className="text-lg bg-white font-semibold tracking-wide py-2  sticky top-0 z-[50]">
               Output
             </h3>
-            {showOutput && <Output outputData={{ type: nodeType, data }} />}
+            {showOutput && data && (
+              <Output outputData={{ type: nodeType, data }} />
+            )}
           </div>
         </Panel>
         <PanelResizeHandle className="h-1.5 w-[80%] mx-auto rounded-full bg-gray-500/20"></PanelResizeHandle>

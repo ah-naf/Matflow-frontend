@@ -13,12 +13,13 @@ import {
 } from "../../../Slices/SideBarSlice";
 
 function ChartNode({ id, data }) {
-  const rflow = useReactFlow();
-  const type = rflow.getNode(id).type;
-  const dispatch = useDispatch();
+  // console.log(data);
   const [visible, setVisible] = useState(false);
   const handler = () => setVisible(true);
   const [isFullScreen, setIsFullScreen] = useState(true);
+  const rflow = useReactFlow();
+  const type = rflow.getNode(id).type;
+  const dispatch = useDispatch();
   const activeID = useSelector((state) => state.sideBar.active_id);
 
   const closeHandler = () => {
@@ -28,10 +29,10 @@ function ChartNode({ id, data }) {
   return (
     <>
       <div
-        className="relative flex bg-white border-2 border-black shadow-[6px_6px_0_1px_rgba(0,0,0,0.7)]"
+        className="flex relative bg-white border-2 border-black shadow-[6px_6px_0_1px_rgba(0,0,0,0.7)]"
         onDoubleClick={handler}
         onClick={() => {
-          dispatch(setRightSidebarData(data));
+          dispatch(setRightSidebarData(JSON.stringify(data)));
           dispatch(setNodeType(type));
           dispatch(setActiveID(id));
         }}

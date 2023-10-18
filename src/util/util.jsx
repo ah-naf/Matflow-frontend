@@ -243,7 +243,7 @@ export let NODES = {
   "Hyper-parameter Optimization": ["Build Model"],
   "Build Model": ["Model"],
   Model: ["Model Deployment", "Model Evaluation", "Model Prediction"],
-  "Model Evalutation": ["Table", "Graph"],
+  "Model Evaluation": ["Table", "Graph"],
   "Model Prediction": ["Graph", "Table", "Text"],
 };
 

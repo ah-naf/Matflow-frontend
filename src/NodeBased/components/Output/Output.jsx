@@ -17,6 +17,7 @@ const TABLE = [
   "Upload File",
   "ReverseML",
   "Time Series Analysis",
+  "Split Dataset",
 ];
 
 function Output({ outputData: { data, type } }) {
@@ -25,8 +26,7 @@ function Output({ outputData: { data, type } }) {
   if (!type)
     return <h1 className="text-lg mt-1">Select a node to see the output</h1>;
 
-  if (!data)
-    return <h1 className="text-lg mt-1">No data found.</h1>;
+  if (!data) return <h1 className="text-lg mt-1">No data found.</h1>;
 
   if (TABLE.includes(type))
     return (
@@ -65,6 +65,54 @@ function Output({ outputData: { data, type } }) {
                 {data[val] && (
                   <h3 className="font-medium text-center text-lg mb-1">
                     File Name: {val}
+                  </h3>
+                )}
+                <AgGridAutoDataComponent
+                  rowData={data[val]}
+                  download
+                  height="500px"
+                  rowHeight={40}
+                  headerHeight={40}
+                  paginationPageSize={10}
+                />
+              </div>
+            </Collapse>
+          </Collapse.Group>
+        ))}
+      </>
+    );
+
+  if (type === "Test-Train Dataset")
+    return (
+      <>
+        {["table", "test", "train"].map((val, ind) => (
+          <Collapse.Group bordered key={ind} className="mt-2">
+            <Collapse
+              title={
+                <h1 className="font-medium tracking-wider capitalize">
+                  {val === "table" ? val : val + " Dataset"}
+                </h1>
+              }
+            >
+              <div className=" w-full h-full overflow-auto">
+                {data[
+                  val === "test"
+                    ? "test_dataset_name"
+                    : val === "train"
+                    ? "train_dataset_name"
+                    : ""
+                ] && (
+                  <h3 className="font-medium text-center text-lg mb-1">
+                    File Name:{" "}
+                    {
+                      data[
+                        val === "test"
+                          ? "test_dataset_name"
+                          : val === "train"
+                          ? "train_dataset_name"
+                          : ""
+                      ]
+                    }
                   </h3>
                 )}
                 <AgGridAutoDataComponent

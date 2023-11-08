@@ -1,7 +1,41 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function Login() {
+  const navigate = useNavigate();
+  const [user, setUser] = useState({
+    email: "",
+    password: "",
+  });
+
+  const handleInputChange = (event) => {
+    setUser((prevState) => {
+      return { ...prevState, [event.target.name]: event.target.value };
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await fetch("http://localhost:8000/api/login/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user),
+      });
+      const response = await res.json();
+      toast.success(response.data.message);
+      setUser({
+        email: "",
+        password: "",
+      });
+      navigate("/dashboard");
+    } catch (error) {
+      toast.error(error);
+    }
+  };
   return (
     <div className="grid place-items-center mt-12">
       <h1 className="text-3xl font-bold mb-12">Already Registered?</h1>
@@ -28,7 +62,11 @@ function Login() {
           <p className="text-sm font-light mb-4">
             If you have an account with us, please login to proceed.
           </p>
-          <form action="" className="flex flex-col items-start">
+          <form
+            onSubmit={handleSubmit}
+            action=""
+            className="flex flex-col items-start"
+          >
             <label
               htmlFor="email"
               className="text-md font-medium text-gray-700"
@@ -38,6 +76,8 @@ function Login() {
             <input
               type="email"
               id="email"
+              onChange={handleInputChange}
+              name="email"
               className="my-2 p-2 rounded outline-none border-2 shadow hover:border-primary-btn hover:border-2 w-full"
               placeholder="Enter your email"
             />
@@ -50,10 +90,15 @@ function Login() {
             <input
               type="password"
               id="password"
+              onChange={handleInputChange}
+              name="password"
               className="my-2 p-2 rounded outline-none border-2 hover:border-primary-btn shadow w-full"
               placeholder="Enter your password"
             />
-            <button className="border-2 mt-4 text-md px-6 py-2 border-primary-btn rounded-md hover:bg-primary-btn hover:text-white">
+            <button
+              className="border-2 mt-4 text-md px-6 py-2 border-primary-btn rounded-md hover:bg-primary-btn hover:text-white"
+              type="submit"
+            >
               Login
             </button>
           </form>
